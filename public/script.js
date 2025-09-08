@@ -894,4 +894,4 @@ socket.on('error', (data) => {
 // Initialize
 showPage('home');
 playerNameInput.focus();
-console.log('Frontend loaded - Threatened by AI v4.7 (Debug Version with Enhanced Logging)');
+console.log('Frontend loaded - Crack and Combat v4.7 (Debug Version with Enhanced Logging)');
