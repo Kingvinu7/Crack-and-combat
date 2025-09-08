@@ -99,6 +99,8 @@ function generateRoomCode() {
 function getRandomRiddle(usedIndices = []) {
     const availableRiddles = gameData.riddles.filter((_, index) => !usedIndices.includes(index));
     if (availableRiddles.length === 0) {
+        // Reset used indices if all riddles have been used
+        console.log('All riddles used, resetting available riddles');
         return { riddle: gameData.riddles[0], index: 0 };
     }
     const randomIndex = Math.floor(Math.random() * availableRiddles.length);
@@ -109,6 +111,10 @@ function getRandomRiddle(usedIndices = []) {
 
 function getRandomOracleMessage(type) {
     const messages = gameData.oraclePersonality[type] || [];
+    if (messages.length === 0) {
+        console.warn(`No oracle messages found for type: ${type}`);
+        return "The Oracle speaks in mysterious ways...";
+    }
     return messages[Math.floor(Math.random() * messages.length)];
 }
 
@@ -214,7 +220,8 @@ async function generateChallengeContent(type, roundNumber) {
             .replace(/^["']|["']$/g, '')
             .replace(/\n+/g, ' ')
             .replace(/\s+/g, ' ')
-            .replace(/[^\w\s.,!?;:()\-'"]/g, '');
+            .replace(/[^\w\s.,!?;:()\-'"]/g, '')
+            .substring(0, 500); // Limit length to prevent extremely long responses
         // Remove special chars that might break UI
         
         // Ensure we have content
@@ -361,7 +368,7 @@ async function startChallengePhase(roomCode) {
         } else {
             // Text-based challenges with 40 seconds
             // Text-based challenges with dynamic time limits
-const challengeContent = await generateChallengeContent(challengeType, room.currentRound);
+let challengeContent = await generateChallengeContent(challengeType, room.currentRound);
 
 // Validate challenge content before sending
 if (!challengeContent || challengeContent.trim().length === 0) {
@@ -727,10 +734,15 @@ io.on('connection', (socket) => {
         startNewRound(data.roomCode);
     });
     socket.on('submit-riddle-answer', (data) => {
-        const room = rooms[data.roomCode];
-        if (!room || room.gameState !== 'riddle-phase') return;
-        const player = room.players.find(p => p.id === socket.id);
-        if (!player) return;
+        try {
+            if (!data || !data.roomCode || !data.answer) {
+                console.warn('Invalid riddle answer submission:', data);
+                return;
+            }
+            const room = rooms[data.roomCode];
+            if (!room || room.gameState !== 'riddle-phase') return;
+            const player = room.players.find(p => p.id === socket.id);
+            if (!player) return;
         if (!room.riddleAnswers[socket.id]) {
             room.riddleAnswers[socket.id] = {
                 answer: data.answer.trim(),
@@ -748,6 +760,10 @@ io.on('connection', (socket) => {
                 console.log('All players submitted riddle answer. Ending riddle phase early.');
                 endRiddlePhase(data.roomCode);
             }
+        }
+        } catch (error) {
+            console.error('Error in submit-riddle-answer:', error);
+            socket.emit('error', { message: 'Failed to submit answer' });
         }
     });
     socket.on('submit-challenge-response', (data) => {
@@ -787,8 +803,15 @@ io.on('connection', (socket) => {
                 const pname = room.players[idx].name;
                 room.players.splice(idx, 1);
                 if (room.players.length === 0) {
-                    clearInterval(room.riddleTimer);
-                    clearTimeout(room.challengeTimer);
+                    // Properly clear all timers to prevent memory leaks
+                    if (room.riddleTimer) {
+                        clearInterval(room.riddleTimer);
+                        room.riddleTimer = null;
+                    }
+                    if (room.challengeTimer) {
+                        clearTimeout(room.challengeTimer);
+                        room.challengeTimer = null;
+                    }
                     delete rooms[roomCode];
                 } else {
                     io.to(roomCode).emit('player-left', {
