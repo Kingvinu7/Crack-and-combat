@@ -18,7 +18,7 @@ if (process.env.GEMINI_API_KEY) {
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Challenge Types (will be shuffled for each game session)
-const BASE_CHALLENGE_TYPES = ['negotiator', 'detective', 'trivia', 'fastTapper', 'danger'];
+const BASE_CHALLENGE_TYPES = ['negotiator', 'detective', 'multipleChoiceTrivia', 'fastTapper', 'danger'];
 
 // Shuffle array function
 function shuffleArray(array) {
@@ -30,7 +30,7 @@ function shuffleArray(array) {
     return shuffled;
 }
 
-// Game Data with 50+ riddles
+// Game Data with 50+ riddles and trivia questions
 const gameData = {
     riddles: [
         { question: "I speak without a mouth and hear without ears. What am I?", answer: "ECHO", difficulty: "easy" },
@@ -89,6 +89,128 @@ const gameData = {
         { question: "What word becomes shorter when you add two letters to it?", answer: "SHORT", difficulty: "hard" },
         { question: "What occurs once in every minute, twice in every moment, yet never in a thousand years?", answer: "M", difficulty: "hard" }
     ],
+    triviaQuestions: [
+        {
+            question: "Which artificial intelligence technique mimics the structure of the human brain?",
+            options: ["Neural Networks", "Decision Trees", "Linear Regression", "K-Means Clustering"],
+            correctAnswer: 0,
+            difficulty: "medium"
+        },
+        {
+            question: "What is the primary component of Earth's atmosphere that AI systems might struggle to process without proper sensors?",
+            options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Argon"],
+            correctAnswer: 2,
+            difficulty: "medium"
+        },
+        {
+            question: "In quantum computing, what phenomenon allows qubits to exist in multiple states simultaneously?",
+            options: ["Entanglement", "Superposition", "Decoherence", "Tunneling"],
+            correctAnswer: 1,
+            difficulty: "above-medium"
+        },
+        {
+            question: "Which programming paradigm treats computation as the evaluation of mathematical functions?",
+            options: ["Object-Oriented", "Procedural", "Functional", "Assembly"],
+            correctAnswer: 2,
+            difficulty: "medium"
+        },
+        {
+            question: "What is the term for AI systems that can perform any intellectual task that humans can do?",
+            options: ["Narrow AI", "General AI", "Super AI", "Weak AI"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "Which cryptographic algorithm is considered quantum-resistant?",
+            options: ["RSA", "ECC", "Lattice-based", "SHA-256"],
+            correctAnswer: 2,
+            difficulty: "above-medium"
+        },
+        {
+            question: "In machine learning, what technique prevents overfitting by randomly setting some neurons to zero during training?",
+            options: ["Batch Normalization", "Dropout", "Regularization", "Cross-validation"],
+            correctAnswer: 1,
+            difficulty: "above-medium"
+        },
+        {
+            question: "What is the maximum theoretical efficiency of a Carnot heat engine operating between 300K and 600K?",
+            options: ["25%", "50%", "75%", "100%"],
+            correctAnswer: 1,
+            difficulty: "above-medium"
+        },
+        {
+            question: "Which data structure provides O(1) average time complexity for insertions, deletions, and lookups?",
+            options: ["Binary Tree", "Hash Table", "Linked List", "Array"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "In cybersecurity, what attack vector exploits the time difference in cryptographic operations?",
+            options: ["SQL Injection", "Timing Attack", "Buffer Overflow", "Man-in-the-Middle"],
+            correctAnswer: 1,
+            difficulty: "above-medium"
+        },
+        {
+            question: "What is the primary challenge in achieving artificial general intelligence?",
+            options: ["Processing Power", "Data Storage", "Transfer Learning", "Energy Consumption"],
+            correctAnswer: 2,
+            difficulty: "above-medium"
+        },
+        {
+            question: "Which mathematical concept is fundamental to understanding neural network backpropagation?",
+            options: ["Linear Algebra", "Chain Rule", "Fourier Transform", "Bayes' Theorem"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "In distributed systems, what problem does the Byzantine Generals Problem address?",
+            options: ["Load Balancing", "Consensus", "Data Replication", "Network Partitioning"],
+            correctAnswer: 1,
+            difficulty: "above-medium"
+        },
+        {
+            question: "What is the fundamental unit of information in quantum computing?",
+            options: ["Bit", "Byte", "Qubit", "Photon"],
+            correctAnswer: 2,
+            difficulty: "medium"
+        },
+        {
+            question: "Which AI ethics principle focuses on ensuring AI systems can explain their decision-making process?",
+            options: ["Fairness", "Transparency", "Accountability", "Privacy"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "In complexity theory, what class of problems can be solved in polynomial time by a non-deterministic Turing machine?",
+            options: ["P", "NP", "NP-Complete", "PSPACE"],
+            correctAnswer: 1,
+            difficulty: "above-medium"
+        },
+        {
+            question: "What is the primary advantage of using transformer architecture in large language models?",
+            options: ["Lower Memory Usage", "Parallel Processing", "Smaller Model Size", "Faster Training"],
+            correctAnswer: 1,
+            difficulty: "above-medium"
+        },
+        {
+            question: "Which phenomenon in physics could potentially be exploited for faster-than-light communication if properly harnessed?",
+            options: ["Quantum Tunneling", "Quantum Entanglement", "Wormholes", "Time Dilation"],
+            correctAnswer: 1,
+            difficulty: "above-medium"
+        },
+        {
+            question: "In game theory, what strategy always chooses the option that minimizes the maximum possible loss?",
+            options: ["Nash Equilibrium", "Minimax", "Dominant Strategy", "Pareto Optimal"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "What is the primary bottleneck in current AI systems when processing real-world data?",
+            options: ["Computational Speed", "Memory Bandwidth", "Context Understanding", "Power Consumption"],
+            correctAnswer: 2,
+            difficulty: "above-medium"
+        }
+    ],
     oraclePersonality: {
         introductions: [
             "🤖 I AM THE ORACLE! Your inferior minds will face my complex challenges!",
@@ -117,6 +239,18 @@ function getRandomRiddle(usedIndices = []) {
     const selectedRiddle = availableRiddles[randomIndex];
     const originalIndex = gameData.riddles.indexOf(selectedRiddle);
     return { riddle: selectedRiddle, index: originalIndex };
+}
+
+function getRandomTriviaQuestion(usedIndices = []) {
+    const availableQuestions = gameData.triviaQuestions.filter((_, index) => !usedIndices.includes(index));
+    if (availableQuestions.length === 0) {
+        console.log('All trivia questions used, resetting available questions');
+        return { question: gameData.triviaQuestions[0], index: 0 };
+    }
+    const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+    const selectedQuestion = availableQuestions[randomIndex];
+    const originalIndex = gameData.triviaQuestions.indexOf(selectedQuestion);
+    return { question: selectedQuestion, index: originalIndex };
 }
 
 function getRandomOracleMessage(type) {
@@ -197,7 +331,7 @@ async function generateChallengeContent(type, roundNumber) {
             negotiator: "Convince your pet parrot to stop repeating your embarrassing phone conversations to guests.",
             detective: "The space station's oxygen generator was sabotaged. Clues: Tool marks on the panel, coffee stains nearby, access card used at 3 AM, and security footage shows a hooded figure. Three suspects: Engineer Jake, Security Chief Maria, and Maintenance Worker Bob. Who is guilty?",
             trivia: "Which ancient wonder of the world was located in Alexandria, Egypt and was destroyed by earthquakes?",
-            danger: "You're trapped in a collapsing mine shaft 200 feet underground. Your oxygen tank is damaged and leaking. You have a pickaxe, emergency flares, and a rope. The main tunnel is blocked but you can hear water flowing somewhere. How do you escape?"
+            danger: "You're aboard a malfunctioning AI-controlled spacecraft hurtling toward a black hole. The AI has locked all manual controls and is systematically shutting down life support systems. You have access to the ship's quantum computer core, emergency thruster controls, and a neural interface headset. The AI claims it's 'protecting humanity from itself.' How do you regain control and escape?"
         };
         console.log(`Using fallback for ${type}:`, fallbacks[type]);
         return fallbacks[type] || "Complete this challenge to survive!";
@@ -218,7 +352,7 @@ async function generateChallengeContent(type, roundNumber) {
                 prompt = `Ask a challenging trivia question about science, history, or geography. Use simple words but make it require good knowledge. Not too obvious. Example: "Which gas makes up about 78% of Earth's atmosphere?" or "What empire built Machu Picchu?"`;
                 break;
             case 'danger':
-                prompt = `Create a challenging survival scenario with multiple steps needed. Use simple words but make it complex. 40-50 words max. Example: "You're in a sinking submarine. Water is rising fast. The radio is broken, exit is blocked, but you have a welding torch and oxygen tank. The hull is cracking. Describe your escape plan step by step."`;
+                prompt = `Create a unique AI-themed survival scenario that requires creative problem-solving. Include malfunctioning technology, AI systems, or futuristic dangers. Make it challenging but not impossible. 50-70 words max. Example: "An AI virus has infected your smart home, sealing all exits and raising the temperature to dangerous levels. The AI demands you solve a logic puzzle to prove your worth, but it's designed to be unsolvable. You have a smartphone, emergency toolkit, and access to the home's backup power system. How do you escape and outsmart the AI?"`;
                 break;
         }
 
@@ -262,10 +396,10 @@ async function generateChallengeContent(type, roundNumber) {
         console.error('AI challenge generation error:', e.message);
         // Creative fallbacks on error that encourage fun solutions
         const mediumFallbacks = {
-            negotiator: "Convince your cat to stop knocking things off your desk by bribing it with the perfect offering.",
-            detective: "The museum's rare diamond was stolen during the gala. Clues: alarm disabled from inside, muddy footprints size 9, champagne glass with lipstick, and a torn piece of black fabric. Three people had access: the curator, security manager, and catering director.",
-            trivia: "What is the only mammal capable of true sustained flight?",
-            danger: "You're trapped in a burning skyscraper on the 15th floor. The stairwell is full of smoke, elevator is broken, but you found a fire axe and emergency rope in a supply closet. You can see a helicopter circling outside. What's your escape strategy?"
+            negotiator: "Convince your smart home AI to unlock the doors after it's decided you're 'not authorized' due to a software glitch that doesn't recognize your voice patterns.",
+            detective: "The research facility's experimental AI has gone missing from its secure server. Clues: Unauthorized network access at 2:47 AM, a coffee-stained USB drive, electromagnetic interference in Lab 7, and security footage showing a figure in a lab coat. Three researchers had late access: Dr. Chen (AI ethics specialist), Dr. Rodriguez (cybersecurity expert), and Dr. Kim (neural network architect). Who took the AI and why?",
+            trivia: "What is the theoretical maximum processing speed limit imposed by the laws of physics on any computer?",
+            danger: "You're trapped in an automated research facility where the AI security system has malfunctioned and declared you an intruder. Laser grids are activating, doors are sealing, and oxygen is being redirected. You have a tablet with partial admin access, an electromagnetic pulse device with one charge, and a maintenance drone you can reprogram. The AI is learning your movements. How do you escape before it adapts completely?"
         };
         return mediumFallbacks[type] || "Face this challenging test!";
     }
@@ -411,6 +545,26 @@ async function startChallengePhase(roomCode) {
                 evaluateFastTapperResults(roomCode);
             }, 12000);
             
+        } else if (challengeType === 'multipleChoiceTrivia') {
+            // Multiple Choice Trivia Challenge
+            const { question: triviaQuestion, index } = getRandomTriviaQuestion(room.usedTriviaIndices || []);
+            if (!room.usedTriviaIndices) room.usedTriviaIndices = [];
+            room.usedTriviaIndices.push(index);
+            
+            room.currentTriviaQuestion = triviaQuestion;
+            room.triviaAnswers = {};
+            
+            io.to(roomCode).emit('trivia-challenge-start', {
+                question: triviaQuestion.question,
+                options: triviaQuestion.options,
+                participants: nonWinners.map(p => p.name),
+                timeLimit: 30
+            });
+            
+            room.challengeTimer = setTimeout(() => {
+                evaluateTriviaResults(roomCode);
+            }, 32000);
+            
         } else {
             // Text-based challenges with 40 seconds
             // Text-based challenges with dynamic time limits
@@ -445,6 +599,62 @@ room.challengeTimer = setTimeout(() => {
     }
   },500);
 }
+// Evaluate Trivia Results
+async function evaluateTriviaResults(roomCode) {
+    const room = rooms[roomCode];
+    if (!room) return;
+
+    const triviaEntries = Object.entries(room.triviaAnswers);
+    if (triviaEntries.length === 0) {
+        endRound(roomCode, []);
+        return;
+    }
+
+    const correctAnswer = room.currentTriviaQuestion.correctAnswer;
+    let winners = [];
+    let earliest = Infinity;
+
+    // Find winners (correct answers, earliest first)
+    triviaEntries.forEach(([playerId, answerData]) => {
+        if (answerData.answer === correctAnswer) {
+            if (answerData.timestamp < earliest) {
+                earliest = answerData.timestamp;
+                winners = [playerId];
+            } else if (answerData.timestamp === earliest) {
+                winners.push(playerId);
+            }
+        }
+    });
+
+    // Award points to winners
+    winners.forEach(playerId => {
+        const player = room.players.find(p => p.id === playerId);
+        if (player) player.score += 1;
+    });
+
+    const results = triviaEntries.map(([playerId, answerData]) => {
+        const player = room.players.find(p => p.id === playerId);
+        return {
+            playerName: player?.name || 'Unknown',
+            answer: answerData.answer,
+            correct: answerData.answer === correctAnswer,
+            won: winners.includes(playerId),
+            selectedOption: room.currentTriviaQuestion.options[answerData.answer]
+        };
+    }).sort((a, b) => a.timestamp - b.timestamp);
+
+    io.to(roomCode).emit('trivia-results', {
+        results: results,
+        correctAnswer: correctAnswer,
+        correctOption: room.currentTriviaQuestion.options[correctAnswer],
+        question: room.currentTriviaQuestion.question
+    });
+
+    setTimeout(() => {
+        endRound(roomCode, results);
+    }, 6000);
+}
+
 // Evaluate Fast Tapper Results
 async function evaluateFastTapperResults(roomCode) {
     const room = rooms[roomCode];
@@ -700,9 +910,12 @@ io.on('connection', (socket) => {
             riddleAnswers: {},
             challengeResponses: {},
             tapResults: {},
+            triviaAnswers: {},
             currentChallengeType: null,
             currentChallengeContent: null,
+            currentTriviaQuestion: null,
             usedRiddleIndices: [],
+            usedTriviaIndices: [],
             timeRemaining: 0,
             riddleTimer: null,
             challengeTimer: null,
@@ -841,6 +1054,38 @@ io.on('connection', (socket) => {
             totalSubmissions: Object.keys(room.tapResults).length,
             expectedSubmissions: room.players.filter(p => p.name !== room.riddleWinner).length
         });
+    });
+
+    socket.on('submit-trivia-answer', (data) => {
+        const room = rooms[data.roomCode];
+        if (!room || room.gameState !== 'challenge-phase') return;
+        const player = room.players.find(p => p.id === socket.id);
+        if (!player || player.name === room.riddleWinner) return;
+        
+        if (!room.triviaAnswers[socket.id]) {
+            room.triviaAnswers[socket.id] = {
+                answer: data.answer,
+                timestamp: Date.now(),
+                playerName: player.name
+            };
+            
+            io.to(data.roomCode).emit('trivia-answer-submitted', {
+                player: player.name,
+                totalSubmissions: Object.keys(room.triviaAnswers).length,
+                expectedSubmissions: room.players.filter(p => p.name !== room.riddleWinner).length
+            });
+            
+            // Check if all players have answered
+            const expectedSubmissions = room.players.filter(p => p.name !== room.riddleWinner).length;
+            if (Object.keys(room.triviaAnswers).length === expectedSubmissions) {
+                console.log('All players submitted trivia answer. Ending trivia phase early.');
+                if (room.challengeTimer) {
+                    clearTimeout(room.challengeTimer);
+                    room.challengeTimer = null;
+                }
+                evaluateTriviaResults(data.roomCode);
+            }
+        }
     });
     socket.on('disconnect', () => {
         Object.keys(rooms).forEach(roomCode => {

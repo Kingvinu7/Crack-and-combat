@@ -118,6 +118,31 @@
         </div>
     </div>
 
+    <!-- Multiple Choice Trivia Screen -->
+    <div id="trivia-challenge-screen" class="page">
+        <div class="page-content">
+            <div class="timer-section">
+                <div id="trivia-timer" class="timer">30</div>
+                <p>seconds to answer</p>
+            </div>
+            <div class="trivia-section">
+                <h2>🧠 TRIVIA CHALLENGE</h2>
+                <p id="trivia-question" class="trivia-question-text">Loading question...</p>
+            </div>
+            <div class="trivia-options-section">
+                <div class="trivia-options" id="trivia-options">
+                    <button class="trivia-option btn" data-option="0">Option A</button>
+                    <button class="trivia-option btn" data-option="1">Option B</button>
+                    <button class="trivia-option btn" data-option="2">Option C</button>
+                    <button class="trivia-option btn" data-option="3">Option D</button>
+                </div>
+                <div class="submission-status">
+                    <p id="trivia-submission-count">0/0 players answered</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Fast Tapper Screen -->
     <div id="fast-tapper-screen" class="page">
         <div class="page-content">
@@ -133,6 +158,26 @@
                     <p>taps</p>
                 </div>
                 <button id="tap-button" class="btn primary tap-btn">TAP!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trivia Results Screen -->
+    <div id="trivia-results-screen" class="page">
+        <div class="page-content">
+            <div class="results-header">
+                <h2>🎯 TRIVIA RESULTS</h2>
+                <p id="trivia-results-message">Analyzing your answers...</p>
+            </div>
+            <div class="trivia-results-section">
+                <div class="correct-answer-display">
+                    <h3>Correct Answer</h3>
+                    <p id="correct-answer-text">Loading...</p>
+                </div>
+                <div class="all-trivia-answers-section">
+                    <h3>All Answers</h3>
+                    <div id="all-trivia-answers-list"></div>
+                </div>
             </div>
         </div>
     </div>
