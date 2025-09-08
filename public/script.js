@@ -62,7 +62,7 @@ howToPlayModal.addEventListener('click', (e) => {
 
 // Close modal with Escape key
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && howToPlayModal.style.display === 'flex') {
+    if (e.key === 'Escape' && howToPlayModal.classList.contains('show')) {
         hideHowToPlay();
     }
 });
@@ -498,12 +498,14 @@ function hideIndividualResult() {
 }
 
 function showHowToPlay() {
-    howToPlayModal.style.display = 'flex';
-    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    if (howToPlayModal) {
+        howToPlayModal.classList.add('show');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
 }
 
 function hideHowToPlay() {
-    howToPlayModal.style.display = 'none';
+    howToPlayModal.classList.remove('show');
     document.body.style.overflow = 'auto'; // Restore scrolling
 }
 
