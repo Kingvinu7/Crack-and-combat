@@ -1773,6 +1773,7 @@ body::before { z-index: -1; }
         overflow: visible;
         font-size: 0.95em;
     }
+}
 
 /* Duplicate challenge description styles removed - already defined above */
 
@@ -1784,22 +1785,23 @@ body::before { z-index: -1; }
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.85);
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
     z-index: 15000;
     backdrop-filter: blur(15px);
     visibility: hidden;
     opacity: 0;
+    pointer-events: none;
     transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
     overflow-y: auto;
     padding: 20px;
 }
 
 .modal-overlay.show {
-    display: flex !important;
     visibility: visible !important;
     opacity: 1 !important;
+    pointer-events: auto !important;
 }
 
 @keyframes modalFadeIn {
@@ -1821,6 +1823,7 @@ body::before { z-index: -1; }
         0 0 50px rgba(0, 245, 255, 0.3),
         var(--shadow-soft);
     position: relative;
+    margin: auto;
 }
 
 @keyframes modalSlideIn {
@@ -2005,26 +2008,31 @@ body::before { z-index: -1; }
         margin: 5px 0;
         overflow: visible;
     }
+}
+
+/* Desktop specific enhancements */
+@media (min-width: 769px) {
+    .modal-overlay {
+        padding: 40px;
+    }
     
-    .modal-header {
-        padding: 12px 15px;
+    .modal-content {
+        width: 800px;
+        max-width: 90vw;
+        max-height: 85vh;
     }
     
     .modal-header h2 {
-        font-size: 1.3em;
-        letter-spacing: 1px;
+        font-size: 2.2em;
     }
     
-    .modal-body {
-        padding: 15px;
-        overflow: visible;
-        max-height: none;
+    .rule-section h3 {
+        font-size: 1.6em;
     }
     
-    .close-btn {
-        width: 35px;
-        height: 35px;
-        font-size: 1.5em;
+    .rule-section p {
+        font-size: 1.1em;
     }
 }
+
 
