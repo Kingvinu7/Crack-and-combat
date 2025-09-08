@@ -1118,7 +1118,7 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
-    console.log(`🤖 Threatened by AI server running on port ${PORT}`);
+    console.log(`🤖 Crack and Combat server running on port ${PORT}`);
     console.log('🎯 ENHANCED: Smart AI judging with creative rewards and brutal shortcuts punishment!');
     console.log('⏱️ Challenge Timer: 40 seconds with auto-submit');
     console.log('🎲 Total Riddles Available:', gameData.riddles.length);
