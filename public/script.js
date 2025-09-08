@@ -345,8 +345,14 @@ function startChallengeTimer(elementId, seconds) {
     const element = document.getElementById(elementId);
     const textarea = document.getElementById('challenge-response');
     const submitBtn = document.getElementById('submit-challenge-response');
+    
+    // Clear any existing timer to prevent multiple timers running
+    if (window.challengeTimer) {
+        clearInterval(window.challengeTimer);
+    }
+    
     let timeLeft = seconds;
-    const timer = setInterval(() => {
+    window.challengeTimer = setInterval(() => {
         element.textContent = timeLeft;
         
         if (timeLeft <= 10) {
@@ -362,7 +368,8 @@ function startChallengeTimer(elementId, seconds) {
         timeLeft--;
         
         if (timeLeft < 0) {
-            clearInterval(timer);
+            clearInterval(window.challengeTimer);
+            window.challengeTimer = null;
             element.classList.remove('urgent', 'danger');
             
             if (textarea && !textarea.disabled && !submitBtn.disabled) {
@@ -383,7 +390,7 @@ function startChallengeTimer(elementId, seconds) {
             }
         }
     }, 1000);
-    return timer;
+    return window.challengeTimer;
 }
 
 function typeWriter(element, text, speed = 30) {
