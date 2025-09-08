@@ -22,6 +22,7 @@
                     <input type="text" id="room-code" placeholder="Room Code" maxlength="6">
                     <button id="join-room-btn" class="btn secondary">Join Room</button>
                 </div>
+                <button id="how-to-play-btn" class="btn tertiary">How to Play</button>
             </div>
         </div>
     </div>
@@ -213,6 +214,64 @@
     <div id="result-overlay" class="result-overlay" style="display: none;">
         <div class="result-overlay-content">
             <div id="individual-result-content"></div>
+        </div>
+    </div>
+
+    <!-- How to Play Modal -->
+    <div id="how-to-play-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🎮 HOW TO PLAY</h2>
+                <button id="close-how-to-play" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="game-rules">
+                    <div class="rule-section">
+                        <h3>🎯 GAME OVERVIEW</h3>
+                        <p>Threatened by AI is a multiplayer strategy game where you must outwit an AI Oracle through 5 challenging rounds. Only the smartest survive!</p>
+                    </div>
+                    
+                    <div class="rule-section">
+                        <h3>🏆 HOW TO WIN</h3>
+                        <p>Win the most rounds to become the ultimate champion! Each round tests different skills:</p>
+                        <ul>
+                            <li><strong>Riddles:</strong> Answer brain-teasers correctly and quickly</li>
+                            <li><strong>AI Challenges:</strong> Solve complex scenarios with strategic thinking</li>
+                            <li><strong>Fast Tapper:</strong> Test your reflexes in rapid-fire challenges</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="rule-section">
+                        <h3>⚡ ROUND STRUCTURE</h3>
+                        <p>Each round consists of:</p>
+                        <ul>
+                            <li><strong>Phase 1:</strong> Everyone answers a riddle (45 seconds)</li>
+                            <li><strong>Phase 2:</strong> Non-winners face AI challenges or skill tests</li>
+                            <li><strong>Scoring:</strong> Round winners get points, others get challenges</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="rule-section">
+                        <h3>🧠 STRATEGY TIPS</h3>
+                        <ul>
+                            <li>Think quickly but carefully - speed and accuracy both matter</li>
+                            <li>In AI challenges, provide detailed, thoughtful responses</li>
+                            <li>Watch the timer - auto-submission happens at 0 seconds</li>
+                            <li>Study other players' answers to learn their strategies</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="rule-section">
+                        <h3>🎮 CONTROLS</h3>
+                        <ul>
+                            <li><strong>Enter:</strong> Submit riddle answers</li>
+                            <li><strong>Ctrl+Enter:</strong> Submit challenge responses</li>
+                            <li><strong>Click/Tap:</strong> Fast tapper challenges</li>
+                            <li><strong>Type:</strong> All text inputs support real-time entry</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
