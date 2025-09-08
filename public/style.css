@@ -1789,7 +1789,15 @@ body::before { z-index: -1; }
     justify-content: center;
     z-index: 15000;
     backdrop-filter: blur(15px);
-    animation: modalFadeIn 0.3s ease-out;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+}
+
+.modal-overlay.show {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 @keyframes modalFadeIn {
@@ -1942,11 +1950,12 @@ body::before { z-index: -1; }
     font-weight: 600;
 }
 
-/* Mobile modal responsiveness */
+/* ===== MODAL RESPONSIVE STYLES ===== */
 @media (max-width: 768px) {
     .modal-content {
-        width: 95%;
-        max-height: 85vh;
+        max-width: 95%;
+        max-height: 95%;
+        width: auto;
         margin: 10px;
     }
     
@@ -1962,10 +1971,6 @@ body::before { z-index: -1; }
         padding: 20px;
     }
     
-    .rule-section {
-        padding: 15px;
-    }
-    
     .rule-section h3 {
         font-size: 1.2em;
     }
@@ -1975,3 +1980,31 @@ body::before { z-index: -1; }
         font-size: 0.9em;
     }
 }
+
+@media (max-width: 480px) {
+    .modal-content {
+        max-width: 98%;
+        max-height: 98%;
+        margin: 5px;
+    }
+    
+    .modal-header {
+        padding: 12px 15px;
+    }
+    
+    .modal-header h2 {
+        font-size: 1.3em;
+        letter-spacing: 1px;
+    }
+    
+    .modal-body {
+        padding: 15px;
+    }
+    
+    .close-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 1.5em;
+    }
+}
+
