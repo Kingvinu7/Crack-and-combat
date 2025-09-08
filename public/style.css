@@ -3,24 +3,26 @@
 
 /* ===== CSS VARIABLES ===== */
 :root {
-    --bg-primary: #0a0a0b;
-    --bg-secondary: #111113;
-    --bg-tertiary: #1a1a1d;
-    --accent-red: #ff0844;
-    --accent-red-dim: #cc0639;
-    --accent-cyan: #00f5ff;
-    --accent-cyan-dim: #00c7d6;
-    --accent-purple: #8b00ff;
-    --accent-yellow: #ffd700;
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #121218;
+    --bg-tertiary: #1a1a24;
+    --accent-red: #ff1744;
+    --accent-red-dim: #d50000;
+    --accent-cyan: #00e5ff;
+    --accent-cyan-dim: #00b8d4;
+    --accent-purple: #7c4dff;
+    --accent-yellow: #ffab00;
+    --accent-green: #00ff88;
     --text-primary: #ffffff;
-    --text-secondary: #b8bcc8;
-    --text-muted: #6b6f7a;
-    --border-primary: rgba(255, 8, 68, 0.3);
-    --border-secondary: rgba(255, 255, 255, 0.1);
-    --glass-bg: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --shadow-glow: 0 0 20px rgba(255, 8, 68, 0.3);
-    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --text-secondary: #b0bec5;
+    --text-muted: #78909c;
+    --border-primary: rgba(255, 23, 68, 0.4);
+    --border-secondary: rgba(255, 255, 255, 0.12);
+    --glass-bg: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --shadow-glow: 0 0 25px rgba(255, 23, 68, 0.4);
+    --shadow-soft: 0 6px 25px rgba(0, 0, 0, 0.4);
+    --neural-gradient: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple), var(--accent-red));
 }
 
 /* ===== BASE STYLES ===== */
@@ -48,12 +50,13 @@ body::before {
     width: 100%;
     height: 100%;
     background: 
-        linear-gradient(45deg, transparent 49%, rgba(255, 8, 68, 0.03) 50%, transparent 51%),
-        linear-gradient(-45deg, transparent 49%, rgba(0, 245, 255, 0.02) 50%, transparent 51%),
-        radial-gradient(circle at 25% 25%, rgba(139, 0, 255, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 75% 75%, rgba(255, 8, 68, 0.03) 0%, transparent 50%);
-    background-size: 60px 60px, 60px 60px, 300px 300px, 300px 300px;
-    animation: neuralFlow 30s linear infinite;
+        linear-gradient(45deg, transparent 48%, rgba(0, 229, 255, 0.04) 50%, transparent 52%),
+        linear-gradient(-45deg, transparent 48%, rgba(124, 77, 255, 0.03) 50%, transparent 52%),
+        radial-gradient(circle at 20% 30%, rgba(255, 23, 68, 0.06) 0%, transparent 60%),
+        radial-gradient(circle at 80% 70%, rgba(0, 229, 255, 0.04) 0%, transparent 60%),
+        radial-gradient(circle at 50% 50%, rgba(124, 77, 255, 0.02) 0%, transparent 80%);
+    background-size: 80px 80px, 80px 80px, 400px 400px, 400px 400px, 600px 600px;
+    animation: neuralFlow 35s linear infinite;
     pointer-events: none;
     z-index: -1;
 }
@@ -136,13 +139,28 @@ body::after {
     padding: 30px;
     text-align: center;
     background: var(--glass-bg);
-    backdrop-filter: blur(20px) saturate(1.2);
+    backdrop-filter: blur(25px) saturate(1.3);
     border: 1px solid var(--glass-border);
-    border-radius: 16px;
+    border-radius: 20px;
     box-shadow: 
         var(--shadow-soft),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        0 0 40px rgba(0, 229, 255, 0.1);
     position: relative;
+}
+
+.page-content::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: var(--neural-gradient);
+    border-radius: 22px;
+    z-index: -1;
+    opacity: 0.1;
+    filter: blur(8px);
 }
 
 .page-content::before {
@@ -171,15 +189,32 @@ body::after {
     font-size: 3.2em;
     font-weight: 800;
     margin-bottom: 12px;
-    background: linear-gradient(135deg, var(--accent-red), var(--accent-cyan), var(--accent-purple));
-    background-size: 300% 300%;
+    background: var(--neural-gradient);
+    background-size: 400% 400%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: aiGradient 6s ease infinite;
+    animation: aiGradient 8s ease infinite;
     text-transform: uppercase;
-    letter-spacing: -2px;
+    letter-spacing: -1px;
     position: relative;
+    filter: drop-shadow(0 0 20px rgba(0, 229, 255, 0.3));
+}
+
+.logo h1::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    background: var(--neural-gradient);
+    background-size: 400% 400%;
+    animation: aiGradient 8s ease infinite;
+    border-radius: 8px;
+    opacity: 0.1;
+    z-index: -1;
+    filter: blur(10px);
 }
 
 @keyframes aiGradient {
@@ -247,10 +282,28 @@ h2 {
 }
 
 .btn.primary {
-    background: linear-gradient(135deg, var(--accent-red), #cc0639);
+    background: linear-gradient(135deg, var(--accent-red), var(--accent-red-dim));
     border-color: var(--accent-red);
     color: white;
     box-shadow: var(--shadow-glow);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn.primary::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+}
+
+.btn.primary:hover::after {
+    transform: translateX(100%);
 }
 
 .btn.primary:hover {
@@ -536,9 +589,15 @@ input[type="text"]::placeholder, textarea::placeholder {
 .oracle-avatar {
     font-size: 2.8em;
     margin: 20px 0;
-    filter: drop-shadow(0 0 20px rgba(255, 8, 68, 0.4));
-    animation: aiPresence 4s ease-in-out infinite;
+    filter: drop-shadow(0 0 25px rgba(0, 229, 255, 0.5));
+    animation: aiPresence 5s ease-in-out infinite;
     position: relative;
+    background: var(--neural-gradient);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: aiPresence 5s ease-in-out infinite, aiGradient 8s ease infinite;
 }
 
 .oracle-avatar.large { 
@@ -627,18 +686,20 @@ input[type="text"]::placeholder, textarea::placeholder {
     font-size: 4em;
     font-weight: 800;
     color: var(--accent-cyan);
-    background: var(--bg-secondary);
+    background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
     border: 3px solid var(--accent-cyan);
     padding: 20px 40px;
     margin: 0 auto 15px;
-    border-radius: 8px;
+    border-radius: 12px;
     box-shadow: 
-        0 0 40px rgba(0, 245, 255, 0.3),
-        inset 0 0 20px rgba(0, 245, 255, 0.1);
-    backdrop-filter: blur(20px);
+        0 0 45px rgba(0, 229, 255, 0.4),
+        inset 0 0 25px rgba(0, 229, 255, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(25px);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    text-shadow: 0 0 15px rgba(0, 229, 255, 0.6);
 }
 
 .timer::before {
@@ -932,6 +993,183 @@ input[type="text"]::placeholder, textarea::placeholder {
 .answer-item.incorrect .answer-status {
     color: var(--accent-red);
     text-shadow: 0 0 10px rgba(255, 8, 68, 0.5);
+}
+
+/* ===== TRIVIA CHALLENGE STYLES ===== */
+.trivia-section {
+    text-align: center;
+    padding: 30px 0;
+    margin-bottom: 30px;
+}
+
+.trivia-question-text {
+    background: var(--bg-secondary);
+    border: 2px solid var(--accent-cyan);
+    border-radius: 12px;
+    padding: 25px 30px;
+    margin: 25px auto;
+    line-height: 1.7;
+    font-size: 1.2em;
+    color: var(--text-primary);
+    font-weight: 500;
+    max-width: 600px;
+    box-shadow: 
+        0 0 30px rgba(0, 245, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    position: relative;
+    animation: questionPulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes questionPulse {
+    0% { 
+        box-shadow: 0 0 30px rgba(0, 245, 255, 0.2);
+        border-color: var(--accent-cyan);
+    }
+    100% { 
+        box-shadow: 0 0 40px rgba(0, 245, 255, 0.4);
+        border-color: var(--accent-purple);
+    }
+}
+
+.trivia-question-text::before {
+    content: '🧠 QUESTION';
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: var(--accent-cyan);
+    color: var(--bg-primary);
+    padding: 6px 14px;
+    font-size: 0.75em;
+    font-weight: 700;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+.trivia-options-section {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+.trivia-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+    padding: 0 20px;
+}
+
+.trivia-option {
+    padding: 20px 25px !important;
+    font-size: 1.1em !important;
+    font-weight: 600 !important;
+    text-align: left !important;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    border: 3px solid var(--border-secondary) !important;
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(15px);
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    overflow: hidden;
+    word-wrap: break-word;
+    line-height: 1.4;
+}
+
+.trivia-option:hover {
+    transform: translateY(-3px) scale(1.02);
+    border-color: var(--accent-cyan) !important;
+    box-shadow: 
+        0 8px 25px rgba(0, 245, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), var(--glass-bg)) !important;
+}
+
+.trivia-option.selected {
+    border-color: var(--accent-red) !important;
+    background: linear-gradient(135deg, rgba(255, 8, 68, 0.2), var(--glass-bg)) !important;
+    color: var(--text-primary);
+    box-shadow: 
+        0 0 30px rgba(255, 8, 68, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    animation: selectedPulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes selectedPulse {
+    0% { 
+        box-shadow: 0 0 30px rgba(255, 8, 68, 0.4);
+        transform: translateY(-3px) scale(1.02);
+    }
+    100% { 
+        box-shadow: 0 0 40px rgba(255, 8, 68, 0.6);
+        transform: translateY(-3px) scale(1.03);
+    }
+}
+
+.trivia-option:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.trivia-option:disabled:hover {
+    transform: none !important;
+    border-color: var(--border-secondary) !important;
+    box-shadow: none !important;
+    background: var(--glass-bg) !important;
+}
+
+/* Trivia Results Styles */
+.trivia-results-section {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.correct-answer-display {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), var(--bg-secondary));
+    border: 2px solid #00ff88;
+    border-radius: 12px;
+    padding: 25px;
+    margin: 25px 0;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+    backdrop-filter: blur(15px);
+}
+
+.correct-answer-display h3 {
+    color: #00ff88;
+    margin-bottom: 15px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+}
+
+.correct-answer-display p {
+    font-size: 1.3em;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.all-trivia-answers-section {
+    margin-top: 30px;
+}
+
+.all-trivia-answers-section h3 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: var(--accent-cyan);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
 /* ===== FAST TAPPER STYLES ===== */
@@ -1559,6 +1797,24 @@ input[type="text"]::placeholder, textarea::placeholder {
         max-height: 250px;
     }
     
+    .trivia-options {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 0 10px;
+    }
+    
+    .trivia-option {
+        min-height: 60px;
+        padding: 15px 20px !important;
+        font-size: 1em !important;
+    }
+    
+    .trivia-question-text {
+        font-size: 1.1em;
+        padding: 20px 25px;
+        margin: 20px 10px;
+    }
+    
     .points-table-header, 
     .points-table-row {
         font-size: 0.8em;
@@ -1636,6 +1892,23 @@ input[type="text"]::placeholder, textarea::placeholder {
         height: auto;
         max-height: none;
         overflow: visible;
+    }
+    
+    .trivia-options {
+        gap: 12px;
+        padding: 0 5px;
+    }
+    
+    .trivia-option {
+        min-height: 50px;
+        padding: 12px 16px !important;
+        font-size: 0.95em !important;
+    }
+    
+    .trivia-question-text {
+        font-size: 1em;
+        padding: 18px 20px;
+        margin: 15px 5px;
     }
 }
 
