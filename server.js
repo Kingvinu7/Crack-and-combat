@@ -184,7 +184,7 @@ async function generateChallengeContent(type, roundNumber) {
     if (!genAI) {
         // Medium difficulty fallback content with simple words
         const fallbacks = {
-            negotiator: "Your friend is locked out of their house and you are the only one with a spare key, but they once stole your favorite book and never returned it. Convince them to let you help without mentioning the book.",
+            negotiator: "Convince your roommate to do the dishes when it's actually your turn.",
             detective: "The space station's oxygen generator was sabotaged. Clues: Tool marks on the panel, coffee stains nearby, access card used at 3 AM, and security footage shows a hooded figure. Three suspects: Engineer Jake, Security Chief Maria, and Maintenance Worker Bob. Who is guilty?",
             trivia: "Which ancient wonder of the world was located in Alexandria, Egypt and was destroyed by earthquakes?",
             danger: "You're trapped in a collapsing mine shaft 200 feet underground. Your oxygen tank is damaged and leaking. You have a pickaxe, emergency flares, and a rope. The main tunnel is blocked but you can hear water flowing somewhere. How do you escape?"
@@ -199,7 +199,7 @@ async function generateChallengeContent(type, roundNumber) {
 
         switch (type) {
             case 'negotiator':
-                prompt = `Create a unique, challenging negotiation scenario with a moral dilemma. Use simple words but make it complex. 40-50 words max. Player must convince someone to help with a difficult situation. Example: "You need to convince a stubborn shopkeeper to give you a discount on an item for a good cause, but they are known for their strict no-discount policy."`;
+                prompt = `Create a fun, short negotiation challenge. Keep it simple and playful, 20-30 words max. Player must convince someone to do something. Make it quirky or amusing. Example: "Convince your cat to get off your keyboard while you're working from home."`;
                 break;
             case 'detective':
                 prompt = `Create a mystery with 4-5 clues and 3 suspects. Use simple words but make it challenging to solve. 60-70 words max. Include red herrings. Example: "Someone poisoned the king's food. Clues: bitter taste, cook was nervous, guard left early, poison bottle in garden, rival prince visited kitchen. Suspects: head cook, royal guard, prince's messenger."`;
@@ -228,7 +228,7 @@ async function generateChallengeContent(type, roundNumber) {
         if (!cleaned || cleaned.length < 10) {
             console.log('AI generated empty or too short content, using fallback');
             const fallbacks = {
-                negotiator: "Your friend is locked out of their house and you are the only one with a spare key, but they once stole your favorite book and never returned it. Convince them to let you help without mentioning the book.",
+                negotiator: "Convince your roommate to do the dishes when it's actually your turn.",
                 detective: "The space station's oxygen generator was sabotaged. Clues: Tool marks on the panel, coffee stains nearby, access card used at 3 AM, and security footage shows a hooded figure. Three suspects: Engineer Jake, Security Chief Maria, and Maintenance Worker Bob. Who is guilty?",
                 trivia: "Which ancient wonder of the world was located in Alexandria, Egypt and was destroyed by earthquakes?",
                 danger: "You're trapped in a collapsing mine shaft 200 feet underground. Your oxygen tank is damaged and leaking. You have a pickaxe, emergency flares, and a rope. The main tunnel is blocked but you can hear water flowing somewhere. How do you escape?"
@@ -236,9 +236,13 @@ async function generateChallengeContent(type, roundNumber) {
             cleaned = fallbacks[type] || "Complete this challenge to survive!";
         }
         
-        // Allow longer responses for medium difficulty but cap at reasonable length
-        if (cleaned.length > 400) {
-            cleaned = cleaned.substring(0, 390) + "...";
+        // Cap length based on challenge type
+        let maxLength = 400;
+        if (type === 'negotiator') {
+            maxLength = 150; // Keep negotiator challenges much shorter
+        }
+        if (cleaned.length > maxLength) {
+            cleaned = cleaned.substring(0, maxLength - 3) + "...";
         }
         
         console.log(`Generated medium difficulty ${type} challenge (${cleaned.length} chars): ${cleaned.substring(0, 50)}...`);
@@ -248,7 +252,7 @@ async function generateChallengeContent(type, roundNumber) {
         console.error('AI challenge generation error:', e.message);
         // Medium difficulty fallbacks on error
         const mediumFallbacks = {
-            negotiator: "You're a refugee trying to cross the border. The guard wants a bribe but you have no money, only your grandmother's necklace. It's all you have left of your family. Convince them to let you pass without taking it.",
+            negotiator: "Convince your pet to stop stealing your socks and hiding them.",
             detective: "The museum's rare diamond was stolen during the gala. Clues: alarm disabled from inside, muddy footprints size 9, champagne glass with lipstick, and a torn piece of black fabric. Three people had access: the curator, security manager, and catering director.",
             trivia: "What is the only mammal capable of true sustained flight?",
             danger: "You're trapped in a burning skyscraper on the 15th floor. The stairwell is full of smoke, elevator is broken, but you found a fire axe and emergency rope in a supply closet. You can see a helicopter circling outside. What's your escape strategy?"
@@ -379,7 +383,7 @@ if (!challengeContent || challengeContent.trim().length === 0) {
 // Set time limit based on challenge type
 let timeLimit = 40; // Default for detective, trivia, danger
 if (challengeType === 'negotiator') {
-    timeLimit = 70; // Extra time for negotiator challenges
+    timeLimit = 45; // Shorter time for simpler negotiator challenges
 }
 
 console.log(`Sending ${challengeType} challenge content (${challengeContent.length} chars): ${challengeContent.substring(0, 50)}...`);
@@ -439,7 +443,7 @@ async function evaluateFastTapperResults(roomCode) {
     });
     setTimeout(() => {
         endRound(roomCode, results);
-    }, 4000);
+    }, 6000);
 }
 
 // Evaluate Text Challenge Results
@@ -488,7 +492,7 @@ async function evaluateTextChallengeResults(roomCode) {
 
     setTimeout(() => {
         endRound(roomCode, evaluationResults);
-    }, 2000);
+    }, 5000);
 }
 
 // Game Flow Functions
@@ -631,11 +635,11 @@ function endRound(roomCode, challengeResults) {
                 scores: finalScores,
                 roundHistory: room.roundHistory
             });
-        }, 8000);
+        }, 12000);
     } else {
         setTimeout(() => {
             startNewRound(roomCode);
-        }, 8000);
+        }, 12000);
     }
 }
 
