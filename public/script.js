@@ -501,7 +501,6 @@ function showHowToPlay() {
     console.log('showHowToPlay called');
     console.log('howToPlayModal element:', howToPlayModal);
     if (howToPlayModal) {
-        howToPlayModal.style.display = 'flex';
         howToPlayModal.classList.add('show');
         document.body.style.overflow = 'hidden'; // Prevent background scrolling
         console.log('Modal should now be visible');
@@ -513,7 +512,6 @@ function showHowToPlay() {
 function hideHowToPlay() {
     console.log('hideHowToPlay called');
     howToPlayModal.classList.remove('show');
-    howToPlayModal.style.display = 'none';
     document.body.style.overflow = 'auto'; // Restore scrolling
 }
 
