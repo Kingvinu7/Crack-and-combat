@@ -17,8 +17,18 @@ if (process.env.GEMINI_API_KEY) {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Challenge Types (rotate each round)
-const CHALLENGE_TYPES = ['negotiator', 'detective', 'trivia', 'fastTapper', 'danger'];
+// Challenge Types (will be shuffled for each game session)
+const BASE_CHALLENGE_TYPES = ['negotiator', 'detective', 'trivia', 'fastTapper', 'danger'];
+
+// Shuffle array function
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
 
 // Game Data with 50+ riddles
 const gameData = {
@@ -182,9 +192,9 @@ function updateRoundHistory(room, riddleWinner, challengeResults) {
 // Better challenge content generation with validation
 async function generateChallengeContent(type, roundNumber) {
     if (!genAI) {
-        // Medium difficulty fallback content with simple words
+        // Creative fallback content that matches the fun vibe
         const fallbacks = {
-            negotiator: "Convince your roommate to do the dishes when it's actually your turn.",
+            negotiator: "Convince your pet parrot to stop repeating your embarrassing phone conversations to guests.",
             detective: "The space station's oxygen generator was sabotaged. Clues: Tool marks on the panel, coffee stains nearby, access card used at 3 AM, and security footage shows a hooded figure. Three suspects: Engineer Jake, Security Chief Maria, and Maintenance Worker Bob. Who is guilty?",
             trivia: "Which ancient wonder of the world was located in Alexandria, Egypt and was destroyed by earthquakes?",
             danger: "You're trapped in a collapsing mine shaft 200 feet underground. Your oxygen tank is damaged and leaking. You have a pickaxe, emergency flares, and a rope. The main tunnel is blocked but you can hear water flowing somewhere. How do you escape?"
@@ -228,7 +238,7 @@ async function generateChallengeContent(type, roundNumber) {
         if (!cleaned || cleaned.length < 10) {
             console.log('AI generated empty or too short content, using fallback');
             const fallbacks = {
-                negotiator: "Convince your roommate to do the dishes when it's actually your turn.",
+                negotiator: "Convince your neighbor's loud dog to stop barking at 3 AM by offering it something irresistible.",
                 detective: "The space station's oxygen generator was sabotaged. Clues: Tool marks on the panel, coffee stains nearby, access card used at 3 AM, and security footage shows a hooded figure. Three suspects: Engineer Jake, Security Chief Maria, and Maintenance Worker Bob. Who is guilty?",
                 trivia: "Which ancient wonder of the world was located in Alexandria, Egypt and was destroyed by earthquakes?",
                 danger: "You're trapped in a collapsing mine shaft 200 feet underground. Your oxygen tank is damaged and leaking. You have a pickaxe, emergency flares, and a rope. The main tunnel is blocked but you can hear water flowing somewhere. How do you escape?"
@@ -250,9 +260,9 @@ async function generateChallengeContent(type, roundNumber) {
         
     } catch (e) {
         console.error('AI challenge generation error:', e.message);
-        // Medium difficulty fallbacks on error
+        // Creative fallbacks on error that encourage fun solutions
         const mediumFallbacks = {
-            negotiator: "Convince your pet to stop stealing your socks and hiding them.",
+            negotiator: "Convince your cat to stop knocking things off your desk by bribing it with the perfect offering.",
             detective: "The museum's rare diamond was stolen during the gala. Clues: alarm disabled from inside, muddy footprints size 9, champagne glass with lipstick, and a torn piece of black fabric. Three people had access: the curator, security manager, and catering director.",
             trivia: "What is the only mammal capable of true sustained flight?",
             danger: "You're trapped in a burning skyscraper on the 15th floor. The stairwell is full of smoke, elevator is broken, but you found a fire axe and emergency rope in a supply closet. You can see a helicopter circling outside. What's your escape strategy?"
@@ -261,11 +271,12 @@ async function generateChallengeContent(type, roundNumber) {
     }
 }
 
-// FIXED: Enhanced evaluation with better feedback handling for auto-submit
+// ENHANCED: Smart AI judging that rewards creativity but shuts down lazy shortcuts
 async function evaluatePlayerResponse(challengeContent, playerResponse, challengeType) {
     // Detect auto-submitted responses
     const isAutoSubmitted = playerResponse.startsWith('[Auto-submitted]');
     const cleanResponse = isAutoSubmitted ? playerResponse.replace('[Auto-submitted] ', '') : playerResponse;
+    
     if (!genAI) {
         return { 
             pass: Math.random() > 0.4, 
@@ -277,21 +288,49 @@ async function evaluatePlayerResponse(challengeContent, playerResponse, challeng
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         let evaluationPrompt = '';
         
+        // Detect oversmart shortcuts that should be brutally shut down
+        const lazyShortcuts = [
+            /shoot|gun|weapon|kill|murder|violence/i,
+            /teleport|magic|supernatural|wizard|spell/i,
+            /cheat|hack|exploit|glitch|bug/i,
+            /call.*police|call.*911|call.*help/i,
+            /ignore|skip|don't|won't|refuse/i,
+            /easy|simple|just.*do|obviously/i
+        ];
+        
+        const hasLazyShortcut = lazyShortcuts.some(pattern => pattern.test(cleanResponse));
+        
         switch (challengeType) {
             case 'negotiator':
-                evaluationPrompt = `Evaluate this negotiation attempt for a challenging scenario:\n\nSituation: ${challengeContent}\n\nPlayer's approach: "${cleanResponse}"\n\nWas this persuasive, creative, and showed good understanding of the problem? Consider: empathy, logic, compromise, and creativity. Answer PASS or FAIL with a detailed reason. Keep your feedback to under 350 characters. ${isAutoSubmitted ? ' NOTE: This was auto-submitted when time ran out.' : ''}`;
+                if (hasLazyShortcut) {
+                    evaluationPrompt = `This negotiation attempt contains an oversmart shortcut: "${cleanResponse}"\n\nSituation: ${challengeContent}\n\nThis is clearly trying to avoid the actual negotiation challenge with lazy solutions like violence, magic, or ignoring the problem. Respond with FAIL and give a brutal, sharp comeback explaining why this approach completely misses the point and would fail spectacularly. Be witty and cutting in your response. Keep under 350 characters.`;
+                } else {
+                    evaluationPrompt = `Evaluate this negotiation attempt:\n\nSituation: ${challengeContent}\n\nPlayer's approach: "${cleanResponse}"\n\nDoes this show genuine creative thinking? Look for: clever bribing with food, creative distractions, sneaky approaches, emotional appeals, logical compromises, or other inventive solutions. Even risky plans should pass if they show real creativity and effort. Answer PASS or FAIL with encouraging or constructive feedback. Keep under 350 characters. ${isAutoSubmitted ? 'NOTE: Auto-submitted when time ran out.' : ''}`;
+                }
                 break;
-            case 'detective':
-                evaluationPrompt = `Evaluate this detective conclusion for a complex mystery:\n\nMystery: ${challengeContent}\n\nPlayer's conclusion: "${cleanResponse}"\n\nDid they use logical reasoning, consider the clues properly, and reach a reasonable conclusion? Even if not perfect, reward good thinking. Answer PASS or FAIL with a brief explanation. Keep your feedback to under 350 characters. ${isAutoSubmitted ? ' NOTE: This was auto-submitted when time ran out.' : ''}`;
-                break;
-            case 'trivia':
-                evaluationPrompt = `Evaluate this answer to a challenging trivia question:\n\nQuestion: ${challengeContent}\n\nPlayer answered: "${cleanResponse}"\n\nIs this correct or close enough? Consider partial credit for good attempts. Answer PASS or FAIL with a brief explanation. Keep your feedback to under 350 characters. ${isAutoSubmitted ? ' NOTE: This was auto-submitted when time ran out.' : ''}`;
-                break;
+                
             case 'danger':
-                evaluationPrompt = `Evaluate this survival plan for a complex emergency:\n\nDanger: ${challengeContent}\n\nPlayer's plan: "${cleanResponse}"\n\nWould this work? Is it creative, practical, and shows good thinking under pressure? Reward clever solutions even if unconventional. Answer PASS or FAIL with a detailed reason. Keep your feedback to under 350 characters. ${isAutoSubmitted ? ' NOTE: This was auto-submitted when time ran out.' : ''}`;
+                if (hasLazyShortcut) {
+                    evaluationPrompt = `This survival plan contains an oversmart shortcut: "${cleanResponse}"\n\nDanger: ${challengeContent}\n\nThis is clearly trying to avoid the actual survival challenge with unrealistic solutions like magic, violence, or ignoring the problem. Respond with FAIL and give a brutal, logical explanation of why this approach would lead to certain doom. Be sharp and merciless in explaining the flaws. Keep under 350 characters.`;
+                } else {
+                    evaluationPrompt = `Evaluate this survival plan:\n\nDanger: ${challengeContent}\n\nPlayer's plan: "${cleanResponse}"\n\nDoes this show practical creativity and real problem-solving? Look for: resourceful use of available items, clever engineering solutions, creative escape routes, or innovative survival tactics. Even unconventional approaches should pass if they demonstrate genuine thinking and could plausibly work. Answer PASS or FAIL with detailed reasoning. Keep under 350 characters. ${isAutoSubmitted ? 'NOTE: Auto-submitted when time ran out.' : ''}`;
+                }
                 break;
+                
+            case 'detective':
+                if (hasLazyShortcut) {
+                    evaluationPrompt = `This detective conclusion tries to shortcut the mystery: "${cleanResponse}"\n\nMystery: ${challengeContent}\n\nThis avoids actually analyzing the clues and evidence provided. Respond with FAIL and a sharp explanation of why good detective work requires examining evidence, not taking lazy shortcuts. Be cutting about their lack of deductive reasoning. Keep under 350 characters.`;
+                } else {
+                    evaluationPrompt = `Evaluate this detective conclusion:\n\nMystery: ${challengeContent}\n\nPlayer's conclusion: "${cleanResponse}"\n\nDid they analyze the clues logically and reach a reasonable conclusion? Even if not perfect, reward genuine deductive reasoning and consideration of evidence. Look for thoughtful analysis over correct guesses. Answer PASS or FAIL with constructive feedback. Keep under 350 characters. ${isAutoSubmitted ? 'NOTE: Auto-submitted when time ran out.' : ''}`;
+                }
+                break;
+                
+            case 'trivia':
+                evaluationPrompt = `Evaluate this trivia answer:\n\nQuestion: ${challengeContent}\n\nPlayer answered: "${cleanResponse}"\n\nIs this correct or demonstrates good knowledge? Consider partial credit for close attempts or showing understanding of the topic. Answer PASS or FAIL with brief explanation. Keep under 350 characters. ${isAutoSubmitted ? 'NOTE: Auto-submitted when time ran out.' : ''}`;
+                break;
+                
             default:
-                evaluationPrompt = `Evaluate this response to a medium difficulty challenge:\n\nChallenge: ${challengeContent}\n\nResponse: ${cleanResponse}\n\nDoes this show good thinking and effort? PASS or FAIL with a reason. Keep your feedback to under 350 characters. ${isAutoSubmitted ? ' NOTE: This was auto-submitted when time ran out.' : ''}`;
+                evaluationPrompt = `Evaluate this response:\n\nChallenge: ${challengeContent}\n\nResponse: ${cleanResponse}\n\nDoes this show genuine effort and creative thinking? PASS or FAIL with reason. Keep under 350 characters. ${isAutoSubmitted ? 'NOTE: Auto-submitted when time ran out.' : ''}`;
         }
 
         const result = await model.generateContent(evaluationPrompt);
@@ -305,24 +344,27 @@ async function evaluatePlayerResponse(challengeContent, playerResponse, challeng
             .replace(/\s+/g, ' ')
             .trim();
 
-        // Truncate if still too long as a fail-safe
+        // Truncate if still too long
         const MAX_FEEDBACK_LENGTH = 350;
         if (feedback.length > MAX_FEEDBACK_LENGTH) {
             feedback = feedback.substring(0, MAX_FEEDBACK_LENGTH - 3) + '...';
-            console.warn('AI feedback was too long, truncated to:', feedback.length);
         }
         
         // Ensure we have some feedback
         if (!feedback || feedback.length < 5) {
-            feedback = pass ? "Good reasoning shown." : "Needs better approach.";
+            if (hasLazyShortcut) {
+                feedback = pass ? "Surprisingly workable despite shortcuts." : "Lazy shortcuts don't work here. Try harder.";
+            } else {
+                feedback = pass ? "Good creative thinking!" : "Needs more clever approach.";
+            }
         }
         
-        // Add auto-submit indicator to feedback
+        // Add auto-submit indicator
         if (isAutoSubmitted) {
             feedback = `⏰ ${feedback}`;
         }
         
-        console.log(`AI Evaluation: ${pass ? 'PASS' : 'FAIL'} - "${feedback}" (${feedback.length} chars)`);
+        console.log(`AI Evaluation (${hasLazyShortcut ? 'SHORTCUT DETECTED' : 'CREATIVE'}): ${pass ? 'PASS' : 'FAIL'} - "${feedback}"`);
         return { pass, feedback };
         
     } catch (e) {
@@ -347,9 +389,9 @@ async function startChallengePhase(roomCode) {
 
     room.gameState = 'challenge-phase';
     room.challengeResponses = {};
-    // Determine challenge type for this round
-    const challengeTypeIndex = (room.currentRound - 1) % CHALLENGE_TYPES.length;
-    const challengeType = CHALLENGE_TYPES[challengeTypeIndex];
+    // Use shuffled challenge types for this room
+    const challengeTypeIndex = (room.currentRound - 1) % room.shuffledChallengeTypes.length;
+    const challengeType = room.shuffledChallengeTypes[challengeTypeIndex];
 
     console.log(`Round ${room.currentRound}: ${challengeType} challenge (40 seconds)`);
     io.to(roomCode).emit('oracle-speaks', {
@@ -665,7 +707,8 @@ io.on('connection', (socket) => {
             riddleTimer: null,
             challengeTimer: null,
             roundHistory: [],
-            ownerId: socket.id
+            ownerId: socket.id,
+            shuffledChallengeTypes: shuffleArray(BASE_CHALLENGE_TYPES) // Shuffle challenges for this room
         };
         
         rooms[roomCode] = newRoom;
@@ -831,12 +874,13 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`🤖 Threatened by AI server running on port ${PORT}`);
-    console.log('🎯 FIXED: Auto-submit, judgment text, tie-breaking!');
+    console.log('🎯 ENHANCED: Smart AI judging with creative rewards and brutal shortcuts punishment!');
     console.log('⏱️ Challenge Timer: 40 seconds with auto-submit');
     console.log('🎲 Total Riddles Available:', gameData.riddles.length);
-    console.log('📋 Challenge Types:', CHALLENGE_TYPES.join(', '));
+    console.log('📋 Challenge Types (shuffled per game):', BASE_CHALLENGE_TYPES.join(', '));
+    console.log('🧠 Smart Judging: Rewards creativity, punishes lazy shortcuts');
     if (genAI) {
-        console.log('🔑 Gemini 2.5 Flash: AI-powered challenges with auto-submit detection!');
+        console.log('🔑 Gemini 2.5 Flash: AI-powered challenges with smart evaluation!');
     } else {
         console.log('⚠️ No Gemini API key: Using fallback challenges.');
     }
