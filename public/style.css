@@ -276,6 +276,22 @@ h2 {
     border-color: var(--accent-cyan);
 }
 
+.btn.tertiary {
+    background: linear-gradient(135deg, var(--accent-cyan), #00a8b8);
+    border-color: var(--accent-cyan);
+    color: white;
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+    margin-top: 15px;
+}
+
+.btn.tertiary:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 0 30px rgba(0, 245, 255, 0.5),
+        var(--shadow-soft);
+    border-color: var(--accent-purple);
+}
+
 .btn.large {
     padding: 20px 40px;
     font-size: 1.3em;
@@ -331,10 +347,15 @@ input[type="text"]::placeholder, textarea::placeholder {
     height: 120px;
     resize: vertical;
     min-height: 80px;
-    max-height: 200px;
+    max-height: 300px; /* Increased for better usability */
     word-break: break-word;
     overflow-wrap: break-word;
     white-space: pre-wrap;
+    font-size: 1em;
+    line-height: 1.5;
+    /* Better scrolling behavior */
+    overflow-y: auto;
+    scroll-behavior: smooth;
 }
 
 /* ===== ACTION SECTIONS ===== */
@@ -723,8 +744,10 @@ input[type="text"]::placeholder, textarea::placeholder {
     word-break: break-word;
     white-space: pre-wrap;
     overflow-wrap: break-word;
-    max-height: 300px;
-    overflow-y: auto;
+    /* Remove scrolling - let content expand naturally */
+    height: auto;
+    max-height: none;
+    overflow: visible;
 }
 
 .challenge-description::before {
@@ -1609,6 +1632,10 @@ input[type="text"]::placeholder, textarea::placeholder {
         padding: 18px 20px;
         line-height: 1.6;
         letter-spacing: 0.1px;
+        /* Ensure no scrolling issues on mobile */
+        height: auto;
+        max-height: none;
+        overflow: visible;
     }
 }
 
@@ -1747,27 +1774,204 @@ body::before { z-index: -1; }
         font-size: 0.95em;
     }
 
-.challenge-description {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-secondary);
-    border-left: 4px solid var(--accent-red);
-    border-radius: 8px;
-    padding: 25px 30px;
-    margin: 25px 0;
-    line-height: 1.8;
-    font-size: 1.05em; /* Slightly smaller for better fit */
+/* Duplicate challenge description styles removed - already defined above */
+
+/* ===== HOW TO PLAY MODAL ===== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 15000;
     backdrop-filter: blur(15px);
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.modal-content {
+    background: var(--bg-secondary);
+    border: 2px solid var(--accent-cyan);
+    border-radius: 12px;
+    max-width: 90%;
+    max-height: 90%;
+    width: 700px;
+    overflow-y: auto;
+    animation: modalSlideIn 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    backdrop-filter: blur(20px);
     box-shadow: 
-        inset 0 1px 0 rgba(255, 255, 255, 0.05),
-        0 0 20px rgba(255, 8, 68, 0.1);
+        0 0 50px rgba(0, 245, 255, 0.3),
+        var(--shadow-soft);
     position: relative;
+}
+
+@keyframes modalSlideIn {
+    0% { 
+        opacity: 0; 
+        transform: scale(0.9) translateY(-20px);
+    }
+    100% { 
+        opacity: 1; 
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+    padding: 20px 30px;
+    border-radius: 10px 10px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.modal-header h2 {
+    color: white;
+    margin: 0;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.8em;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2em;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 30px;
     color: var(--text-primary);
+}
+
+.game-rules {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.rule-section {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.rule-section:hover {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.1);
+}
+
+.rule-section h3 {
+    color: var(--accent-cyan);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.4em;
+    font-weight: 700;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.rule-section p {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 15px;
     font-family: 'JetBrains Mono', monospace;
-    word-break: break-word;
-    white-space: pre-wrap;
-    overflow-wrap: break-word;
-    /* Remove problematic height limit */
-    height: auto;
-    max-height: none;
-    overflow: visible;
+    font-size: 1em;
+}
+
+.rule-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.rule-section li {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95em;
+    position: relative;
+    padding-left: 20px;
+}
+
+.rule-section li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--accent-red);
+    font-weight: bold;
+}
+
+.rule-section li strong {
+    color: var(--accent-yellow);
+    font-weight: 600;
+}
+
+/* Mobile modal responsiveness */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        max-height: 85vh;
+        margin: 10px;
+    }
+    
+    .modal-header {
+        padding: 15px 20px;
+    }
+    
+    .modal-header h2 {
+        font-size: 1.5em;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .rule-section {
+        padding: 15px;
+    }
+    
+    .rule-section h3 {
+        font-size: 1.2em;
+    }
+    
+    .rule-section p,
+    .rule-section li {
+        font-size: 0.9em;
+    }
 }

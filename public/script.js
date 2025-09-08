@@ -27,6 +27,9 @@ const createRoomBtn = document.getElementById('create-room-btn');
 const joinRoomBtn = document.getElementById('join-room-btn');
 const startGameBtn = document.getElementById('start-game-btn');
 const submitRiddleBtn = document.getElementById('submit-riddle');
+const howToPlayBtn = document.getElementById('how-to-play-btn');
+const howToPlayModal = document.getElementById('how-to-play-modal');
+const closeHowToPlayBtn = document.getElementById('close-how-to-play');
 
 const roomCodeDisplay = document.getElementById('room-code-display');
 const playersListEl = document.getElementById('players-list');
@@ -38,6 +41,8 @@ createRoomBtn.addEventListener('click', createRoom);
 joinRoomBtn.addEventListener('click', joinRoom);
 startGameBtn.addEventListener('click', startGame);
 submitRiddleBtn.addEventListener('click', submitRiddleAnswer);
+howToPlayBtn.addEventListener('click', showHowToPlay);
+closeHowToPlayBtn.addEventListener('click', hideHowToPlay);
 playerNameInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') createRoom();
 });
@@ -46,6 +51,20 @@ roomCodeInput.addEventListener('keypress', (e) => {
 });
 riddleAnswer.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') submitRiddleAnswer();
+});
+
+// Close modal when clicking outside
+howToPlayModal.addEventListener('click', (e) => {
+    if (e.target === howToPlayModal) {
+        hideHowToPlay();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && howToPlayModal.style.display === 'flex') {
+        hideHowToPlay();
+    }
 });
 
 // Challenge response event listeners
@@ -476,6 +495,16 @@ function hideIndividualResult() {
     if (overlay) {
         overlay.style.display = 'none';
     }
+}
+
+function showHowToPlay() {
+    howToPlayModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+}
+
+function hideHowToPlay() {
+    howToPlayModal.style.display = 'none';
+    document.body.style.overflow = 'auto'; // Restore scrolling
 }
 
 // Socket event listeners
