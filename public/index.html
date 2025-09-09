@@ -46,21 +46,84 @@
     <div class="strategic-symbols"></div>
     <div class="scanlines"></div>
     
-    <!-- Home Screen -->
+    <!-- Home Screen - Redesigned Black & Red Theme -->
     <div id="home-screen" class="page active">
-        <div class="page-content">
-            <div class="logo">
-                <h1 data-text="CRACK AND COMBAT">CRACK AND COMBAT</h1>
-                <p>Face the Oracle's evolving challenges. Survive. Outsmart. Conquer.</p>
-            </div>
-            <div class="action-section">
-                <input type="text" id="player-name" placeholder="Enter your name" maxlength="15">
-                <button id="create-room-btn" class="btn primary large">Create Room</button>
-                <div class="join-section">
-                    <input type="text" id="room-code" placeholder="Room Code" maxlength="6">
-                    <button id="join-room-btn" class="btn secondary">Join Room</button>
+        <div class="home-container">
+            <!-- Animated Background Elements -->
+            <div class="red-particles"></div>
+            <div class="geometric-lines"></div>
+            
+            <!-- Main Content -->
+            <div class="home-content">
+                <!-- Logo Section -->
+                <div class="logo-section">
+                    <div class="logo-backdrop"></div>
+                    <h1 class="main-title">
+                        <span class="title-crack">CRACK</span>
+                        <span class="title-separator">&</span>
+                        <span class="title-combat">COMBAT</span>
+                    </h1>
+                    <div class="subtitle-container">
+                        <p class="subtitle">Face the Oracle's evolving challenges</p>
+                        <div class="tagline">
+                            <span class="tag survive">SURVIVE</span>
+                            <span class="tag-dot">•</span>
+                            <span class="tag outsmart">OUTSMART</span>
+                            <span class="tag-dot">•</span>
+                            <span class="tag conquer">CONQUER</span>
+                        </div>
+                    </div>
                 </div>
-                <button id="how-to-play-btn" class="btn tertiary">How to Play</button>
+
+                <!-- Game Interface -->
+                <div class="game-interface">
+                    <div class="interface-glow"></div>
+                    
+                    <!-- Player Input Section -->
+                    <div class="player-section">
+                        <div class="input-group">
+                            <label class="input-label">ENTER CODENAME</label>
+                            <input type="text" id="player-name" class="player-input" placeholder="Your codename..." maxlength="15">
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-grid">
+                        <button id="create-room-btn" class="action-btn primary-action">
+                            <span class="btn-icon">⚡</span>
+                            <span class="btn-text">CREATE BATTLE</span>
+                            <div class="btn-glow"></div>
+                        </button>
+                        
+                        <div class="join-container">
+                            <div class="join-input-group">
+                                <label class="input-label">BATTLE CODE</label>
+                                <input type="text" id="room-code" class="code-input" placeholder="XXXXXX" maxlength="6">
+                            </div>
+                            <button id="join-room-btn" class="action-btn secondary-action">
+                                <span class="btn-icon">🎯</span>
+                                <span class="btn-text">JOIN BATTLE</span>
+                                <div class="btn-glow"></div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Info Button -->
+                    <div class="info-section">
+                        <button id="how-to-play-btn" class="info-btn">
+                            <span class="info-icon">❓</span>
+                            <span class="info-text">BATTLE INSTRUCTIONS</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Status Bar -->
+                <div class="status-bar">
+                    <div class="status-item">
+                        <span class="status-label">STATUS:</span>
+                        <span class="status-value ready">READY FOR COMBAT</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
