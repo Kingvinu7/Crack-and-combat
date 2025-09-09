@@ -352,7 +352,7 @@ async function generateChallengeContent(type, roundNumber) {
                 prompt = `Ask a challenging trivia question about science, history, or geography. Use simple words but make it require good knowledge. Not too obvious. Example: "Which gas makes up about 78% of Earth's atmosphere?" or "What empire built Machu Picchu?"`;
                 break;
             case 'danger':
-                prompt = `Create a unique AI-themed survival scenario that requires creative problem-solving. Include malfunctioning technology, AI systems, or futuristic dangers. Make it challenging but not impossible. 50-70 words max. Example: "An AI virus has infected your smart home, sealing all exits and raising the temperature to dangerous levels. The AI demands you solve a logic puzzle to prove your worth, but it's designed to be unsolvable. You have a smartphone, emergency toolkit, and access to the home's backup power system. How do you escape and outsmart the AI?"`;
+                prompt = `Create an AI survival scenario requiring creative problem-solving. Include malfunctioning tech or AI systems. Make it challenging but solvable. 50-70 words max. Example: "AI virus locks your smart home, raising temperature dangerously. It demands an unsolvable logic puzzle. You have: smartphone, toolkit, backup power access. How do you escape?"`;
                 break;
         }
 
