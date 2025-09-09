@@ -48,47 +48,14 @@
     
     <!-- Home Screen - Cyberpunk Grid Layout -->
     <div id="home-screen" class="page active">
-        <!-- Matrix Rain Background -->
-        <div class="matrix-rain"></div>
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         
-        <!-- Cyberpunk Grid Layout -->
-        <div class="cyberpunk-grid">
-            <!-- Vertical Navigation -->
-            <nav class="cyber-nav">
-                <div class="nav-header">
-                    <div class="nav-logo">
-                        <div class="logo-hex">◢</div>
-                        <span class="nav-title">NEURAL</span>
-                    </div>
-                </div>
-                <div class="nav-menu">
-                    <div class="nav-item active">
-                        <span class="nav-icon">▸</span>
-                        <span class="nav-text">INTERFACE</span>
-                    </div>
-                    <div class="nav-item">
-                        <span class="nav-icon">◦</span>
-                        <span class="nav-text">PROTOCOLS</span>
-                    </div>
-                    <div class="nav-item">
-                        <span class="nav-icon">◦</span>
-                        <span class="nav-text">ARCHIVES</span>
-                    </div>
-                    <div class="nav-item">
-                        <span class="nav-icon">◦</span>
-                        <span class="nav-text">SYSTEMS</span>
-                    </div>
-                </div>
-                <div class="nav-footer">
-                    <div class="connection-status">
-                        <div class="status-dot"></div>
-                        <span>ONLINE</span>
-                    </div>
-                </div>
-            </nav>
+        <!-- Clean Centered Layout -->
+        <div class="clean-layout">
 
             <!-- Main Content Area -->
-            <main class="cyber-main">
+            <main class="main-content">
                 <!-- Title Section -->
                 <div class="title-section">
                     <h1 class="cyber-title">
@@ -113,40 +80,38 @@
                     </div>
                 </div>
 
-                <!-- Interface Panel -->
-                <div class="interface-panel">
-                    <div class="panel-header">
-                        <span class="panel-title">COMBAT INITIALIZATION</span>
-                        <div class="panel-status">
+                <!-- Game Controls -->
+                <div class="game-controls">
+                    <div class="controls-title">
+                        <span class="title-text">COMBAT INITIALIZATION</span>
+                        <div class="status-display">
                             <span class="status-indicator">●</span>
                             <span>READY</span>
                         </div>
                     </div>
                     
-                    <div class="control-grid">
-                        <div class="input-section">
-                            <label class="cyber-label">OPERATOR_ID</label>
-                            <input type="text" id="player-name" class="cyber-input" placeholder="ENTER_CODENAME" maxlength="15">
-                        </div>
-                        
-                        <div class="action-section">
-                            <button id="create-room-btn" class="cyber-btn primary">
+                    <div class="input-section">
+                        <label class="cyber-label">OPERATOR_ID</label>
+                        <input type="text" id="player-name" class="cyber-input" placeholder="ENTER_CODENAME" maxlength="15">
+                    </div>
+                    
+                    <div class="action-section">
+                        <button id="create-room-btn" class="cyber-btn primary">
+                            <span class="btn-prefix">[</span>
+                            <span class="btn-text">INITIALIZE</span>
+                            <span class="btn-suffix">]</span>
+                        </button>
+                    </div>
+                    
+                    <div class="join-section">
+                        <label class="cyber-label">SESSION_KEY</label>
+                        <div class="join-controls">
+                            <input type="text" id="room-code" class="cyber-input code-input" placeholder="######" maxlength="6">
+                            <button id="join-room-btn" class="cyber-btn secondary">
                                 <span class="btn-prefix">[</span>
-                                <span class="btn-text">INITIALIZE</span>
+                                <span class="btn-text">CONNECT</span>
                                 <span class="btn-suffix">]</span>
                             </button>
-                        </div>
-                        
-                        <div class="join-section">
-                            <label class="cyber-label">SESSION_KEY</label>
-                            <div class="join-controls">
-                                <input type="text" id="room-code" class="cyber-input code-input" placeholder="######" maxlength="6">
-                                <button id="join-room-btn" class="cyber-btn secondary">
-                                    <span class="btn-prefix">[</span>
-                                    <span class="btn-text">CONNECT</span>
-                                    <span class="btn-suffix">]</span>
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -160,82 +125,13 @@
                 </div>
             </main>
 
-            <!-- Stats Sidebar -->
-            <aside class="cyber-sidebar">
-                <div class="sidebar-header">
-                    <h3 class="sidebar-title">SYSTEM_STATUS</h3>
-                </div>
-                
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-label">CPU_LOAD</div>
-                        <div class="stat-value">47%</div>
-                        <div class="stat-bar">
-                            <div class="stat-fill" style="width: 47%"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-item">
-                        <div class="stat-label">MEMORY</div>
-                        <div class="stat-value">2.3GB</div>
-                        <div class="stat-bar">
-                            <div class="stat-fill" style="width: 63%"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-item">
-                        <div class="stat-label">NETWORK</div>
-                        <div class="stat-value">892ms</div>
-                        <div class="stat-bar">
-                            <div class="stat-fill" style="width: 28%"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="system-info">
-                    <div class="info-item">
-                        <span class="info-key">VERSION:</span>
-                        <span class="info-value">4.7.2</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-key">UPTIME:</span>
-                        <span class="info-value">14:23:41</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-key">SESSIONS:</span>
-                        <span class="info-value">1,247</span>
-                    </div>
-                </div>
-                
-                <div class="terminal-window">
-                    <div class="terminal-header">
-                        <span>CONSOLE</span>
-                        <div class="terminal-controls">
-                            <span class="terminal-dot red"></span>
-                            <span class="terminal-dot yellow"></span>
-                            <span class="terminal-dot green"></span>
-                        </div>
-                    </div>
-                    <div class="terminal-content">
-                        <div class="terminal-line">
-                            <span class="prompt">></span>
-                            <span class="command">neural_init.exe</span>
-                        </div>
-                        <div class="terminal-line">
-                            <span class="output">SYSTEM READY</span>
-                        </div>
-                        <div class="terminal-line">
-                            <span class="prompt">></span>
-                            <span class="cursor">_</span>
-                        </div>
-                    </div>
-                </div>
-            </aside>
         </div>
     </div>
 
     <!-- Lobby Screen -->
     <div id="lobby-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="lobby-header">
                 <h2>Game Lobby</h2>
@@ -256,6 +152,8 @@
 
     <!-- Oracle Introduction Screen -->
     <div id="oracle-intro-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="oracle-avatar large">🤖</div>
             <div class="oracle-message">
@@ -271,6 +169,8 @@
 
     <!-- Riddle Screen -->
     <div id="riddle-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="timer-section">
                 <div id="riddle-timer" class="timer">45</div>
@@ -292,6 +192,8 @@
 
     <!-- Riddle Results Screen -->
     <div id="riddle-results-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="results-header">
                 <h2>🎯 Riddle Results</h2>
@@ -306,6 +208,8 @@
 
     <!-- Text Challenge Screen -->
     <div id="text-challenge-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="timer-section">
                 <div id="text-challenge-timer" class="timer">60</div>
@@ -327,6 +231,8 @@
 
     <!-- Multiple Choice Trivia Screen -->
     <div id="trivia-challenge-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="timer-section">
                 <div id="trivia-timer" class="timer">30</div>
@@ -352,6 +258,8 @@
 
     <!-- Fast Tapper Screen -->
     <div id="fast-tapper-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="timer-section">
                 <div id="fast-tapper-timer" class="timer danger">10</div>
@@ -371,6 +279,8 @@
 
     <!-- Trivia Results Screen -->
     <div id="trivia-results-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="results-header">
                 <h2>🎯 TRIVIA RESULTS</h2>
@@ -391,6 +301,8 @@
 
     <!-- Challenge Results Screen -->
     <div id="challenge-results-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="results-header">
                 <h2 id="challenge-results-title">⚖️ CHALLENGE RESULTS</h2>
@@ -405,6 +317,8 @@
 
     <!-- Waiting Screen -->
     <div id="waiting-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="waiting-section">
                 <h2 id="waiting-title">⏳ Please Wait</h2>
@@ -420,6 +334,8 @@
 
     <!-- Round Summary Screen -->
     <div id="round-summary-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="round-summary-section">
                 <h2 id="round-summary-title">Round Complete!</h2>
@@ -439,6 +355,8 @@
 
     <!-- Game Over Screen -->
     <div id="game-over-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="game-over-section">
                 <h1>🏁 GAME OVER</h1>
