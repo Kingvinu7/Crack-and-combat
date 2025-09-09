@@ -46,85 +46,191 @@
     <div class="strategic-symbols"></div>
     <div class="scanlines"></div>
     
-    <!-- Home Screen - Redesigned Black & Red Theme -->
+    <!-- Home Screen - Cyberpunk Grid Layout -->
     <div id="home-screen" class="page active">
-        <div class="home-container">
-            <!-- Animated Background Elements -->
-            <div class="red-particles"></div>
-            <div class="geometric-lines"></div>
-            
-            <!-- Main Content -->
-            <div class="home-content">
-                <!-- Logo Section -->
-                <div class="logo-section">
-                    <div class="logo-backdrop"></div>
-                    <h1 class="main-title">
+        <!-- Matrix Rain Background -->
+        <div class="matrix-rain"></div>
+        
+        <!-- Cyberpunk Grid Layout -->
+        <div class="cyberpunk-grid">
+            <!-- Vertical Navigation -->
+            <nav class="cyber-nav">
+                <div class="nav-header">
+                    <div class="nav-logo">
+                        <div class="logo-hex">◢</div>
+                        <span class="nav-title">NEURAL</span>
+                    </div>
+                </div>
+                <div class="nav-menu">
+                    <div class="nav-item active">
+                        <span class="nav-icon">▸</span>
+                        <span class="nav-text">INTERFACE</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="nav-icon">◦</span>
+                        <span class="nav-text">PROTOCOLS</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="nav-icon">◦</span>
+                        <span class="nav-text">ARCHIVES</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="nav-icon">◦</span>
+                        <span class="nav-text">SYSTEMS</span>
+                    </div>
+                </div>
+                <div class="nav-footer">
+                    <div class="connection-status">
+                        <div class="status-dot"></div>
+                        <span>ONLINE</span>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content Area -->
+            <main class="cyber-main">
+                <!-- Title Section -->
+                <div class="title-section">
+                    <h1 class="cyber-title">
                         <span class="title-crack">CRACK</span>
-                        <span class="title-separator">&</span>
+                        <span class="title-separator">∧</span>
                         <span class="title-combat">COMBAT</span>
                     </h1>
-                    <div class="subtitle-container">
-                        <p class="subtitle">Face the Oracle's evolving challenges</p>
-                        <div class="tagline">
-                            <span class="tag survive">SURVIVE</span>
-                            <span class="tag-dot">•</span>
-                            <span class="tag outsmart">OUTSMART</span>
-                            <span class="tag-dot">•</span>
-                            <span class="tag conquer">CONQUER</span>
+                    <p class="cyber-subtitle">NEURAL COMBAT SIMULATION</p>
+                </div>
+
+                <!-- Hexagonal AI Symbol -->
+                <div class="ai-symbol-container">
+                    <div class="hexagon-wrapper">
+                        <div class="hexagon-outer">
+                            <div class="hexagon-inner">
+                                <div class="ai-core">
+                                    <div class="core-ring"></div>
+                                    <div class="core-center">AI</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Game Interface -->
-                <div class="game-interface">
-                    <div class="interface-glow"></div>
-                    
-                    <!-- Player Input Section -->
-                    <div class="player-section">
-                        <div class="input-group">
-                            <label class="input-label">ENTER CODENAME</label>
-                            <input type="text" id="player-name" class="player-input" placeholder="Your codename..." maxlength="15">
+                <!-- Interface Panel -->
+                <div class="interface-panel">
+                    <div class="panel-header">
+                        <span class="panel-title">COMBAT INITIALIZATION</span>
+                        <div class="panel-status">
+                            <span class="status-indicator">●</span>
+                            <span>READY</span>
                         </div>
                     </div>
-
-                    <!-- Action Buttons -->
-                    <div class="action-grid">
-                        <button id="create-room-btn" class="action-btn primary-action">
-                            <span class="btn-icon">⚡</span>
-                            <span class="btn-text">CREATE BATTLE</span>
-                            <div class="btn-glow"></div>
-                        </button>
+                    
+                    <div class="control-grid">
+                        <div class="input-section">
+                            <label class="cyber-label">OPERATOR_ID</label>
+                            <input type="text" id="player-name" class="cyber-input" placeholder="ENTER_CODENAME" maxlength="15">
+                        </div>
                         
-                        <div class="join-container">
-                            <div class="join-input-group">
-                                <label class="input-label">BATTLE CODE</label>
-                                <input type="text" id="room-code" class="code-input" placeholder="XXXXXX" maxlength="6">
-                            </div>
-                            <button id="join-room-btn" class="action-btn secondary-action">
-                                <span class="btn-icon">🎯</span>
-                                <span class="btn-text">JOIN BATTLE</span>
-                                <div class="btn-glow"></div>
+                        <div class="action-section">
+                            <button id="create-room-btn" class="cyber-btn primary">
+                                <span class="btn-prefix">[</span>
+                                <span class="btn-text">INITIALIZE</span>
+                                <span class="btn-suffix">]</span>
                             </button>
                         </div>
-                    </div>
-
-                    <!-- Info Button -->
-                    <div class="info-section">
-                        <button id="how-to-play-btn" class="info-btn">
-                            <span class="info-icon">❓</span>
-                            <span class="info-text">BATTLE INSTRUCTIONS</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Status Bar -->
-                <div class="status-bar">
-                    <div class="status-item">
-                        <span class="status-label">STATUS:</span>
-                        <span class="status-value ready">READY FOR COMBAT</span>
+                        
+                        <div class="join-section">
+                            <label class="cyber-label">SESSION_KEY</label>
+                            <div class="join-controls">
+                                <input type="text" id="room-code" class="cyber-input code-input" placeholder="######" maxlength="6">
+                                <button id="join-room-btn" class="cyber-btn secondary">
+                                    <span class="btn-prefix">[</span>
+                                    <span class="btn-text">CONNECT</span>
+                                    <span class="btn-suffix">]</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+
+                <!-- Help Section -->
+                <div class="help-section">
+                    <button id="how-to-play-btn" class="help-btn">
+                        <span class="help-icon">?</span>
+                        <span class="help-text">PROTOCOL_DOCS</span>
+                    </button>
+                </div>
+            </main>
+
+            <!-- Stats Sidebar -->
+            <aside class="cyber-sidebar">
+                <div class="sidebar-header">
+                    <h3 class="sidebar-title">SYSTEM_STATUS</h3>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">CPU_LOAD</div>
+                        <div class="stat-value">47%</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill" style="width: 47%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-label">MEMORY</div>
+                        <div class="stat-value">2.3GB</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill" style="width: 63%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-label">NETWORK</div>
+                        <div class="stat-value">892ms</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill" style="width: 28%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="system-info">
+                    <div class="info-item">
+                        <span class="info-key">VERSION:</span>
+                        <span class="info-value">4.7.2</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-key">UPTIME:</span>
+                        <span class="info-value">14:23:41</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-key">SESSIONS:</span>
+                        <span class="info-value">1,247</span>
+                    </div>
+                </div>
+                
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <span>CONSOLE</span>
+                        <div class="terminal-controls">
+                            <span class="terminal-dot red"></span>
+                            <span class="terminal-dot yellow"></span>
+                            <span class="terminal-dot green"></span>
+                        </div>
+                    </div>
+                    <div class="terminal-content">
+                        <div class="terminal-line">
+                            <span class="prompt">></span>
+                            <span class="command">neural_init.exe</span>
+                        </div>
+                        <div class="terminal-line">
+                            <span class="output">SYSTEM READY</span>
+                        </div>
+                        <div class="terminal-line">
+                            <span class="prompt">></span>
+                            <span class="cursor">_</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
         </div>
     </div>
 
