@@ -80,40 +80,38 @@
                     </div>
                 </div>
 
-                <!-- Interface Panel -->
-                <div class="interface-panel">
-                    <div class="panel-header">
-                        <span class="panel-title">COMBAT INITIALIZATION</span>
-                        <div class="panel-status">
+                <!-- Game Controls -->
+                <div class="game-controls">
+                    <div class="controls-title">
+                        <span class="title-text">COMBAT INITIALIZATION</span>
+                        <div class="status-display">
                             <span class="status-indicator">●</span>
                             <span>READY</span>
                         </div>
                     </div>
                     
-                    <div class="control-grid">
-                        <div class="input-section">
-                            <label class="cyber-label">OPERATOR_ID</label>
-                            <input type="text" id="player-name" class="cyber-input" placeholder="ENTER_CODENAME" maxlength="15">
-                        </div>
-                        
-                        <div class="action-section">
-                            <button id="create-room-btn" class="cyber-btn primary">
+                    <div class="input-section">
+                        <label class="cyber-label">OPERATOR_ID</label>
+                        <input type="text" id="player-name" class="cyber-input" placeholder="ENTER_CODENAME" maxlength="15">
+                    </div>
+                    
+                    <div class="action-section">
+                        <button id="create-room-btn" class="cyber-btn primary">
+                            <span class="btn-prefix">[</span>
+                            <span class="btn-text">INITIALIZE</span>
+                            <span class="btn-suffix">]</span>
+                        </button>
+                    </div>
+                    
+                    <div class="join-section">
+                        <label class="cyber-label">SESSION_KEY</label>
+                        <div class="join-controls">
+                            <input type="text" id="room-code" class="cyber-input code-input" placeholder="######" maxlength="6">
+                            <button id="join-room-btn" class="cyber-btn secondary">
                                 <span class="btn-prefix">[</span>
-                                <span class="btn-text">INITIALIZE</span>
+                                <span class="btn-text">CONNECT</span>
                                 <span class="btn-suffix">]</span>
                             </button>
-                        </div>
-                        
-                        <div class="join-section">
-                            <label class="cyber-label">SESSION_KEY</label>
-                            <div class="join-controls">
-                                <input type="text" id="room-code" class="cyber-input code-input" placeholder="######" maxlength="6">
-                                <button id="join-room-btn" class="cyber-btn secondary">
-                                    <span class="btn-prefix">[</span>
-                                    <span class="btn-text">CONNECT</span>
-                                    <span class="btn-suffix">]</span>
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -132,6 +130,8 @@
 
     <!-- Lobby Screen -->
     <div id="lobby-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="lobby-header">
                 <h2>Game Lobby</h2>
@@ -152,6 +152,8 @@
 
     <!-- Oracle Introduction Screen -->
     <div id="oracle-intro-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="oracle-avatar large">🤖</div>
             <div class="oracle-message">
@@ -167,6 +169,8 @@
 
     <!-- Riddle Screen -->
     <div id="riddle-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="timer-section">
                 <div id="riddle-timer" class="timer">45</div>
@@ -188,6 +192,8 @@
 
     <!-- Riddle Results Screen -->
     <div id="riddle-results-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="results-header">
                 <h2>🎯 Riddle Results</h2>
@@ -202,6 +208,8 @@
 
     <!-- Text Challenge Screen -->
     <div id="text-challenge-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="timer-section">
                 <div id="text-challenge-timer" class="timer">60</div>
@@ -223,6 +231,8 @@
 
     <!-- Multiple Choice Trivia Screen -->
     <div id="trivia-challenge-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="timer-section">
                 <div id="trivia-timer" class="timer">30</div>
@@ -248,6 +258,8 @@
 
     <!-- Fast Tapper Screen -->
     <div id="fast-tapper-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="timer-section">
                 <div id="fast-tapper-timer" class="timer danger">10</div>
@@ -267,6 +279,8 @@
 
     <!-- Trivia Results Screen -->
     <div id="trivia-results-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="results-header">
                 <h2>🎯 TRIVIA RESULTS</h2>
@@ -287,6 +301,8 @@
 
     <!-- Challenge Results Screen -->
     <div id="challenge-results-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="results-header">
                 <h2 id="challenge-results-title">⚖️ CHALLENGE RESULTS</h2>
@@ -301,6 +317,8 @@
 
     <!-- Waiting Screen -->
     <div id="waiting-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="waiting-section">
                 <h2 id="waiting-title">⏳ Please Wait</h2>
@@ -316,6 +334,8 @@
 
     <!-- Round Summary Screen -->
     <div id="round-summary-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="round-summary-section">
                 <h2 id="round-summary-title">Round Complete!</h2>
@@ -335,6 +355,8 @@
 
     <!-- Game Over Screen -->
     <div id="game-over-screen" class="page">
+        <!-- Matrix Background Effect -->
+        <div class="matrix-bg"></div>
         <div class="page-content">
             <div class="game-over-section">
                 <h1>🏁 GAME OVER</h1>

@@ -787,39 +787,36 @@ body::before {
     position: relative;
 }
 
-/* Interface Panel */
-.interface-panel {
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid var(--border-cyan);
-    border-radius: 8px;
-    padding: 30px;
+/* Game Controls - Clean Layout */
+.game-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
     margin: 40px 0;
-    backdrop-filter: blur(10px);
-    box-shadow: var(--shadow-deep);
     position: relative;
     z-index: 2;
-    min-width: 400px;
+    max-width: 400px;
+    width: 100%;
 }
 
-.panel-header {
+.controls-title {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid var(--border-dim);
+    margin-bottom: 10px;
 }
 
-.panel-title {
+.title-text {
     font-family: 'Rajdhani', sans-serif;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 700;
     color: var(--text-cyan);
     letter-spacing: 2px;
     text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
 }
 
-.panel-status {
+.status-display {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -833,9 +830,10 @@ body::before {
     animation: statusBlink 2s ease-in-out infinite;
 }
 
-.control-grid {
-    display: grid;
-    gap: 20px;
+.input-section, .action-section, .join-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .cyber-label {
@@ -2740,9 +2738,8 @@ input[type="text"]::placeholder, textarea::placeholder {
         height: 120px;
     }
     
-    .interface-panel {
-        min-width: auto;
-        padding: 20px;
+    .game-controls {
+        max-width: 100%;
         margin: 20px 0;
     }
     
@@ -2881,17 +2878,12 @@ input[type="text"]::placeholder, textarea::placeholder {
         font-size: 18px;
     }
     
-    .interface-panel {
-        padding: 15px;
-        min-width: auto;
-    }
-    
-    .panel-title {
-        font-size: 14px;
+    .title-text {
+        font-size: 16px;
         letter-spacing: 1px;
     }
-    
-    .panel-status {
+
+    .status-display {
         font-size: 10px;
     }
     
