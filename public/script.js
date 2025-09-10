@@ -10,11 +10,11 @@ function createMatrixLines() {
     const matrixBg = document.querySelector('.matrix-bg');
     if (!matrixBg) return;
     
-    // Generate binary content for full screen width
-    function generateBinaryLine() {
+    // Generate single line of binary code
+    function generateSingleBinaryLine() {
         const screenWidth = window.innerWidth;
-        const charWidth = window.innerWidth > 768 ? 14 : 10; // Approximate character width
-        const charsPerLine = Math.floor(screenWidth / charWidth) * 3; // Extra characters for wrapping
+        const charWidth = window.innerWidth > 768 ? 12 : 10; // Character width
+        const charsPerLine = Math.floor(screenWidth / charWidth);
         
         let binary = '';
         for (let i = 0; i < charsPerLine; i++) {
@@ -23,32 +23,31 @@ function createMatrixLines() {
         return binary;
     }
     
-    // Create multiple matrix line elements for continuous coverage
-    for (let i = 0; i < 15; i++) {
+    // Create single line falling elements
+    for (let i = 0; i < 20; i++) {
         const matrixLine = document.createElement('div');
-        matrixLine.className = 'matrix-line';
-        matrixLine.textContent = generateBinaryLine();
+        matrixLine.className = 'matrix-single-line';
+        matrixLine.textContent = generateSingleBinaryLine();
         
-        // Staggered timing to ensure screen is never blank
-        const delay = i * 2; // Every 2 seconds a new line starts
-        const duration = 25 + Math.random() * 10; // Much slower: 25-35 seconds
+        // Each line starts at different times for continuous effect
+        const delay = i * 1.2; // Every 1.2 seconds a new line starts
+        const duration = 12 + Math.random() * 6; // 12-18 seconds duration
         
         matrixLine.style.cssText = `
             position: absolute;
             width: 100%;
-            height: 50vh;
-            top: -50vh;
+            height: auto;
+            top: -2em;
             left: 0;
             font-family: 'JetBrains Mono', monospace;
-            font-size: clamp(8px, 1.1vw, 12px);
-            line-height: clamp(12px, 1.6vw, 18px);
+            font-size: clamp(10px, 1.2vw, 14px);
+            line-height: 1.2;
             color: var(--text-matrix);
-            word-break: break-all;
             letter-spacing: clamp(0.5px, 0.1vw, 1px);
-            animation: matrixLineFall ${duration}s linear infinite ${delay}s;
-            opacity: 1;
-            text-shadow: 0 0 6px var(--text-matrix);
-            white-space: pre-wrap;
+            animation: matrixSingleLineFall ${duration}s linear infinite ${delay}s;
+            opacity: 0.7;
+            text-shadow: 0 0 8px var(--text-matrix);
+            white-space: nowrap;
             overflow: hidden;
             z-index: ${-1 - i};
             pointer-events: none;
@@ -64,26 +63,26 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Regenerate lines periodically for variety
     setInterval(() => {
-        const matrixLines = document.querySelectorAll('.matrix-line');
+        const matrixLines = document.querySelectorAll('.matrix-single-line');
         matrixLines.forEach(line => {
-            if (Math.random() > 0.7) { // 30% chance to regenerate
-                line.textContent = generateBinaryLine();
+            if (Math.random() > 0.8) { // 20% chance to regenerate
+                line.textContent = generateSingleBinaryLine();
             }
         });
-    }, 5000);
+    }, 8000);
 });
 
 // Regenerate on window resize
 window.addEventListener('resize', () => {
-    const matrixLines = document.querySelectorAll('.matrix-line');
+    const matrixLines = document.querySelectorAll('.matrix-single-line');
     matrixLines.forEach(line => line.remove());
     setTimeout(createMatrixLines, 100);
 });
 
-function generateBinaryLine() {
+function generateSingleBinaryLine() {
     const screenWidth = window.innerWidth;
-    const charWidth = window.innerWidth > 768 ? 14 : 10;
-    const charsPerLine = Math.floor(screenWidth / charWidth) * 3;
+    const charWidth = window.innerWidth > 768 ? 12 : 10;
+    const charsPerLine = Math.floor(screenWidth / charWidth);
     
     let binary = '';
     for (let i = 0; i < charsPerLine; i++) {
