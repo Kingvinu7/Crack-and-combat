@@ -474,8 +474,8 @@ body::before {
     color: var(--text-matrix);
     word-break: break-all;
     letter-spacing: clamp(0.5px, 0.1vw, 1px);
-    animation: matrixLineFall1 8s linear infinite;
-    opacity: 0.6;
+    animation: matrixLineFall 20s linear infinite;
+    opacity: 0.4;
     text-shadow: 0 0 8px var(--text-matrix);
     white-space: pre-wrap;
     overflow: hidden;
@@ -494,8 +494,8 @@ body::before {
     color: var(--text-matrix);
     word-break: break-all;
     letter-spacing: clamp(0.5px, 0.15vw, 2px);
-    animation: matrixLineFall2 12s linear infinite 4s;
-    opacity: 0.4;
+    animation: matrixLineFall 25s linear infinite 10s;
+    opacity: 0.3;
     text-shadow: 0 0 6px var(--text-matrix);
     white-space: pre-wrap;
     overflow: hidden;
@@ -517,39 +517,22 @@ body::before {
             transparent clamp(15px, 2vw, 25px)
         );
     background-size: 100% 100%;
-    animation: matrixBackgroundShift 20s linear infinite;
+    animation: matrixBackgroundShift 40s linear infinite;
 }
 
-@keyframes matrixLineFall1 {
+@keyframes matrixLineFall {
     0% {
         transform: translateY(-100vh);
         opacity: 0;
     }
-    5% {
+    3% {
         opacity: 0.6;
     }
-    95% {
+    97% {
         opacity: 0.6;
     }
     100% {
-        transform: translateY(200vh);
-        opacity: 0;
-    }
-}
-
-@keyframes matrixLineFall2 {
-    0% {
-        transform: translateY(-100vh);
-        opacity: 0;
-    }
-    8% {
-        opacity: 0.4;
-    }
-    92% {
-        opacity: 0.4;
-    }
-    100% {
-        transform: translateY(200vh);
+        transform: translateY(100vh);
         opacity: 0;
     }
 }

@@ -23,15 +23,15 @@ function createMatrixLines() {
         return binary;
     }
     
-    // Create multiple matrix line elements
-    for (let i = 0; i < 6; i++) {
+    // Create multiple matrix line elements for continuous coverage
+    for (let i = 0; i < 15; i++) {
         const matrixLine = document.createElement('div');
         matrixLine.className = 'matrix-line';
         matrixLine.textContent = generateBinaryLine();
         
-        // Randomize animation timing
-        const delay = i * 2 + Math.random() * 3;
-        const duration = 8 + Math.random() * 6;
+        // Staggered timing to ensure screen is never blank
+        const delay = i * 2; // Every 2 seconds a new line starts
+        const duration = 25 + Math.random() * 10; // Much slower: 25-35 seconds
         
         matrixLine.style.cssText = `
             position: absolute;
@@ -46,7 +46,7 @@ function createMatrixLines() {
             word-break: break-all;
             letter-spacing: clamp(0.5px, 0.1vw, 1px);
             animation: matrixLineFall ${duration}s linear infinite ${delay}s;
-            opacity: ${0.3 + Math.random() * 0.3};
+            opacity: ${0.2 + Math.random() * 0.4};
             text-shadow: 0 0 6px var(--text-matrix);
             white-space: pre-wrap;
             overflow: hidden;
