@@ -581,10 +581,10 @@ body::before {
 
 /* Main Content Area */
 .main-content {
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.15);
     border: 1px solid var(--border-cyan);
     border-radius: 12px;
-    backdrop-filter: blur(15px);
+    backdrop-filter: blur(8px);
     box-shadow: 
         0 0 40px rgba(0, 255, 255, 0.1),
         var(--shadow-deep);
