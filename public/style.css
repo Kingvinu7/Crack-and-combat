@@ -460,113 +460,106 @@ body::before {
     pointer-events: none;
 }
 
-/* Multiple matrix columns at different speeds */
-.matrix-bg::before, .matrix-bg-overlay::before {
-    content: '01010011001101111011001100101001110100010000110010010011010010110110000011010000100101011001110110010101110010011110010010000001000011011011110110010001100101001000000100011001100001011011000110110001101001011011100110011100100000010010000100000001000001010010010010000001000011011010000110000101101100011011000110010101101110011001110110010100100000001000000100000100100000010000010100100100100000010010010110111001110100011001010111001001100110011000010110001101100101';
+/* Full-width matrix lines falling */
+.matrix-bg::before {
+    content: '0101001100110111101100110010100111010001000011001001001101001011011000001101000010010101100111011001010111001001111001001000000100001101101111011001000110010100100000010001100110000101101100011011000110100101101110011001110010000001001000010000000100000101001001001000000100001101101000011000010110110001101100011001010110111001100111011001010010000000100000010000010010000001000001010010010010000001001001011011100111010001100101011100100110011001100001011000110110010101001010010011010100010101010000010100100100010010000101001010100100100000101001001000010100101010010010000010100100100001010010101001001000001010010010000101001010100100100000101001001000010100101010010010000010100100100001010010101001001000001010010010000101001010100100100000101001001000010100101010010010000010100100100001010010101001001000001010010010000101001010100100100000101001001000010100101010010010000010100100100001010010101001001';
     position: absolute;
-    width: 20%;
-    height: 200%;
+    width: 100%;
+    height: 100vh;
+    top: -100vh;
     left: 0;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 14px;
-    line-height: 20px;
+    font-size: clamp(10px, 1.2vw, 14px);
+    line-height: clamp(14px, 1.8vw, 20px);
     color: var(--text-matrix);
     word-break: break-all;
-    letter-spacing: 1px;
-    animation: matrixRain1 12s linear infinite;
-    opacity: 0.4;
-    text-shadow: 0 0 5px var(--text-matrix);
+    letter-spacing: clamp(0.5px, 0.1vw, 1px);
+    animation: matrixLineFall1 8s linear infinite;
+    opacity: 0.6;
+    text-shadow: 0 0 8px var(--text-matrix);
+    white-space: pre-wrap;
+    overflow: hidden;
 }
 
-.matrix-bg::after, .matrix-bg-overlay::after {
-    content: '11001010011001010110111001100011011001010010000001101001011100110010000001100110011101010111010001101001011011000110010100100000011100100110010101110011011010010111001101110100011000010110111001100011011001010010000001101001011100110010000001100110011101010111010001101001011011000110010100000101000100000010000010100100100100000010010010101001100100000010101000100100001000101001000000100011001010101010101000101010101010010010001010000101000100000010001100100111101010010001000000100100001010101010011010100000101001110001000000100011001001111010100100100001100100000010010000101010101001101010000010100111000001010001000000100001101001111010011010101000001010101010101000100100001000101010100100100010100001010';
+.matrix-bg::after {
+    content: '1100101001100101011011100110001101100101001000000110100101110011001000000110011001110101011101000110100101101100011001010010000001110010011001010111001101101001011100110111010001100001011011100110001101100101001000000110100101110011001000000110011001110101011101000110100101101100011001010000010100010000001000001010010010010000001001001010100110010000001010100010010000100010100100000010001100101010101010100010101010101001001000101000010100010000001000110010011110101001000100000010010000101010101001101010000010100111000100000010001100100111101010010010000110010000001001000010101010100110101000001010011100000101000100000010000110100111101001101010100000101010101010100010010000100010101010010010001010000101001010100100100010100001010100101001001000001010010010000101001010100100100000101001001000010100101010010010000010100100100001010010101001001';
     position: absolute;
-    width: 25%;
-    height: 250%;
-    right: 0;
+    width: 100%;
+    height: 100vh;
+    top: -100vh;
+    left: 0;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    line-height: 18px;
+    font-size: clamp(8px, 1vw, 12px);
+    line-height: clamp(12px, 1.5vw, 18px);
     color: var(--text-matrix);
     word-break: break-all;
-    letter-spacing: 2px;
-    animation: matrixRain2 18s linear infinite;
-    opacity: 0.3;
-    text-shadow: 0 0 3px var(--text-matrix);
+    letter-spacing: clamp(0.5px, 0.15vw, 2px);
+    animation: matrixLineFall2 12s linear infinite 4s;
+    opacity: 0.4;
+    text-shadow: 0 0 6px var(--text-matrix);
+    white-space: pre-wrap;
+    overflow: hidden;
 }
 
-/* Create additional matrix columns with pseudo-elements */
+/* Additional matrix line layers for continuous effect */
+.matrix-bg {
+    overflow: hidden;
+}
+
 .matrix-bg, .matrix-bg-overlay {
     background-image: 
-        /* Column 1 */
+        /* Subtle background lines */
         repeating-linear-gradient(
             0deg,
             transparent 0px,
-            rgba(0, 255, 65, 0.1) 1px,
+            rgba(0, 255, 65, 0.05) 1px,
             transparent 2px,
-            transparent 20px
-        ),
-        /* Column 2 */
-        repeating-linear-gradient(
-            0deg,
-            transparent 0px,
-            rgba(0, 255, 65, 0.15) 1px,
-            transparent 2px,
-            transparent 15px
-        ),
-        /* Column 3 */
-        repeating-linear-gradient(
-            0deg,
-            transparent 0px,
-            rgba(0, 255, 65, 0.08) 1px,
-            transparent 2px,
-            transparent 25px
+            transparent clamp(15px, 2vw, 25px)
         );
-    background-size: 15% 100%, 20% 100%, 18% 100%;
-    background-position: 25% 0, 50% 0, 75% 0;
-    animation: matrixColumns 25s linear infinite;
+    background-size: 100% 100%;
+    animation: matrixBackgroundShift 20s linear infinite;
 }
 
-@keyframes matrixRain1 {
+@keyframes matrixLineFall1 {
     0% {
-        transform: translateY(-100%);
+        transform: translateY(-100vh);
+        opacity: 0;
+    }
+    5% {
+        opacity: 0.6;
+    }
+    95% {
+        opacity: 0.6;
+    }
+    100% {
+        transform: translateY(200vh);
+        opacity: 0;
+    }
+}
+
+@keyframes matrixLineFall2 {
+    0% {
+        transform: translateY(-100vh);
+        opacity: 0;
+    }
+    8% {
         opacity: 0.4;
     }
-    10% {
-        opacity: 0.6;
-    }
-    90% {
-        opacity: 0.6;
+    92% {
+        opacity: 0.4;
     }
     100% {
-        transform: translateY(100vh);
+        transform: translateY(200vh);
         opacity: 0;
     }
 }
 
-@keyframes matrixRain2 {
+@keyframes matrixBackgroundShift {
     0% {
-        transform: translateY(-120%);
-        opacity: 0.3;
-    }
-    15% {
-        opacity: 0.5;
-    }
-    85% {
-        opacity: 0.5;
+        background-position: 0% 0%;
     }
     100% {
-        transform: translateY(100vh);
-        opacity: 0;
-    }
-}
-
-@keyframes matrixColumns {
-    0% {
-        background-position: 25% -100%, 50% -100%, 75% -100%;
-    }
-    100% {
-        background-position: 25% 100vh, 50% 100vh, 75% 100vh;
+        background-position: 0% 100vh;
     }
 }
 

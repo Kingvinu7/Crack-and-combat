@@ -5,6 +5,92 @@ let isRoomOwner = false;
 let tapCount = 0;
 let tapperActive = false;
 
+// Matrix background effect
+function createMatrixLines() {
+    const matrixBg = document.querySelector('.matrix-bg');
+    if (!matrixBg) return;
+    
+    // Generate binary content for full screen width
+    function generateBinaryLine() {
+        const screenWidth = window.innerWidth;
+        const charWidth = window.innerWidth > 768 ? 14 : 10; // Approximate character width
+        const charsPerLine = Math.floor(screenWidth / charWidth) * 3; // Extra characters for wrapping
+        
+        let binary = '';
+        for (let i = 0; i < charsPerLine; i++) {
+            binary += Math.random() > 0.5 ? '1' : '0';
+        }
+        return binary;
+    }
+    
+    // Create multiple matrix line elements
+    for (let i = 0; i < 6; i++) {
+        const matrixLine = document.createElement('div');
+        matrixLine.className = 'matrix-line';
+        matrixLine.textContent = generateBinaryLine();
+        
+        // Randomize animation timing
+        const delay = i * 2 + Math.random() * 3;
+        const duration = 8 + Math.random() * 6;
+        
+        matrixLine.style.cssText = `
+            position: absolute;
+            width: 100%;
+            height: 100vh;
+            top: -100vh;
+            left: 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(8px, 1.1vw, 12px);
+            line-height: clamp(12px, 1.6vw, 18px);
+            color: var(--text-matrix);
+            word-break: break-all;
+            letter-spacing: clamp(0.5px, 0.1vw, 1px);
+            animation: matrixLineFall ${duration}s linear infinite ${delay}s;
+            opacity: ${0.3 + Math.random() * 0.3};
+            text-shadow: 0 0 6px var(--text-matrix);
+            white-space: pre-wrap;
+            overflow: hidden;
+            z-index: ${-1 - i};
+        `;
+        
+        matrixBg.appendChild(matrixLine);
+    }
+}
+
+// Initialize matrix effect when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    createMatrixLines();
+    
+    // Regenerate lines periodically for variety
+    setInterval(() => {
+        const matrixLines = document.querySelectorAll('.matrix-line');
+        matrixLines.forEach(line => {
+            if (Math.random() > 0.7) { // 30% chance to regenerate
+                line.textContent = generateBinaryLine();
+            }
+        });
+    }, 5000);
+});
+
+// Regenerate on window resize
+window.addEventListener('resize', () => {
+    const matrixLines = document.querySelectorAll('.matrix-line');
+    matrixLines.forEach(line => line.remove());
+    setTimeout(createMatrixLines, 100);
+});
+
+function generateBinaryLine() {
+    const screenWidth = window.innerWidth;
+    const charWidth = window.innerWidth > 768 ? 14 : 10;
+    const charsPerLine = Math.floor(screenWidth / charWidth) * 3;
+    
+    let binary = '';
+    for (let i = 0; i < charsPerLine; i++) {
+        binary += Math.random() > 0.5 ? '1' : '0';
+    }
+    return binary;
+}
+
 // DOM elements
 const pages = {
     home: document.getElementById('home-screen'),
