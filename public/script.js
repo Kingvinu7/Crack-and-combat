@@ -36,8 +36,8 @@ function createMatrixLines() {
         matrixLine.style.cssText = `
             position: absolute;
             width: 100%;
-            height: 100vh;
-            top: -100vh;
+            height: 50vh;
+            top: -50vh;
             left: 0;
             font-family: 'JetBrains Mono', monospace;
             font-size: clamp(8px, 1.1vw, 12px);
@@ -46,11 +46,12 @@ function createMatrixLines() {
             word-break: break-all;
             letter-spacing: clamp(0.5px, 0.1vw, 1px);
             animation: matrixLineFall ${duration}s linear infinite ${delay}s;
-            opacity: ${0.2 + Math.random() * 0.4};
+            opacity: 1;
             text-shadow: 0 0 6px var(--text-matrix);
             white-space: pre-wrap;
             overflow: hidden;
             z-index: ${-1 - i};
+            pointer-events: none;
         `;
         
         matrixBg.appendChild(matrixLine);
