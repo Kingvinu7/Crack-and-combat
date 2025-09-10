@@ -352,7 +352,7 @@ async function generateChallengeContent(type, roundNumber) {
                 prompt = `Ask a challenging trivia question about science, history, or geography. Use simple words but make it require good knowledge. Not too obvious. Example: "Which gas makes up about 78% of Earth's atmosphere?" or "What empire built Machu Picchu?"`;
                 break;
             case 'danger':
-                prompt = `Create an AI survival scenario requiring creative problem-solving. Include malfunctioning tech or AI systems. Make it challenging but solvable. 50-70 words max. Example: "AI virus locks your smart home, raising temperature dangerously. It demands an unsolvable logic puzzle. You have: smartphone, toolkit, backup power access. How do you escape?"`;
+                prompt = `Create a dangerous survival scenario requiring creative problem-solving. Focus on physical dangers like wild animals, natural disasters, or being trapped. Make it challenging but solvable with clever thinking. 30-50 words max. Example: "You're trapped in a room with a hungry lion. What will you do to survive?"`;
                 break;
         }
 
@@ -375,7 +375,7 @@ async function generateChallengeContent(type, roundNumber) {
                 negotiator: "Convince your neighbor's loud dog to stop barking at 3 AM by offering it something irresistible.",
                 detective: "The space station's oxygen generator was sabotaged. Clues: Tool marks on the panel, coffee stains nearby, access card used at 3 AM, and security footage shows a hooded figure. Three suspects: Engineer Jake, Security Chief Maria, and Maintenance Worker Bob. Who is guilty?",
                 trivia: "Which ancient wonder of the world was located in Alexandria, Egypt and was destroyed by earthquakes?",
-                danger: "You're trapped in a collapsing mine shaft 200 feet underground. Your oxygen tank is damaged and leaking. You have a pickaxe, emergency flares, and a rope. The main tunnel is blocked but you can hear water flowing somewhere. How do you escape?"
+                danger: "You got trapped in front of a room with a hungry lion. What will you do to survive?"
             };
             cleaned = fallbacks[type] || "Complete this challenge to survive!";
         }
@@ -399,7 +399,7 @@ async function generateChallengeContent(type, roundNumber) {
             negotiator: "Convince your smart home AI to unlock the doors after it's decided you're 'not authorized' due to a software glitch that doesn't recognize your voice patterns.",
             detective: "The research facility's experimental AI has gone missing from its secure server. Clues: Unauthorized network access at 2:47 AM, a coffee-stained USB drive, electromagnetic interference in Lab 7, and security footage showing a figure in a lab coat. Three researchers had late access: Dr. Chen (AI ethics specialist), Dr. Rodriguez (cybersecurity expert), and Dr. Kim (neural network architect). Who took the AI and why?",
             trivia: "What is the theoretical maximum processing speed limit imposed by the laws of physics on any computer?",
-            danger: "You're trapped in an automated research facility where the AI security system has malfunctioned and declared you an intruder. Laser grids are activating, doors are sealing, and oxygen is being redirected. You have a tablet with partial admin access, an electromagnetic pulse device with one charge, and a maintenance drone you can reprogram. The AI is learning your movements. How do you escape before it adapts completely?"
+            danger: "You got trapped in front of a room with a hungry lion that hasn't eaten for days. The door behind you is locked, and there's no other way out. You have a flashlight, a bag of chips, and your phone with 10% battery. What will you do to survive?"
         };
         return mediumFallbacks[type] || "Face this challenging test!";
     }
@@ -429,31 +429,53 @@ async function evaluatePlayerResponse(challengeContent, playerResponse, challeng
             /cheat|hack|exploit|glitch|bug/i,
             /call.*police|call.*911|call.*help/i,
             /ignore|skip|don't|won't|refuse/i,
-            /easy|simple|just.*do|obviously/i
+            /easy|simple|just.*do|obviously/i,
+            /run.*away|just.*run|simply.*run/i,
+            /use.*phone.*call|call.*someone/i,
+            /break.*window|smash.*glass/i
+        ];
+        
+        // Detect genuinely clever responses that should always pass
+        const cleverIndicators = [
+            /distract|diversion|misdirect/i,
+            /slowly|carefully|quietly/i,
+            /food|bait|lure|attract/i,
+            /mirror|reflection|light/i,
+            /sound|noise|whistle/i,
+            /patience|wait|timing/i,
+            /psychology|behavior|instinct/i,
+            /creative|innovative|unconventional/i
         ];
         
         const hasLazyShortcut = lazyShortcuts.some(pattern => pattern.test(cleanResponse));
+        const hasCleverIndicators = cleverIndicators.some(pattern => pattern.test(cleanResponse));
         
         switch (challengeType) {
             case 'negotiator':
-                if (hasLazyShortcut) {
+                if (hasLazyShortcut && !hasCleverIndicators) {
                     evaluationPrompt = `This negotiation attempt contains an oversmart shortcut: "${cleanResponse}"\n\nSituation: ${challengeContent}\n\nThis is clearly trying to avoid the actual negotiation challenge with lazy solutions like violence, magic, or ignoring the problem. Respond with FAIL and give a brutal, sharp comeback explaining why this approach completely misses the point and would fail spectacularly. Be witty and cutting in your response. Keep under 350 characters.`;
+                } else if (hasCleverIndicators) {
+                    evaluationPrompt = `Evaluate this clever negotiation attempt:\n\nSituation: ${challengeContent}\n\nPlayer's approach: "${cleanResponse}"\n\nThis response shows creative thinking elements. Reward genuine creativity, psychological insights, and clever approaches. Look for: food bribes, creative distractions, emotional appeals, understanding behavior, or innovative solutions. PASS creative approaches that show real thought. Answer PASS or FAIL with encouraging feedback. Keep under 350 characters. ${isAutoSubmitted ? 'NOTE: Auto-submitted when time ran out.' : ''}`;
                 } else {
                     evaluationPrompt = `Evaluate this negotiation attempt:\n\nSituation: ${challengeContent}\n\nPlayer's approach: "${cleanResponse}"\n\nDoes this show genuine creative thinking? Look for: clever bribing with food, creative distractions, sneaky approaches, emotional appeals, logical compromises, or other inventive solutions. Even risky plans should pass if they show real creativity and effort. Answer PASS or FAIL with encouraging or constructive feedback. Keep under 350 characters. ${isAutoSubmitted ? 'NOTE: Auto-submitted when time ran out.' : ''}`;
                 }
                 break;
                 
             case 'danger':
-                if (hasLazyShortcut) {
-                    evaluationPrompt = `This survival plan contains an oversmart shortcut: "${cleanResponse}"\n\nDanger: ${challengeContent}\n\nThis is clearly trying to avoid the actual survival challenge with unrealistic solutions like magic, violence, or ignoring the problem. Respond with FAIL and give a brutal, logical explanation of why this approach would lead to certain doom. Be sharp and merciless in explaining the flaws. Keep under 350 characters.`;
+                if (hasLazyShortcut && !hasCleverIndicators) {
+                    evaluationPrompt = `This survival plan contains an oversmart shortcut: "${cleanResponse}"\n\nDanger: ${challengeContent}\n\nThis is clearly trying to avoid the actual survival challenge with unrealistic solutions like violence, running away, or calling for help. Respond with FAIL and give a brutal, logical explanation of why this approach would lead to certain doom. Be sharp and merciless in explaining the flaws. Keep under 350 characters.`;
+                } else if (hasCleverIndicators) {
+                    evaluationPrompt = `Evaluate this clever survival plan:\n\nDanger: ${challengeContent}\n\nPlayer's plan: "${cleanResponse}"\n\nThis response shows creative thinking with clever elements. Evaluate if the approach is realistic and could work. Reward genuine creativity, psychological insights, and resourceful use of available items. Even if risky, PASS creative solutions that show real thought. Answer PASS or FAIL with encouraging feedback. Keep under 350 characters. ${isAutoSubmitted ? 'NOTE: Auto-submitted when time ran out.' : ''}`;
                 } else {
-                    evaluationPrompt = `Evaluate this survival plan:\n\nDanger: ${challengeContent}\n\nPlayer's plan: "${cleanResponse}"\n\nDoes this show practical creativity and real problem-solving? Look for: resourceful use of available items, clever engineering solutions, creative escape routes, or innovative survival tactics. Even unconventional approaches should pass if they demonstrate genuine thinking and could plausibly work. Answer PASS or FAIL with detailed reasoning. Keep under 350 characters. ${isAutoSubmitted ? 'NOTE: Auto-submitted when time ran out.' : ''}`;
+                    evaluationPrompt = `Evaluate this survival plan:\n\nDanger: ${challengeContent}\n\nPlayer's plan: "${cleanResponse}"\n\nDoes this show practical creativity and real problem-solving? Look for: resourceful use of available items, clever distractions, understanding animal behavior, creative escape tactics, or psychological approaches. Even unconventional approaches should pass if they demonstrate genuine thinking and could plausibly work. Answer PASS or FAIL with detailed reasoning. Keep under 350 characters. ${isAutoSubmitted ? 'NOTE: Auto-submitted when time ran out.' : ''}`;
                 }
                 break;
                 
             case 'detective':
-                if (hasLazyShortcut) {
+                if (hasLazyShortcut && !hasCleverIndicators) {
                     evaluationPrompt = `This detective conclusion tries to shortcut the mystery: "${cleanResponse}"\n\nMystery: ${challengeContent}\n\nThis avoids actually analyzing the clues and evidence provided. Respond with FAIL and a sharp explanation of why good detective work requires examining evidence, not taking lazy shortcuts. Be cutting about their lack of deductive reasoning. Keep under 350 characters.`;
+                } else if (hasCleverIndicators) {
+                    evaluationPrompt = `Evaluate this clever detective work:\n\nMystery: ${challengeContent}\n\nPlayer's conclusion: "${cleanResponse}"\n\nThis response shows analytical thinking elements. Reward logical deduction, evidence analysis, and creative reasoning. Look for: careful consideration of clues, psychological insights, or innovative connections. PASS thoughtful analysis even if conclusion isn't perfect. Answer PASS or FAIL with encouraging feedback. Keep under 350 characters. ${isAutoSubmitted ? 'NOTE: Auto-submitted when time ran out.' : ''}`;
                 } else {
                     evaluationPrompt = `Evaluate this detective conclusion:\n\nMystery: ${challengeContent}\n\nPlayer's conclusion: "${cleanResponse}"\n\nDid they analyze the clues logically and reach a reasonable conclusion? Even if not perfect, reward genuine deductive reasoning and consideration of evidence. Look for thoughtful analysis over correct guesses. Answer PASS or FAIL with constructive feedback. Keep under 350 characters. ${isAutoSubmitted ? 'NOTE: Auto-submitted when time ran out.' : ''}`;
                 }
@@ -486,8 +508,10 @@ async function evaluatePlayerResponse(challengeContent, playerResponse, challeng
         
         // Ensure we have some feedback
         if (!feedback || feedback.length < 5) {
-            if (hasLazyShortcut) {
+            if (hasLazyShortcut && !hasCleverIndicators) {
                 feedback = pass ? "Surprisingly workable despite shortcuts." : "Lazy shortcuts don't work here. Try harder.";
+            } else if (hasCleverIndicators) {
+                feedback = pass ? "Excellent creative thinking!" : "Creative approach but needs refinement.";
             } else {
                 feedback = pass ? "Good creative thinking!" : "Needs more clever approach.";
             }
@@ -498,7 +522,9 @@ async function evaluatePlayerResponse(challengeContent, playerResponse, challeng
             feedback = `⏰ ${feedback}`;
         }
         
-        console.log(`AI Evaluation (${hasLazyShortcut ? 'SHORTCUT DETECTED' : 'CREATIVE'}): ${pass ? 'PASS' : 'FAIL'} - "${feedback}"`);
+        const evaluationType = hasLazyShortcut && !hasCleverIndicators ? 'LAZY SHORTCUT' : 
+                              hasCleverIndicators ? 'CLEVER RESPONSE' : 'STANDARD';
+        console.log(`AI Evaluation (${evaluationType}): ${pass ? 'PASS' : 'FAIL'} - "${feedback}"`);
         return { pass, feedback };
         
     } catch (e) {
