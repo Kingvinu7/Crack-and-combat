@@ -2893,16 +2893,18 @@ input[type="text"]::placeholder, textarea::placeholder {
     }
 }
 
+/* ===== EXTRA SMALL PHONES (320px - 480px) ===== */
 @media (max-width: 480px) {
     .clean-layout {
-        padding: 5px;
+        padding: 2px;
         min-height: 100vh;
     }
     
     .main-content {
-        padding: 12px;
-        margin: 5px 0;
-        max-height: 95vh;
+        padding: 8px;
+        margin: 2px 0;
+        max-height: 98vh;
+        border-width: 1px;
     }
     
     .title-section {
@@ -2923,18 +2925,20 @@ input[type="text"]::placeholder, textarea::placeholder {
     }
     
     .cyber-title {
-        font-size: clamp(1.5rem, 5vw, 2.2rem);
-        letter-spacing: 1px;
+        font-size: clamp(1.2rem, 4vw, 1.8rem);
+        letter-spacing: 0.5px;
+        line-height: 1.1;
     }
     
     .title-separator {
-        margin: 0 8px;
-        font-size: 0.7em;
+        margin: 0 4px;
+        font-size: 0.6em;
     }
     
     .cyber-subtitle {
-        font-size: 12px;
-        letter-spacing: 2px;
+        font-size: 10px;
+        letter-spacing: 1px;
+        margin-top: 5px;
     }
     
     .hexagon-wrapper {
@@ -2982,19 +2986,23 @@ input[type="text"]::placeholder, textarea::placeholder {
     
     /* Other existing mobile styles */
     .page-content {
-        padding: 15px;
-        margin: 5px;
-        max-width: 98%;
+        padding: 10px;
+        margin: 2px;
+        max-width: 99%;
+        border-width: 1px;
     }
     
     .btn {
-        padding: 14px 24px;
-        font-size: 1em;
+        padding: 12px 20px;
+        font-size: 0.9em;
+        min-height: 40px;
+        border-width: 1px;
     }
     
     .btn.large {
-        padding: 16px 28px;
-        font-size: 1.1em;
+        padding: 14px 24px;
+        font-size: 1em;
+        min-height: 44px;
     }
     
     .timer {
@@ -3063,6 +3071,297 @@ input[type="text"]::placeholder, textarea::placeholder {
         font-size: 1em;
         padding: 18px 20px;
         margin: 15px 5px;
+    }
+}
+
+/* ===== VERY SMALL PHONES (320px and below) ===== */
+@media (max-width: 360px) {
+    body {
+        font-size: 14px;
+    }
+    
+    .clean-layout {
+        padding: 1px;
+    }
+    
+    .main-content, .page-content {
+        padding: 6px;
+        margin: 1px 0;
+        border-radius: 4px;
+    }
+    
+    .cyber-title {
+        font-size: clamp(1rem, 4vw, 1.4rem);
+        letter-spacing: 0px;
+        margin-bottom: 5px;
+    }
+    
+    .title-separator {
+        margin: 0 2px;
+        font-size: 0.5em;
+    }
+    
+    .cyber-subtitle {
+        font-size: 8px;
+        letter-spacing: 0.5px;
+    }
+    
+    .hexagon-wrapper {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .hexagon-outer {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .core-center {
+        font-size: 14px;
+    }
+    
+    .game-controls {
+        gap: 6px;
+        margin: 8px 0;
+    }
+    
+    .title-text {
+        font-size: 12px;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-display {
+        font-size: 8px;
+    }
+    
+    .cyber-label {
+        font-size: 8px;
+        margin-bottom: 4px;
+    }
+    
+    .cyber-input {
+        padding: 8px 10px;
+        font-size: 11px;
+        min-height: 32px;
+    }
+    
+    .cyber-btn {
+        padding: 8px 12px;
+        font-size: 10px;
+        min-height: 32px;
+        letter-spacing: 0.5px;
+    }
+    
+    .help-btn {
+        padding: 4px 8px;
+        font-size: 8px;
+        min-height: 24px;
+    }
+    
+    .btn {
+        padding: 10px 16px;
+        font-size: 0.8em;
+        min-height: 36px;
+    }
+    
+    .btn.large {
+        padding: 12px 20px;
+        font-size: 0.9em;
+        min-height: 40px;
+    }
+    
+    .timer {
+        font-size: 2em !important;
+        padding: 8px 16px;
+        border-width: 2px;
+    }
+    
+    .oracle-avatar {
+        font-size: 2em;
+        margin: 15px 0 10px;
+    }
+    
+    .oracle-avatar.large {
+        font-size: 2.8em;
+    }
+    
+    .oracle-message {
+        padding: 12px 16px;
+        font-size: 0.9em;
+        margin: 10px auto;
+    }
+    
+    .riddle-question, .challenge-description {
+        font-size: 0.9em;
+        padding: 12px 16px;
+        line-height: 1.5;
+    }
+    
+    .response-textarea {
+        height: 60px;
+        padding: 8px;
+        font-size: 0.8em;
+        min-height: 60px;
+    }
+    
+    .trivia-options {
+        gap: 8px;
+        padding: 0;
+    }
+    
+    .trivia-option {
+        min-height: 40px;
+        padding: 8px 12px !important;
+        font-size: 0.8em !important;
+    }
+    
+    .trivia-question-text {
+        font-size: 0.9em;
+        padding: 12px 16px;
+        margin: 10px 0;
+    }
+    
+    .tap-btn {
+        width: 100px;
+        height: 100px;
+        font-size: 1em !important;
+        padding: 10px !important;
+    }
+    
+    .tap-count-display {
+        font-size: 2em;
+    }
+    
+    .big-winner-announcement {
+        font-size: 1.2em;
+        padding: 20px 10px;
+        margin: 20px 0;
+    }
+    
+    .individual-result {
+        padding: 15px;
+        margin: 5px;
+        max-width: 95%;
+    }
+    
+    .individual-result h3 {
+        font-size: 1.2em;
+    }
+    
+    .result-feedback, .result-response {
+        font-size: 0.8em;
+        padding: 8px;
+    }
+    
+    .points-table-header, 
+    .points-table-row {
+        font-size: 0.7em;
+        padding: 6px 4px;
+        gap: 3px;
+    }
+    
+    .modal-content {
+        max-width: 98%;
+        margin: 2px 0;
+    }
+    
+    .modal-header {
+        padding: 10px 15px;
+    }
+    
+    .modal-header h2 {
+        font-size: 1.2em;
+    }
+    
+    .modal-body {
+        padding: 15px;
+    }
+    
+    .rule-section {
+        padding: 12px;
+        margin-bottom: 15px;
+    }
+    
+    .rule-section h3 {
+        font-size: 1em;
+        margin-bottom: 8px;
+    }
+    
+    .rule-section p,
+    .rule-section li {
+        font-size: 0.8em;
+        line-height: 1.4;
+    }
+}
+
+/* ===== MOBILE TOUCH IMPROVEMENTS ===== */
+@media (hover: none) and (pointer: coarse) {
+    /* Touch device optimizations */
+    .btn, .cyber-btn, .help-btn {
+        min-height: 44px; /* iOS recommended touch target */
+        min-width: 44px;
+        -webkit-tap-highlight-color: rgba(0, 255, 255, 0.3);
+    }
+    
+    .trivia-option {
+        min-height: 48px !important;
+        -webkit-tap-highlight-color: rgba(0, 255, 255, 0.3);
+    }
+    
+    .tap-btn {
+        -webkit-tap-highlight-color: rgba(255, 0, 68, 0.5);
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+    }
+    
+    input, textarea {
+        font-size: 16px; /* Prevent zoom on iOS */
+        -webkit-appearance: none;
+        border-radius: 4px;
+    }
+    
+    /* Improve scrolling on mobile */
+    .page-content, .individual-result, .modal-body {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+}
+
+/* ===== MOBILE KEYBOARD ADJUSTMENTS ===== */
+.keyboard-open .page-content {
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.keyboard-open .main-content {
+    max-height: 50vh;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.keyboard-open .ai-symbol-container {
+    display: none; /* Hide decorative elements when keyboard is open */
+}
+
+.keyboard-open .title-section {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.keyboard-open .cyber-title {
+    font-size: 1.5rem;
+}
+
+@media (max-width: 480px) {
+    .keyboard-open .page-content {
+        max-height: 40vh;
+        padding: 8px;
+    }
+    
+    .keyboard-open .main-content {
+        max-height: 40vh;
+        padding: 8px;
     }
 }
 

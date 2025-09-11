@@ -1044,6 +1044,11 @@ io.on('connection', (socket) => {
             // Check if all players have answered
             if (Object.keys(room.riddleAnswers).length === room.players.length) {
                 console.log('All players submitted riddle answer. Ending riddle phase early.');
+                // Clear the riddle timer if it's still running
+                if (room.riddleTimer) {
+                    clearInterval(room.riddleTimer);
+                    room.riddleTimer = null;
+                }
                 endRiddlePhase(data.roomCode);
             }
         }
@@ -1060,11 +1065,24 @@ io.on('connection', (socket) => {
         
         room.challengeResponses[socket.id] = data.response.trim();
         
+        const expectedSubmissions = room.players.filter(p => p.name !== room.riddleWinner).length;
+        const totalSubmissions = Object.keys(room.challengeResponses).length;
+        
         io.to(data.roomCode).emit('challenge-response-submitted', {
             player: player.name,
-            totalSubmissions: Object.keys(room.challengeResponses).length,
-            expectedSubmissions: room.players.filter(p => p.name !== room.riddleWinner).length
+            totalSubmissions: totalSubmissions,
+            expectedSubmissions: expectedSubmissions
         });
+        
+        // Check if all players have responded - auto advance
+        if (totalSubmissions === expectedSubmissions) {
+            console.log('All players submitted challenge response. Ending challenge phase early.');
+            if (room.challengeTimer) {
+                clearTimeout(room.challengeTimer);
+                room.challengeTimer = null;
+            }
+            evaluateTextChallengeResults(data.roomCode);
+        }
     });
     socket.on('submit-tap-result', (data) => {
         const room = rooms[data.roomCode];

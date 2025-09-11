@@ -696,8 +696,24 @@ socket.on('riddle-presented', (data) => {
 });
 
 socket.on('answer-submitted', (data) => {
-    document.getElementById('submission-count').textContent = 
-        `${data.totalSubmissions}/${data.totalPlayers} players answered`;
+    const submissionCount = document.getElementById('submission-count');
+    submissionCount.textContent = `${data.totalSubmissions}/${data.totalPlayers} players answered`;
+    
+    // Show auto-advance indicator when all players have answered
+    if (data.totalSubmissions === data.totalPlayers) {
+        submissionCount.innerHTML = `
+            <span style="color: var(--accent-green); font-weight: bold;">
+                ✓ All players answered! Auto-advancing...
+            </span>
+        `;
+        
+        // Add visual feedback to timer
+        const timer = document.getElementById('riddle-timer');
+        if (timer) {
+            timer.textContent = 'ADVANCING...';
+            timer.classList.add('auto-submit');
+        }
+    }
 });
 
 socket.on('riddle-results-reveal', (data) => {
@@ -833,13 +849,45 @@ socket.on('fast-tapper-results', (data) => {
 });
 
 socket.on('challenge-response-submitted', (data) => {
-    document.getElementById('text-challenge-submission-count').textContent = 
-        `${data.totalSubmissions}/${data.expectedSubmissions} players responded`;
+    const submissionCount = document.getElementById('text-challenge-submission-count');
+    submissionCount.textContent = `${data.totalSubmissions}/${data.expectedSubmissions} players responded`;
+    
+    // Show auto-advance indicator when all players have responded
+    if (data.totalSubmissions === data.expectedSubmissions) {
+        submissionCount.innerHTML = `
+            <span style="color: var(--accent-green); font-weight: bold;">
+                ✓ All players responded! Auto-advancing...
+            </span>
+        `;
+        
+        // Add visual feedback to timer
+        const timer = document.getElementById('text-challenge-timer');
+        if (timer) {
+            timer.textContent = 'ADVANCING...';
+            timer.classList.add('auto-submit');
+        }
+    }
 });
 
 socket.on('trivia-answer-submitted', (data) => {
-    document.getElementById('trivia-submission-count').textContent = 
-        `${data.totalSubmissions}/${data.expectedSubmissions} players answered`;
+    const submissionCount = document.getElementById('trivia-submission-count');
+    submissionCount.textContent = `${data.totalSubmissions}/${data.expectedSubmissions} players answered`;
+    
+    // Show auto-advance indicator when all players have answered
+    if (data.totalSubmissions === data.expectedSubmissions) {
+        submissionCount.innerHTML = `
+            <span style="color: var(--accent-green); font-weight: bold;">
+                ✓ All players answered! Auto-advancing...
+            </span>
+        `;
+        
+        // Add visual feedback to timer
+        const timer = document.getElementById('trivia-timer');
+        if (timer) {
+            timer.textContent = 'ADVANCING...';
+            timer.classList.add('auto-submit');
+        }
+    }
 });
 
 socket.on('trivia-results', (data) => {
@@ -991,7 +1039,48 @@ socket.on('error', (data) => {
     alert(data.message);
 });
 
+// Mobile keyboard handling
+function handleMobileKeyboard() {
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+        // Prevent zoom when focusing inputs
+        document.querySelectorAll('input, textarea').forEach(input => {
+            input.addEventListener('focus', () => {
+                if (input.style.fontSize !== '16px') {
+                    input.style.fontSize = '16px';
+                }
+            });
+        });
+        
+        // Handle viewport changes when keyboard opens/closes
+        let initialViewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+        
+        function handleViewportChange() {
+            if (window.visualViewport) {
+                const currentHeight = window.visualViewport.height;
+                const heightDiff = initialViewportHeight - currentHeight;
+                
+                if (heightDiff > 150) {
+                    // Keyboard is likely open
+                    document.body.classList.add('keyboard-open');
+                } else {
+                    // Keyboard is likely closed
+                    document.body.classList.remove('keyboard-open');
+                }
+            }
+        }
+        
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', handleViewportChange);
+        }
+    }
+}
+
 // Initialize
 showPage('home');
-playerNameInput.focus();
-console.log('Frontend loaded - Crack and Combat v4.7 (Debug Version with Enhanced Logging)');
+handleMobileKeyboard();
+// Only focus on desktop to prevent mobile keyboard popup
+if (!/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    playerNameInput.focus();
+}
+console.log('Frontend loaded - Crack and Combat v4.8 (Enhanced Mobile + Auto-Advance)');
