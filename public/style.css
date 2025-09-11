@@ -384,53 +384,58 @@ body::before {
 
 .page-content {
     width: 100%;
-    max-width: 500px;
+    max-width: clamp(500px, 85vw, 950px);
     margin: 0 auto;
-    padding: 25px;
+    padding: clamp(25px, 3vh, 60px);
     text-align: center;
-    background: var(--glass-bg);
-    backdrop-filter: blur(5px) saturate(1.1);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(8px) saturate(1.1);
+    border: 2px solid var(--accent-cyan);
+    border-radius: 8px;
     box-shadow: 
-        var(--shadow-soft),
-        inset 0 1px 0 rgba(255, 255, 255, 0.15),
-        0 0 40px rgba(0, 229, 255, 0.1);
+        0 0 50px rgba(0, 255, 255, 0.15),
+        inset 0 1px 0 rgba(0, 255, 255, 0.1),
+        var(--shadow-deep);
     position: relative;
-}
-
-.page-content::after {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: var(--neural-gradient);
-    border-radius: 22px;
-    z-index: -1;
-    opacity: 0.1;
-    filter: blur(8px);
+    max-height: 95vh;
+    overflow-y: auto;
 }
 
 .page-content::before {
-    content: '';
+    content: 'NEURAL_COMBAT_TERMINAL_v2.1.5 :: GAME_SESSION_ACTIVE :: PROCESSING';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+    height: 35px;
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 255, 255, 0.05));
+    border-bottom: 1px solid var(--accent-cyan);
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(8px, 1vw, 11px);
+    font-weight: 600;
+    color: var(--accent-cyan);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    pointer-events: none;
+    z-index: 5;
 }
 
 .page-content::after {
     content: '';
     position: absolute;
-    bottom: 0;
+    top: 35px;
     left: 0;
     right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent-red), transparent);
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(0, 255, 255, 0.02) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 0, 68, 0.02) 0%, transparent 50%);
+    pointer-events: none;
+    border-radius: 0 0 6px 6px;
 }
 
 /* ===== MATRIX BACKGROUND EFFECT ===== */
@@ -1238,21 +1243,22 @@ h2 {
 
 /* ===== BUTTONS ===== */
 .btn {
-    padding: 12px 24px;
+    padding: clamp(12px, 1.5vh, 18px) clamp(24px, 3vw, 40px);
     border: 2px solid transparent;
-    border-radius: 8px;
-    font-family: 'Rajdhani', sans-serif;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
     font-weight: 600;
-    font-size: 1em;
+    font-size: clamp(14px, 1.2vw, 18px);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-    margin: 6px;
+    margin: clamp(4px, 0.5vh, 8px);
     position: relative;
     overflow: hidden;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    background: var(--glass-bg);
+    letter-spacing: clamp(0.5px, 0.1vw, 2px);
+    background: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(10px);
+    min-height: clamp(44px, 5vh, 54px);
 }
 
 .btn::before {
@@ -1272,10 +1278,10 @@ h2 {
 }
 
 .btn.primary {
-    background: var(--gradient-red);
+    background: rgba(255, 0, 68, 0.2);
     border-color: var(--accent-red);
-    color: white;
-    box-shadow: var(--glow-red);
+    color: var(--accent-red);
+    box-shadow: 0 0 25px rgba(255, 0, 68, 0.3);
     position: relative;
     overflow: hidden;
 }
@@ -1299,26 +1305,28 @@ h2 {
 .btn.primary:hover {
     transform: translateY(-2px);
     box-shadow: 
-        0 0 30px rgba(255, 0, 68, 0.6),
-        var(--shadow-deep);
+        0 0 35px rgba(255, 0, 68, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     border-color: var(--accent-red-bright);
+    background: rgba(255, 0, 68, 0.3);
+    color: white;
 }
 
 .btn.secondary {
-    background: rgba(0, 255, 255, 0.1);
+    background: rgba(0, 255, 255, 0.15);
     border-color: var(--accent-cyan);
     color: var(--accent-cyan);
-    box-shadow: var(--glow-cyan);
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
 }
 
 .btn.secondary:hover {
     transform: translateY(-2px);
     box-shadow: 
-        0 0 30px rgba(0, 255, 255, 0.6),
-        var(--shadow-deep);
+        0 0 35px rgba(0, 255, 255, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     border-color: var(--accent-cyan-bright);
-    background: var(--gradient-cyan);
-    color: black;
+    background: rgba(0, 255, 255, 0.3);
+    color: var(--bg-primary);
 }
 
 .btn.tertiary {
@@ -1360,27 +1368,30 @@ h2 {
 /* ===== INPUTS ===== */
 input[type="text"], textarea {
     width: 100%;
-    max-width: 350px;
-    padding: 14px 20px;
-    background: var(--bg-secondary);
-    border: 2px solid var(--border-secondary);
-    border-radius: 8px;
+    max-width: clamp(350px, 60vw, 500px);
+    padding: clamp(14px, 1.5vh, 20px) clamp(20px, 2.5vw, 30px);
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid var(--border-dim);
+    border-radius: 6px;
     color: var(--text-primary);
-    font-size: 1em;
+    font-size: clamp(14px, 1.2vw, 18px);
     font-family: 'JetBrains Mono', monospace;
     text-align: center;
-    margin: 8px 0;
+    margin: clamp(6px, 1vh, 12px) 0;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
+    min-height: clamp(44px, 5vh, 54px);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 input[type="text"]:focus, textarea:focus {
     outline: none;
-    border-color: var(--accent-red);
+    border-color: var(--accent-cyan);
     box-shadow: 
-        0 0 20px rgba(255, 8, 68, 0.3),
-        inset 0 0 20px rgba(255, 8, 68, 0.05);
-    background: var(--bg-tertiary);
+        0 0 25px rgba(0, 255, 255, 0.4),
+        inset 0 2px 4px rgba(0, 0, 0, 0.4),
+        inset 0 0 10px rgba(0, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.8);
     transform: translateY(-1px);
 }
 
@@ -1390,15 +1401,16 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .response-textarea {
-    height: 120px;
+    height: clamp(120px, 15vh, 180px);
     resize: vertical;
-    min-height: 80px;
-    max-height: 300px; /* Increased for better usability */
+    min-height: clamp(80px, 10vh, 120px);
+    max-height: clamp(300px, 35vh, 400px);
     word-break: break-word;
     overflow-wrap: break-word;
     white-space: pre-wrap;
-    font-size: 1em;
+    font-size: clamp(14px, 1.1vw, 16px);
     line-height: 1.5;
+    padding: clamp(16px, 2vh, 24px);
     /* Better scrolling behavior */
     overflow-y: auto;
     scroll-behavior: smooth;
@@ -1431,7 +1443,8 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 /* ===== LOBBY SYSTEM ===== */
 .lobby-header {
-    margin-bottom: 40px;
+    margin-top: clamp(35px, 5vh, 50px);
+    margin-bottom: clamp(30px, 4vh, 40px);
     text-align: center;
     animation: slideDown 0.8s ease-out;
 }
@@ -1580,8 +1593,8 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 /* ===== ORACLE SYSTEM ===== */
 .oracle-avatar {
-    font-size: 2.8em;
-    margin: 20px 0;
+    font-size: clamp(2.4em, 5vw, 3.2em);
+    margin: clamp(35px, 4vh, 45px) 0 clamp(15px, 2vh, 25px);
     filter: drop-shadow(0 0 25px rgba(0, 229, 255, 0.5));
     animation: aiPresence 5s ease-in-out infinite;
     position: relative;
@@ -1669,30 +1682,32 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 /* ===== TIMER SYSTEM ===== */
 .timer-section {
-    margin-bottom: 30px;
-    padding: 20px 0;
+    margin-top: clamp(35px, 5vh, 50px);
+    margin-bottom: clamp(25px, 3vh, 35px);
+    padding: clamp(15px, 2vh, 25px) 0;
 }
 
 .timer {
     display: block;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 4em;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(3em, 8vw, 5em);
     font-weight: 800;
     color: var(--accent-cyan);
-    background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+    background: rgba(0, 0, 0, 0.4);
     border: 3px solid var(--accent-cyan);
-    padding: 20px 40px;
-    margin: 0 auto 15px;
-    border-radius: 12px;
+    padding: clamp(15px, 3vh, 25px) clamp(30px, 5vw, 50px);
+    margin: 0 auto clamp(10px, 2vh, 20px);
+    border-radius: 8px;
     box-shadow: 
         0 0 45px rgba(0, 229, 255, 0.4),
         inset 0 0 25px rgba(0, 229, 255, 0.15),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(25px);
+    backdrop-filter: blur(15px);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
     text-shadow: 0 0 15px rgba(0, 229, 255, 0.6);
+    min-width: clamp(120px, 20vw, 200px);
 }
 
 .timer::before {
@@ -2738,8 +2753,32 @@ input[type="text"]::placeholder, textarea::placeholder {
         max-height: 92vh;
     }
     
+    .main-content::before {
+        font-size: 8px;
+        height: 28px;
+    }
+    
+    .main-content::after {
+        top: 28px;
+    }
+    
     .title-section {
+        margin-top: 35px;
         margin-bottom: 15px;
+    }
+    
+    .page-content {
+        padding: 20px 15px;
+        max-height: 92vh;
+    }
+    
+    .page-content::before {
+        font-size: 8px;
+        height: 28px;
+    }
+    
+    .page-content::after {
+        top: 28px;
     }
     
     .ai-symbol-container {
