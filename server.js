@@ -584,12 +584,12 @@ async function startChallengePhase(roomCode) {
                 question: triviaQuestion.question,
                 options: triviaQuestion.options,
                 participants: nonWinners.map(p => p.name),
-                timeLimit: 30
+                timeLimit: 45
             });
             
             room.challengeTimer = setTimeout(() => {
                 evaluateTriviaResults(roomCode);
-            }, 32000);
+            }, 48000);
             
         } else {
             // Text-based challenges with 40 seconds
@@ -603,9 +603,9 @@ if (!challengeContent || challengeContent.trim().length === 0) {
 }
 
 // Set time limit based on challenge type
-let timeLimit = 40; // Default for detective, trivia, danger
+let timeLimit = 60; // Default for detective, trivia, danger
 if (challengeType === 'negotiator') {
-    timeLimit = 45; // Shorter time for simpler negotiator challenges
+    timeLimit = 60; // Same time for negotiator challenges
 }
 
 console.log(`Sending ${challengeType} challenge content (${challengeContent.length} chars): ${challengeContent.substring(0, 50)}...`);
@@ -621,7 +621,7 @@ room.currentChallengeContent = challengeContent;
 // Set timer with 5 second buffer
 room.challengeTimer = setTimeout(() => {
     evaluateTextChallengeResults(roomCode);
-}, timeLimit * 1000 + 5000);
+}, timeLimit * 1000 + 8000);
     }
   },500);
 }
@@ -1044,6 +1044,11 @@ io.on('connection', (socket) => {
             // Check if all players have answered
             if (Object.keys(room.riddleAnswers).length === room.players.length) {
                 console.log('All players submitted riddle answer. Ending riddle phase early.');
+                // Clear the riddle timer if it's still running
+                if (room.riddleTimer) {
+                    clearInterval(room.riddleTimer);
+                    room.riddleTimer = null;
+                }
                 endRiddlePhase(data.roomCode);
             }
         }
@@ -1060,11 +1065,24 @@ io.on('connection', (socket) => {
         
         room.challengeResponses[socket.id] = data.response.trim();
         
+        const expectedSubmissions = room.players.filter(p => p.name !== room.riddleWinner).length;
+        const totalSubmissions = Object.keys(room.challengeResponses).length;
+        
         io.to(data.roomCode).emit('challenge-response-submitted', {
             player: player.name,
-            totalSubmissions: Object.keys(room.challengeResponses).length,
-            expectedSubmissions: room.players.filter(p => p.name !== room.riddleWinner).length
+            totalSubmissions: totalSubmissions,
+            expectedSubmissions: expectedSubmissions
         });
+        
+        // Check if all players have responded - auto advance
+        if (totalSubmissions === expectedSubmissions) {
+            console.log('All players submitted challenge response. Ending challenge phase early.');
+            if (room.challengeTimer) {
+                clearTimeout(room.challengeTimer);
+                room.challengeTimer = null;
+            }
+            evaluateTextChallengeResults(data.roomCode);
+        }
     });
     socket.on('submit-tap-result', (data) => {
         const room = rooms[data.roomCode];

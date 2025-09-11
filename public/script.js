@@ -5,91 +5,7 @@ let isRoomOwner = false;
 let tapCount = 0;
 let tapperActive = false;
 
-// Matrix background effect
-function createMatrixLines() {
-    const matrixBg = document.querySelector('.matrix-bg');
-    if (!matrixBg) return;
-    
-    // Generate single line of binary code
-    function generateSingleBinaryLine() {
-        const screenWidth = window.innerWidth;
-        const charWidth = window.innerWidth > 768 ? 12 : 10; // Character width
-        const charsPerLine = Math.floor(screenWidth / charWidth);
-        
-        let binary = '';
-        for (let i = 0; i < charsPerLine; i++) {
-            binary += Math.random() > 0.5 ? '1' : '0';
-        }
-        return binary;
-    }
-    
-    // Create single line falling elements
-    for (let i = 0; i < 20; i++) {
-        const matrixLine = document.createElement('div');
-        matrixLine.className = 'matrix-single-line';
-        matrixLine.textContent = generateSingleBinaryLine();
-        
-        // Each line starts at different times for continuous effect
-        const delay = i * 1.2; // Every 1.2 seconds a new line starts
-        const duration = 12 + Math.random() * 6; // 12-18 seconds duration
-        
-        matrixLine.style.cssText = `
-            position: absolute;
-            width: 100%;
-            height: auto;
-            top: -2em;
-            left: 0;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: clamp(10px, 1.2vw, 14px);
-            line-height: 1.2;
-            color: var(--text-matrix);
-            letter-spacing: clamp(0.5px, 0.1vw, 1px);
-            animation: matrixSingleLineFall ${duration}s linear infinite ${delay}s;
-            opacity: 0.7;
-            text-shadow: 0 0 8px var(--text-matrix);
-            white-space: nowrap;
-            overflow: hidden;
-            z-index: ${-1 - i};
-            pointer-events: none;
-        `;
-        
-        matrixBg.appendChild(matrixLine);
-    }
-}
-
-// Initialize matrix effect when page loads
-document.addEventListener('DOMContentLoaded', () => {
-    createMatrixLines();
-    
-    // Regenerate lines periodically for variety
-    setInterval(() => {
-        const matrixLines = document.querySelectorAll('.matrix-single-line');
-        matrixLines.forEach(line => {
-            if (Math.random() > 0.8) { // 20% chance to regenerate
-                line.textContent = generateSingleBinaryLine();
-            }
-        });
-    }, 8000);
-});
-
-// Regenerate on window resize
-window.addEventListener('resize', () => {
-    const matrixLines = document.querySelectorAll('.matrix-single-line');
-    matrixLines.forEach(line => line.remove());
-    setTimeout(createMatrixLines, 100);
-});
-
-function generateSingleBinaryLine() {
-    const screenWidth = window.innerWidth;
-    const charWidth = window.innerWidth > 768 ? 12 : 10;
-    const charsPerLine = Math.floor(screenWidth / charWidth);
-    
-    let binary = '';
-    for (let i = 0; i < charsPerLine; i++) {
-        binary += Math.random() > 0.5 ? '1' : '0';
-    }
-    return binary;
-}
+// Removed complex matrix animation - keeping simple static background only
 
 // DOM elements
 const pages = {
@@ -586,6 +502,7 @@ async function showIndividualResult(data) {
     
     content.innerHTML = resultHtml;
     overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
     
     const responseEl = content.querySelector('.result-response');
     const feedbackEl = content.querySelector('.result-feedback');
@@ -608,8 +525,21 @@ function hideIndividualResult() {
     const overlay = document.getElementById('result-overlay');
     if (overlay) {
         overlay.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Restore scrolling
     }
 }
+
+// Add click-to-close functionality for overlay
+document.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.getElementById('result-overlay');
+    if (overlay) {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                hideIndividualResult();
+            }
+        });
+    }
+});
 
 function showHowToPlay() {
     console.log('showHowToPlay called');
@@ -678,12 +608,28 @@ socket.on('riddle-presented', (data) => {
     document.getElementById('submission-count').textContent = '0/0 players answered';
     
     showPage('riddle');
-    startTimer('riddle-timer', 45);
+    startTimer('riddle-timer', 60);
 });
 
 socket.on('answer-submitted', (data) => {
-    document.getElementById('submission-count').textContent = 
-        `${data.totalSubmissions}/${data.totalPlayers} players answered`;
+    const submissionCount = document.getElementById('submission-count');
+    submissionCount.textContent = `${data.totalSubmissions}/${data.totalPlayers} players answered`;
+    
+    // Show auto-advance indicator when all players have answered
+    if (data.totalSubmissions === data.totalPlayers) {
+        submissionCount.innerHTML = `
+            <span style="color: var(--accent-green); font-weight: bold;">
+                ✓ All players answered! Auto-advancing...
+            </span>
+        `;
+        
+        // Add visual feedback to timer
+        const timer = document.getElementById('riddle-timer');
+        if (timer) {
+            timer.textContent = 'ADVANCING...';
+            timer.classList.add('auto-submit');
+        }
+    }
 });
 
 socket.on('riddle-results-reveal', (data) => {
@@ -742,7 +688,7 @@ socket.on('text-challenge-start', (data) => {
             `0/${data.participants.length} players responded`;
         
         showPage('textChallenge');
-        startChallengeTimer('text-challenge-timer', data.timeLimit || 40);
+        startChallengeTimer('text-challenge-timer', data.timeLimit || 60);
         setTimeout(() => {
             const textarea = document.getElementById('challenge-response');
             textarea.focus();
@@ -773,7 +719,7 @@ socket.on('trivia-challenge-start', (data) => {
             `0/${data.participants.length} players answered`;
         
         showPage('triviaChallenge');
-        startTimer('trivia-timer', data.timeLimit || 30);
+        startTimer('trivia-timer', data.timeLimit || 45);
     } else {
         document.getElementById('waiting-title').textContent = 'Trivia Challenge!';
         document.getElementById('waiting-message').textContent = 'Others are solving a challenging trivia question!';
@@ -819,13 +765,45 @@ socket.on('fast-tapper-results', (data) => {
 });
 
 socket.on('challenge-response-submitted', (data) => {
-    document.getElementById('text-challenge-submission-count').textContent = 
-        `${data.totalSubmissions}/${data.expectedSubmissions} players responded`;
+    const submissionCount = document.getElementById('text-challenge-submission-count');
+    submissionCount.textContent = `${data.totalSubmissions}/${data.expectedSubmissions} players responded`;
+    
+    // Show auto-advance indicator when all players have responded
+    if (data.totalSubmissions === data.expectedSubmissions) {
+        submissionCount.innerHTML = `
+            <span style="color: var(--accent-green); font-weight: bold;">
+                ✓ All players responded! Auto-advancing...
+            </span>
+        `;
+        
+        // Add visual feedback to timer
+        const timer = document.getElementById('text-challenge-timer');
+        if (timer) {
+            timer.textContent = 'ADVANCING...';
+            timer.classList.add('auto-submit');
+        }
+    }
 });
 
 socket.on('trivia-answer-submitted', (data) => {
-    document.getElementById('trivia-submission-count').textContent = 
-        `${data.totalSubmissions}/${data.expectedSubmissions} players answered`;
+    const submissionCount = document.getElementById('trivia-submission-count');
+    submissionCount.textContent = `${data.totalSubmissions}/${data.expectedSubmissions} players answered`;
+    
+    // Show auto-advance indicator when all players have answered
+    if (data.totalSubmissions === data.expectedSubmissions) {
+        submissionCount.innerHTML = `
+            <span style="color: var(--accent-green); font-weight: bold;">
+                ✓ All players answered! Auto-advancing...
+            </span>
+        `;
+        
+        // Add visual feedback to timer
+        const timer = document.getElementById('trivia-timer');
+        if (timer) {
+            timer.textContent = 'ADVANCING...';
+            timer.classList.add('auto-submit');
+        }
+    }
 });
 
 socket.on('trivia-results', (data) => {
@@ -977,7 +955,48 @@ socket.on('error', (data) => {
     alert(data.message);
 });
 
+// Mobile keyboard handling
+function handleMobileKeyboard() {
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+        // Prevent zoom when focusing inputs
+        document.querySelectorAll('input, textarea').forEach(input => {
+            input.addEventListener('focus', () => {
+                if (input.style.fontSize !== '16px') {
+                    input.style.fontSize = '16px';
+                }
+            });
+        });
+        
+        // Handle viewport changes when keyboard opens/closes
+        let initialViewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+        
+        function handleViewportChange() {
+            if (window.visualViewport) {
+                const currentHeight = window.visualViewport.height;
+                const heightDiff = initialViewportHeight - currentHeight;
+                
+                if (heightDiff > 150) {
+                    // Keyboard is likely open
+                    document.body.classList.add('keyboard-open');
+                } else {
+                    // Keyboard is likely closed
+                    document.body.classList.remove('keyboard-open');
+                }
+            }
+        }
+        
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', handleViewportChange);
+        }
+    }
+}
+
 // Initialize
 showPage('home');
-playerNameInput.focus();
-console.log('Frontend loaded - Crack and Combat v4.7 (Debug Version with Enhanced Logging)');
+handleMobileKeyboard();
+// Only focus on desktop to prevent mobile keyboard popup
+if (!/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    playerNameInput.focus();
+}
+console.log('Frontend loaded - Crack and Combat v4.8 (Enhanced Mobile + Auto-Advance)');
