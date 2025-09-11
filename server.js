@@ -584,12 +584,12 @@ async function startChallengePhase(roomCode) {
                 question: triviaQuestion.question,
                 options: triviaQuestion.options,
                 participants: nonWinners.map(p => p.name),
-                timeLimit: 30
+                timeLimit: 45
             });
             
             room.challengeTimer = setTimeout(() => {
                 evaluateTriviaResults(roomCode);
-            }, 32000);
+            }, 48000);
             
         } else {
             // Text-based challenges with 40 seconds
@@ -603,9 +603,9 @@ if (!challengeContent || challengeContent.trim().length === 0) {
 }
 
 // Set time limit based on challenge type
-let timeLimit = 40; // Default for detective, trivia, danger
+let timeLimit = 60; // Default for detective, trivia, danger
 if (challengeType === 'negotiator') {
-    timeLimit = 45; // Shorter time for simpler negotiator challenges
+    timeLimit = 60; // Same time for negotiator challenges
 }
 
 console.log(`Sending ${challengeType} challenge content (${challengeContent.length} chars): ${challengeContent.substring(0, 50)}...`);
@@ -621,7 +621,7 @@ room.currentChallengeContent = challengeContent;
 // Set timer with 5 second buffer
 room.challengeTimer = setTimeout(() => {
     evaluateTextChallengeResults(roomCode);
-}, timeLimit * 1000 + 5000);
+}, timeLimit * 1000 + 8000);
     }
   },500);
 }

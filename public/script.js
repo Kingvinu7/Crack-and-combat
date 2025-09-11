@@ -586,6 +586,7 @@ async function showIndividualResult(data) {
     
     content.innerHTML = resultHtml;
     overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
     
     const responseEl = content.querySelector('.result-response');
     const feedbackEl = content.querySelector('.result-feedback');
@@ -608,8 +609,21 @@ function hideIndividualResult() {
     const overlay = document.getElementById('result-overlay');
     if (overlay) {
         overlay.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Restore scrolling
     }
 }
+
+// Add click-to-close functionality for overlay
+document.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.getElementById('result-overlay');
+    if (overlay) {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                hideIndividualResult();
+            }
+        });
+    }
+});
 
 function showHowToPlay() {
     console.log('showHowToPlay called');
@@ -678,7 +692,7 @@ socket.on('riddle-presented', (data) => {
     document.getElementById('submission-count').textContent = '0/0 players answered';
     
     showPage('riddle');
-    startTimer('riddle-timer', 45);
+    startTimer('riddle-timer', 60);
 });
 
 socket.on('answer-submitted', (data) => {
@@ -742,7 +756,7 @@ socket.on('text-challenge-start', (data) => {
             `0/${data.participants.length} players responded`;
         
         showPage('textChallenge');
-        startChallengeTimer('text-challenge-timer', data.timeLimit || 40);
+        startChallengeTimer('text-challenge-timer', data.timeLimit || 60);
         setTimeout(() => {
             const textarea = document.getElementById('challenge-response');
             textarea.focus();
@@ -773,7 +787,7 @@ socket.on('trivia-challenge-start', (data) => {
             `0/${data.participants.length} players answered`;
         
         showPage('triviaChallenge');
-        startTimer('trivia-timer', data.timeLimit || 30);
+        startTimer('trivia-timer', data.timeLimit || 45);
     } else {
         document.getElementById('waiting-title').textContent = 'Trivia Challenge!';
         document.getElementById('waiting-message').textContent = 'Others are solving a challenging trivia question!';
