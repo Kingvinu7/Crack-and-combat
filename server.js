@@ -209,6 +209,66 @@ const gameData = {
             options: ["Computational Speed", "Memory Bandwidth", "Context Understanding", "Power Consumption"],
             correctAnswer: 2,
             difficulty: "above-medium"
+        },
+        {
+            question: "What is Bungee.exchange primarily used for?",
+            options: ["NFT trading", "Cross-chain token swapping", "Staking rewards", "Mining pools"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "Which routing modes does Bungee.exchange offer for cross-chain swaps?",
+            options: ["Auto Mode and Manual Mode", "Fast Mode and Secure Mode", "Basic Mode and Pro Mode", "Direct Mode and Bridge Mode"],
+            correctAnswer: 0,
+            difficulty: "medium"
+        },
+        {
+            question: "What is the main advantage of Bungee's Auto Mode?",
+            options: ["Lower fees", "Automatically selects the best route", "Faster transactions", "Higher security"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "Which of these blockchains is supported by Bungee.exchange?",
+            options: ["Bitcoin", "Ethereum", "Litecoin", "Dogecoin"],
+            correctAnswer: 1,
+            difficulty: "easy"
+        },
+        {
+            question: "How does Bungee ensure security in cross-chain swaps?",
+            options: ["Single validator", "Decentralized network of liquidity pools", "Government backing", "Insurance policies"],
+            correctAnswer: 1,
+            difficulty: "above-medium"
+        },
+        {
+            question: "What technology does Bungee use to enable cross-chain functionality?",
+            options: ["Atomic swaps only", "Bridge protocols and AMMs", "Centralized exchanges", "Mining rewards"],
+            correctAnswer: 1,
+            difficulty: "above-medium"
+        },
+        {
+            question: "Which wallet integration was recently announced by Bungee?",
+            options: ["MetaMask", "Bitget Wallet", "Trust Wallet", "Coinbase Wallet"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "What is the primary benefit of using Bungee over traditional exchanges for cross-chain swaps?",
+            options: ["Lower transaction costs", "Seamless cross-chain experience", "Better customer support", "Faster KYC process"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "How many blockchain networks does Bungee support for cross-chain transactions?",
+            options: ["Less than 5", "5-10", "More than 10", "Only 2"],
+            correctAnswer: 2,
+            difficulty: "medium"
+        },
+        {
+            question: "What makes Bungee different from other cross-chain platforms?",
+            options: ["Only supports Ethereum", "Marketplace of competing off-chain agents", "Requires KYC verification", "Only works with stablecoins"],
+            correctAnswer: 1,
+            difficulty: "above-medium"
         }
     ],
     oraclePersonality: {
@@ -352,7 +412,7 @@ async function generateChallengeContent(type, roundNumber) {
                 prompt = `Ask a challenging trivia question about science, history, or geography. Use simple words but make it require good knowledge. Not too obvious. Example: "Which gas makes up about 78% of Earth's atmosphere?" or "What empire built Machu Picchu?"`;
                 break;
             case 'danger':
-                prompt = `Create a dangerous survival scenario requiring creative problem-solving. Focus on physical dangers like wild animals, natural disasters, or being trapped. Make it challenging but solvable with clever thinking. 30-50 words max. Example: "You're trapped in a room with a hungry lion. What will you do to survive?"`;
+                prompt = `Create a mind-bending survival scenario requiring creative problem-solving. Focus on psychological challenges, illusions, or reality distortions. Make it challenging but solvable with clever thinking. 30-50 words max. Example: "You're in a mirrored room where your reflections move on their own. Spot the real you before the glass shatters."`;
                 break;
         }
 
@@ -375,7 +435,7 @@ async function generateChallengeContent(type, roundNumber) {
                 negotiator: "Convince your neighbor's loud dog to stop barking at 3 AM by offering it something irresistible.",
                 detective: "The space station's oxygen generator was sabotaged. Clues: Tool marks on the panel, coffee stains nearby, access card used at 3 AM, and security footage shows a hooded figure. Three suspects: Engineer Jake, Security Chief Maria, and Maintenance Worker Bob. Who is guilty?",
                 trivia: "Which ancient wonder of the world was located in Alexandria, Egypt and was destroyed by earthquakes?",
-                danger: "You got trapped in front of a room with a hungry lion. What will you do to survive?"
+                danger: "You're in a mirrored room where your reflections move on their own. Spot the real you before the glass shatters."
             };
             cleaned = fallbacks[type] || "Complete this challenge to survive!";
         }
@@ -399,7 +459,7 @@ async function generateChallengeContent(type, roundNumber) {
             negotiator: "Convince your smart home AI to unlock the doors after it's decided you're 'not authorized' due to a software glitch that doesn't recognize your voice patterns.",
             detective: "The research facility's experimental AI has gone missing from its secure server. Clues: Unauthorized network access at 2:47 AM, a coffee-stained USB drive, electromagnetic interference in Lab 7, and security footage showing a figure in a lab coat. Three researchers had late access: Dr. Chen (AI ethics specialist), Dr. Rodriguez (cybersecurity expert), and Dr. Kim (neural network architect). Who took the AI and why?",
             trivia: "What is the theoretical maximum processing speed limit imposed by the laws of physics on any computer?",
-            danger: "You got trapped in front of a room with a hungry lion that hasn't eaten for days. The door behind you is locked, and there's no other way out. You have a flashlight, a bag of chips, and your phone with 10% battery. What will you do to survive?"
+            danger: "You're in a mirrored room where your reflections move on their own. Spot the real you before the glass shatters. The mirrors seem to show different versions of yourself, each moving independently. How do you identify which one is real?"
         };
         return mediumFallbacks[type] || "Face this challenging test!";
     }
@@ -440,11 +500,15 @@ async function evaluatePlayerResponse(challengeContent, playerResponse, challeng
             /distract|diversion|misdirect/i,
             /slowly|carefully|quietly/i,
             /food|bait|lure|attract/i,
-            /mirror|reflection|light/i,
+            /mirror|reflection|light|blink|eye/i,
+            /observe|watch|look|examine|study/i,
+            /test|try|experiment|check/i,
+            /pattern|difference|unique|distinguish/i,
             /sound|noise|whistle/i,
             /patience|wait|timing/i,
             /psychology|behavior|instinct/i,
-            /creative|innovative|unconventional/i
+            /creative|innovative|unconventional/i,
+            /fiction|story|imagine|pretend/i
         ];
         
         const hasLazyShortcut = lazyShortcuts.some(pattern => pattern.test(cleanResponse));
@@ -463,11 +527,11 @@ async function evaluatePlayerResponse(challengeContent, playerResponse, challeng
                 
             case 'danger':
                 if (hasLazyShortcut && !hasCleverIndicators) {
-                    evaluationPrompt = `This survival plan contains an oversmart shortcut: "${cleanResponse}"\n\nDanger: ${challengeContent}\n\nThis is clearly trying to avoid the actual survival challenge with unrealistic solutions like violence, running away, or calling for help. Respond with FAIL and give a brutal, logical explanation of why this approach would lead to certain doom. Be sharp and merciless in explaining the flaws. Keep under 350 characters.`;
+                    evaluationPrompt = `This survival plan contains an oversmart shortcut: "${cleanResponse}"\n\nDanger: ${challengeContent}\n\nThis avoids the actual psychological challenge with lazy solutions like violence, magic, or ignoring the problem. Respond with FAIL and give a sharp explanation of why this approach misses the point of the mind-bending scenario. Be cutting about their lack of creative thinking. Keep under 350 characters.`;
                 } else if (hasCleverIndicators) {
-                    evaluationPrompt = `Evaluate this clever survival plan:\n\nDanger: ${challengeContent}\n\nPlayer's plan: "${cleanResponse}"\n\nThis response shows creative thinking with clever elements. Evaluate if the approach is realistic and could work. Reward genuine creativity, psychological insights, and resourceful use of available items. Even if risky, PASS creative solutions that show real thought. Answer PASS or FAIL with encouraging feedback. Keep under 350 characters. ${isAutoSubmitted ? 'NOTE: Auto-submitted when time ran out.' : ''}`;
+                    evaluationPrompt = `Evaluate this clever survival plan:\n\nDanger: ${challengeContent}\n\nPlayer's plan: "${cleanResponse}"\n\nThis response shows creative thinking elements. Reward genuine creativity, psychological insights, and innovative approaches. Look for: observation skills, pattern recognition, creative testing methods, or fictional but logical solutions. PASS creative approaches that show real thought, even if fictional. Answer PASS or FAIL with encouraging feedback. Keep under 350 characters. ${isAutoSubmitted ? 'NOTE: Auto-submitted when time ran out.' : ''}`;
                 } else {
-                    evaluationPrompt = `Evaluate this survival plan:\n\nDanger: ${challengeContent}\n\nPlayer's plan: "${cleanResponse}"\n\nDoes this show practical creativity and real problem-solving? Look for: resourceful use of available items, clever distractions, understanding animal behavior, creative escape tactics, or psychological approaches. Even unconventional approaches should pass if they demonstrate genuine thinking and could plausibly work. Answer PASS or FAIL with detailed reasoning. Keep under 350 characters. ${isAutoSubmitted ? 'NOTE: Auto-submitted when time ran out.' : ''}`;
+                    evaluationPrompt = `Evaluate this survival plan:\n\nDanger: ${challengeContent}\n\nPlayer's plan: "${cleanResponse}"\n\nDoes this show creative problem-solving for this mind-bending scenario? Look for: observation techniques, pattern testing, psychological insights, creative identification methods, or innovative fictional solutions. Even unconventional or fictional approaches should PASS if they demonstrate genuine creative thinking and logical reasoning. Answer PASS or FAIL with detailed reasoning. Keep under 350 characters. ${isAutoSubmitted ? 'NOTE: Auto-submitted when time ran out.' : ''}`;
                 }
                 break;
                 
