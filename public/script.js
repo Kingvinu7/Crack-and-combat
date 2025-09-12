@@ -179,7 +179,12 @@ function showPage(pageName) {
         
         // Play transition sound and switch music based on page
         if (window.audioManager) {
-            window.audioManager.playTransitionSound();
+            console.log(`Showing page: ${pageName}, Audio initialized: ${window.audioManager.isInitialized}`);
+            
+            // Play transition sound only if initialized
+            if (window.audioManager.isInitialized) {
+                window.audioManager.playTransitionSound();
+            }
             
             switch (pageName) {
                 case 'home':
@@ -215,6 +220,8 @@ function showPage(pageName) {
                     // Keep current music for unknown pages
                     break;
             }
+        } else {
+            console.warn('Audio manager not available when showing page:', pageName);
         }
     }
 }
@@ -232,6 +239,13 @@ function createRoom() {
         return;
     }
     playerName = name;
+    
+    // Ensure audio is initialized on user action
+    if (window.audioManager && !window.audioManager.isInitialized) {
+        console.log('Initializing audio on create room action');
+        window.audioManager.init().catch(console.error);
+    }
+    
     if (window.audioManager) window.audioManager.playClickSound();
     socket.emit('create-room', { playerName: name });
 }
@@ -255,6 +269,13 @@ function joinRoom() {
         return;
     }
     playerName = name;
+    
+    // Ensure audio is initialized on user action
+    if (window.audioManager && !window.audioManager.isInitialized) {
+        console.log('Initializing audio on join room action');
+        window.audioManager.init().catch(console.error);
+    }
+    
     if (window.audioManager) window.audioManager.playClickSound();
     socket.emit('join-room', { playerName: name, roomCode: roomCode });
 }
@@ -1274,10 +1295,36 @@ function addAudioControlsToAllPages() {
     });
 }
 
+// Audio status indicator
+function updateSystemStatus(status, color = 'var(--accent-green)') {
+    const statusText = document.getElementById('status-text');
+    const statusIndicator = document.getElementById('status-indicator');
+    if (statusText) statusText.textContent = status;
+    if (statusIndicator) statusIndicator.style.color = color;
+}
+
+// Monitor audio initialization
+function checkAudioStatus() {
+    if (window.audioManager) {
+        if (window.audioManager.isInitialized) {
+            updateSystemStatus('AUDIO READY', 'var(--accent-green)');
+        } else {
+            updateSystemStatus('CLICK TO ENABLE AUDIO', 'var(--accent-yellow)');
+        }
+    } else {
+        updateSystemStatus('LOADING...', 'var(--accent-yellow)');
+    }
+}
+
+// Check audio status periodically
+setInterval(checkAudioStatus, 1000);
+
 // Initialize
 addAudioControlsToAllPages();
 showPage('home');
 handleMobileKeyboard();
+checkAudioStatus(); // Initial check
+
 // Only focus on desktop to prevent mobile keyboard popup
 if (!/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     playerNameInput.focus();

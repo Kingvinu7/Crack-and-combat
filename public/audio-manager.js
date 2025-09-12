@@ -23,6 +23,7 @@ class AudioManager {
         
         // State tracking
         this.currentTrack = null;
+        this.queuedTrack = null;
         this.isInitialized = false;
         this.preloadPromises = [];
         
@@ -41,14 +42,17 @@ class AudioManager {
     setupAutoInit() {
         const initOnInteraction = () => {
             if (!this.isInitialized) {
+                console.log('Audio manager: User interaction detected, initializing...');
                 this.init().catch(console.error);
                 document.removeEventListener('click', initOnInteraction);
                 document.removeEventListener('keydown', initOnInteraction);
+                document.removeEventListener('touchstart', initOnInteraction);
             }
         };
         
         document.addEventListener('click', initOnInteraction);
         document.addEventListener('keydown', initOnInteraction);
+        document.addEventListener('touchstart', initOnInteraction); // For mobile
     }
     
     async init() {
@@ -82,8 +86,11 @@ class AudioManager {
                 window.showNotification('Audio system ready! 🔊', 'success');
             }
             
-            // Start with home screen music
-            this.playMusic('home');
+            // Play queued track or default to home screen music
+            const trackToPlay = this.queuedTrack || 'home';
+            console.log(`Audio manager: Playing ${trackToPlay} after initialization`);
+            this.playMusic(trackToPlay);
+            this.queuedTrack = null;
             
         } catch (error) {
             console.warn('Audio initialization failed:', error);
@@ -96,6 +103,14 @@ class AudioManager {
         console.log('Using HTML5 audio fallback');
         this.isInitialized = true;
         this.loadAudioAssetsFallback();
+        
+        // Play queued track or default to home screen music
+        const trackToPlay = this.queuedTrack || 'home';
+        console.log(`Audio manager (fallback): Playing ${trackToPlay} after initialization`);
+        setTimeout(() => {
+            this.playMusic(trackToPlay);
+            this.queuedTrack = null;
+        }, 500); // Small delay to ensure assets are loaded
     }
     
     async loadAudioAssets() {
@@ -218,12 +233,14 @@ class AudioManager {
     
     async loadAudioBuffer(url) {
         try {
+            console.log(`Loading audio buffer: ${url}`);
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
             const arrayBuffer = await response.arrayBuffer();
             const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+            console.log(`Successfully loaded audio buffer: ${url} (${audioBuffer.duration.toFixed(2)}s)`);
             return audioBuffer;
         } catch (error) {
             console.warn(`Failed to load ${url}:`, error);
@@ -234,6 +251,8 @@ class AudioManager {
     playMusic(trackName, fadeIn = true) {
         if (!this.isInitialized) {
             // Queue the music to play after initialization
+            console.log(`Audio manager: Queueing music "${trackName}" until initialization`);
+            this.queuedTrack = trackName;
             setTimeout(() => this.playMusic(trackName, fadeIn), 100);
             return;
         }
@@ -283,7 +302,7 @@ class AudioManager {
             }
             
             this.currentTrack = trackName;
-            console.log(`Playing music: ${trackName}`);
+            console.log(`Successfully playing music: ${trackName} (${track instanceof AudioBuffer ? 'Web Audio' : 'HTML5'})`);
             
         } catch (error) {
             console.warn(`Failed to play music ${trackName}:`, error);

@@ -231,11 +231,29 @@
                 .catch(error => {
                     logResult('File Access', false, `Network error: ${error.message}`);
                 });
+            
+            // Debug audio manager state
+            if (window.audioManager) {
+                logResult('Audio Manager', true, `Initialized: ${window.audioManager.isInitialized}`);
+                logResult('Audio Manager', true, `Current track: ${window.audioManager.currentTrack || 'None'}`);
+                logResult('Audio Manager', true, `Is muted: ${window.audioManager.isMuted}`);
+                
+                // Check loaded tracks
+                const trackCount = Object.keys(window.audioManager.musicTracks).length;
+                logResult('Music Tracks', trackCount > 0, `${trackCount} tracks loaded`);
+                
+                // List all available tracks
+                Object.keys(window.audioManager.musicTracks).forEach(trackName => {
+                    const track = window.audioManager.musicTracks[trackName];
+                    logResult(`Track: ${trackName}`, !!track, track ? 'Loaded' : 'Missing');
+                });
+            }
         });
         
         // Auto-initialize audio on first user interaction
         document.addEventListener('click', () => {
             if (window.audioManager && !window.audioManager.isInitialized) {
+                logResult('Auto Init', true, 'Initializing on user click');
                 initializeAudio();
             }
         }, { once: true });
