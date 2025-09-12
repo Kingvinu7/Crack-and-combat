@@ -85,6 +85,62 @@ document.querySelectorAll('.trivia-option').forEach(button => {
     button.addEventListener('click', onTriviaOptionClick);
 });
 
+// Custom notification system
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `custom-notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span class="notification-message">${message}</span>
+            <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+        </div>
+    `;
+    
+    // Position multiple notifications
+    const existingNotifications = document.querySelectorAll('.custom-notification');
+    if (existingNotifications.length > 0) {
+        notification.style.top = `${20 + (existingNotifications.length * 80)}px`;
+    }
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Auto remove after 4 seconds
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                    // Reposition remaining notifications
+                    repositionNotifications();
+                }
+            }, 300);
+        }
+    }, 4000);
+    
+    // Add click to close
+    notification.addEventListener('click', (e) => {
+        if (e.target === notification) {
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                notification.remove();
+                repositionNotifications();
+            }, 300);
+        }
+    });
+}
+
+function repositionNotifications() {
+    const notifications = document.querySelectorAll('.custom-notification');
+    notifications.forEach((notification, index) => {
+        notification.style.top = `${20 + (index * 80)}px`;
+    });
+}
+
 // Utility functions
 function showPage(pageName) {
     Object.values(pages).forEach(page => page.classList.remove('active'));
@@ -96,11 +152,11 @@ function showPage(pageName) {
 function createRoom() {
     const name = playerNameInput.value.trim();
     if (!name) {
-        alert('Please enter your name');
+        showNotification('Please enter your name', 'warning');
         return;
     }
     if (name.length > 15) {
-        alert('Name must be 15 characters or less');
+        showNotification('Name must be 15 characters or less', 'warning');
         return;
     }
     playerName = name;
@@ -111,15 +167,15 @@ function joinRoom() {
     const name = playerNameInput.value.trim();
     const roomCode = roomCodeInput.value.trim().toUpperCase();
     if (!name || !roomCode) {
-        alert('Please enter your name and room code');
+        showNotification('Please enter your name and room code', 'warning');
         return;
     }
     if (name.length > 15) {
-        alert('Name must be 15 characters or less');
+        showNotification('Name must be 15 characters or less', 'warning');
         return;
     }
     if (roomCode.length !== 6) {
-        alert('Room code must be 6 characters');
+        showNotification('Room code must be 6 characters', 'warning');
         return;
     }
     playerName = name;
@@ -147,11 +203,11 @@ function submitChallengeResponse(isAutoSubmit = false) {
     
     if (!isAutoSubmit) {
         if (!response) {
-            alert('Please enter your response - this is a complex challenge that requires thought!');
+            showNotification('Please enter your response - this is a complex challenge that requires thought!', 'warning');
             return;
         }
         if (response.length < 5) {
-            alert('Please provide a more detailed response for this complex scenario.');
+            showNotification('Please provide a more detailed response for this complex scenario.', 'warning');
             return;
         }
     }
@@ -165,7 +221,7 @@ function submitChallengeResponse(isAutoSubmit = false) {
     if (isAutoSubmit) {
         setTimeout(() => {
             const shortResponse = response.length > 50 ? response.substring(0, 50) + '...' : response;
-            alert(`Your response was auto-submitted: "${shortResponse}"`);
+            showNotification(`Your response was auto-submitted: "${shortResponse}"`, 'info');
         }, 1000);
     }
 }
@@ -232,7 +288,7 @@ function startFastTapperTimer(duration) {
             socket.emit('submit-tap-result', { roomCode: currentRoom, taps: tapCount });
             
             setTimeout(() => {
-                alert(`Time's up! You tapped ${tapCount} times!`);
+                showNotification(`Time's up! You tapped ${tapCount} times!`, 'success');
             }, 500);
         }
     }, 1000);
@@ -952,7 +1008,7 @@ socket.on('game-over', (data) => {
 
 socket.on('error', (data) => {
     console.error('Socket error:', data.message);
-    alert(data.message);
+    showNotification(data.message, 'error');
 });
 
 // Mobile keyboard handling

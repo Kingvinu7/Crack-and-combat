@@ -3130,6 +3130,116 @@ textarea:focus {
     scrollbar-color: var(--accent-red) var(--bg-secondary);
 }
 
+/* ===== CUSTOM NOTIFICATIONS ===== */
+.custom-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    max-width: 400px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--accent-cyan);
+    border-radius: 8px;
+    box-shadow: 
+        0 0 30px rgba(0, 255, 255, 0.3),
+        var(--shadow-deep);
+    z-index: 15000;
+    animation: notificationSlideIn 0.3s ease-out;
+    backdrop-filter: blur(15px);
+}
+
+.custom-notification.warning {
+    border-color: #ff9800;
+    box-shadow: 
+        0 0 30px rgba(255, 152, 0, 0.3),
+        var(--shadow-deep);
+}
+
+.custom-notification.error {
+    border-color: var(--accent-red);
+    box-shadow: 
+        0 0 30px rgba(255, 0, 68, 0.3),
+        var(--shadow-deep);
+}
+
+.custom-notification.success {
+    border-color: #00ff88;
+    box-shadow: 
+        0 0 30px rgba(0, 255, 136, 0.3),
+        var(--shadow-deep);
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    gap: 15px;
+}
+
+.notification-message {
+    color: var(--text-primary);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+    flex: 1;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.notification-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+@keyframes notificationSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Stack multiple notifications */
+.custom-notification:nth-child(n+2) {
+    top: calc(20px + (80px * var(--notification-index, 0)));
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+    .custom-notification {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+    
+    .notification-content {
+        padding: 12px 15px;
+    }
+    
+    .notification-message {
+        font-size: 13px;
+    }
+}
+
 /* ===== FINAL TOUCHES ===== */
 /* Ensure proper z-indexing */
 .page { z-index: 10; }
