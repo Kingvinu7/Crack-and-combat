@@ -44,7 +44,15 @@
     </style>
 </head>
 <body>
-    <h1>🔊 Crack and Combat - Audio System Test</h1>
+    <div style="position: relative;">
+        <h1>🔊 Crack and Combat - Audio System Test</h1>
+        
+        <!-- Top Audio Controls (like in the game) -->
+        <div style="position: absolute; top: 0; right: 0; display: flex; gap: 8px; background: rgba(0, 0, 0, 0.7); border: 1px solid #00ffff; border-radius: 8px; padding: 8px;">
+            <button onclick="toggleMute()" style="width: 40px; height: 40px; background: rgba(0, 0, 0, 0.5); border: 1px solid #666; border-radius: 6px; color: #00ff88; cursor: pointer; font-size: 18px;">🔊</button>
+            <button onclick="showVolumeControls()" style="width: 40px; height: 40px; background: rgba(0, 0, 0, 0.5); border: 1px solid #666; border-radius: 6px; color: #00ff88; cursor: pointer; font-size: 18px;">⚙️</button>
+        </div>
+    </div>
     
     <div class="test-section">
         <h2>Audio System Status</h2>

@@ -599,6 +599,116 @@ body::before {
     margin: 0 8px;
 }
 
+/* Top Audio Controls Bar */
+.top-audio-bar {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.audio-controls-top {
+    display: flex;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-dim);
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    animation: slideInFromTop 0.5s ease-out;
+}
+
+@keyframes slideInFromTop {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.audio-btn-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    color: var(--accent-green);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+}
+
+.audio-btn-top:hover {
+    border-color: var(--accent-green);
+    background: rgba(0, 255, 136, 0.1);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+    transform: translateY(-2px);
+}
+
+.audio-btn-top:active {
+    transform: translateY(0);
+}
+
+.audio-btn-top .audio-icon {
+    font-size: 18px;
+    line-height: 1;
+}
+
+/* Responsive adjustments for top audio bar */
+@media (max-width: 768px) {
+    .top-audio-bar {
+        top: 10px;
+        right: 10px;
+    }
+    
+    .audio-controls-top {
+        padding: 6px;
+        gap: 6px;
+    }
+    
+    .audio-btn-top {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+    
+    .audio-btn-top .audio-icon {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .top-audio-bar {
+        top: 8px;
+        right: 8px;
+    }
+    
+    .audio-controls-top {
+        padding: 4px;
+        gap: 4px;
+    }
+    
+    .audio-btn-top {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+    
+    .audio-btn-top .audio-icon {
+        font-size: 14px;
+    }
+}
+
 /* Help Section */
 .help-section {
     margin-top: clamp(10px, 1vh, 25px);
@@ -641,36 +751,6 @@ body::before {
     font-weight: bold;
 }
 
-/* Audio Controls */
-.audio-controls {
-    display: flex;
-    gap: 5px;
-}
-
-.audio-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: clamp(8px, 1vh, 12px) clamp(10px, 1.5vw, 16px);
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid var(--border-dim);
-    border-radius: 4px;
-    color: var(--accent-green);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    min-width: clamp(32px, 4vh, 40px);
-    min-height: clamp(32px, 4vh, 40px);
-}
-
-.audio-btn:hover {
-    border-color: var(--accent-green);
-    background: rgba(0, 255, 136, 0.05);
-    box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-}
-
-.audio-btn .audio-icon {
-    font-size: clamp(14px, 1.5vw, 18px);
-}
 
 /* Audio Settings Modal */
 .audio-settings {

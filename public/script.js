@@ -36,8 +36,6 @@ const howToPlayModal = document.getElementById('how-to-play-modal');
 const closeHowToPlayBtn = document.getElementById('close-how-to-play');
 
 // Audio control elements
-const audioToggleBtn = document.getElementById('audio-toggle-btn');
-const audioSettingsBtn = document.getElementById('audio-settings-btn');
 const audioSettingsModal = document.getElementById('audio-settings-modal');
 const closeAudioSettingsBtn = document.getElementById('close-audio-settings');
 const masterVolumeSlider = document.getElementById('master-volume');
@@ -59,9 +57,7 @@ submitRiddleBtn.addEventListener('click', submitRiddleAnswer);
 howToPlayBtn.addEventListener('click', showHowToPlay);
 closeHowToPlayBtn.addEventListener('click', hideHowToPlay);
 
-// Audio event listeners
-audioToggleBtn.addEventListener('click', toggleAudio);
-audioSettingsBtn.addEventListener('click', showAudioSettings);
+// Audio settings modal event listeners
 closeAudioSettingsBtn.addEventListener('click', hideAudioSettings);
 testMusicBtn.addEventListener('click', testMusic);
 testSfxBtn.addEventListener('click', testSoundEffects);
@@ -705,9 +701,15 @@ function hideHowToPlay() {
 function toggleAudio() {
     if (window.audioManager) {
         const isMuted = window.audioManager.toggleMute();
-        const audioIcon = audioToggleBtn.querySelector('.audio-icon');
-        audioIcon.textContent = isMuted ? '🔇' : '🔊';
-        audioToggleBtn.title = isMuted ? 'Enable Audio' : 'Disable Audio';
+        
+        // Update all audio toggle buttons
+        document.querySelectorAll('.audio-toggle-btn .audio-icon').forEach(icon => {
+            icon.textContent = isMuted ? '🔇' : '🔊';
+        });
+        
+        document.querySelectorAll('.audio-toggle-btn').forEach(btn => {
+            btn.title = isMuted ? 'Enable Audio' : 'Disable Audio';
+        });
         
         if (!isMuted) {
             window.audioManager.playClickSound();
@@ -1233,7 +1235,47 @@ function handleMobileKeyboard() {
 }
 
 
+// Add audio controls to all pages
+function addAudioControlsToAllPages() {
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(page => {
+        // Skip if already has audio controls
+        if (page.querySelector('.top-audio-bar')) return;
+        
+        const audioBar = document.createElement('div');
+        audioBar.className = 'top-audio-bar';
+        audioBar.innerHTML = `
+            <div class="audio-controls-top">
+                <button class="audio-toggle-btn audio-btn-top" title="Toggle Audio">
+                    <span class="audio-icon">🔊</span>
+                </button>
+                <button class="audio-settings-btn audio-btn-top" title="Audio Settings">
+                    <span class="audio-icon">⚙️</span>
+                </button>
+            </div>
+        `;
+        
+        // Insert as first child after matrix-bg if it exists
+        const matrixBg = page.querySelector('.matrix-bg');
+        if (matrixBg) {
+            matrixBg.insertAdjacentElement('afterend', audioBar);
+        } else {
+            page.insertBefore(audioBar, page.firstChild);
+        }
+    });
+    
+    // Add event listeners to all audio control buttons
+    document.querySelectorAll('.audio-toggle-btn').forEach(btn => {
+        btn.addEventListener('click', toggleAudio);
+    });
+    
+    document.querySelectorAll('.audio-settings-btn').forEach(btn => {
+        btn.addEventListener('click', showAudioSettings);
+    });
+}
+
 // Initialize
+addAudioControlsToAllPages();
 showPage('home');
 handleMobileKeyboard();
 // Only focus on desktop to prevent mobile keyboard popup
