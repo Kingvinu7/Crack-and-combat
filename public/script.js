@@ -171,50 +171,50 @@ function repositionNotifications() {
     });
 }
 
+// Determine what music should be playing for a given page
+function getMusicForPage(pageName) {
+    switch (pageName) {
+        case 'textChallenge':
+        case 'triviaChallenge':
+        case 'fastTapper':
+            return 'challenge'; // intense-focus
+            
+        case 'gameOver':
+            return 'victory'; // triumph-epic (will be set by game-over handler)
+            
+        default:
+            return 'home'; // cyber-ambient for all other pages
+    }
+}
+
 // Utility functions
 function showPage(pageName) {
     Object.values(pages).forEach(page => page.classList.remove('active'));
     if (pages[pageName]) {
         pages[pageName].classList.add('active');
         
-        // Play transition sound and switch music based on page
+        // Simplified 3-track music system with smart switching
         if (window.audioManager) {
-            window.audioManager.playTransitionSound();
+            console.log(`Showing page: ${pageName}, Audio initialized: ${window.audioManager.isInitialized}`);
             
-            switch (pageName) {
-                case 'home':
-                    window.audioManager.playHomeMusic();
-                    break;
-                case 'lobby':
-                    window.audioManager.playLobbyMusic();
-                    break;
-                case 'oracleIntro':
-                    window.audioManager.playOracleMusic();
-                    break;
-                case 'riddle':
-                    window.audioManager.playRiddleMusic();
-                    break;
-                case 'textChallenge':
-                case 'triviaChallenge':
-                case 'fastTapper':
-                    window.audioManager.playChallengeMusic();
-                    break;
-                case 'riddleResults':
-                case 'triviaResults':
-                case 'challengeResults':
-                case 'roundSummary':
-                    window.audioManager.playResultsMusic();
-                    break;
-                case 'gameOver':
-                    // Victory or defeat music will be set by the game-over event handler
-                    break;
-                case 'waiting':
-                    // Keep current music for waiting screens
-                    break;
-                default:
-                    // Keep current music for unknown pages
-                    break;
+            // Play transition sound only if initialized
+            if (window.audioManager.isInitialized) {
+                window.audioManager.playTransitionSound();
             }
+            
+            // Determine what music should play
+            const requiredMusic = getMusicForPage(pageName);
+            
+            // Only change music if we need a different track
+            if (pageName === 'gameOver') {
+                // Special case: game over music is handled by the game-over event
+                console.log('Game over page - music will be set by game-over handler');
+            } else if (requiredMusic) {
+                console.log(`Page ${pageName} requires music: ${requiredMusic}`);
+                window.audioManager.playMusic(requiredMusic);
+            }
+        } else {
+            console.warn('Audio manager not available when showing page:', pageName);
         }
     }
 }
@@ -232,6 +232,13 @@ function createRoom() {
         return;
     }
     playerName = name;
+    
+    // Ensure audio is initialized on user action
+    if (window.audioManager && !window.audioManager.isInitialized) {
+        console.log('Initializing audio on create room action');
+        window.audioManager.init().catch(console.error);
+    }
+    
     if (window.audioManager) window.audioManager.playClickSound();
     socket.emit('create-room', { playerName: name });
 }
@@ -255,6 +262,13 @@ function joinRoom() {
         return;
     }
     playerName = name;
+    
+    // Ensure audio is initialized on user action
+    if (window.audioManager && !window.audioManager.isInitialized) {
+        console.log('Initializing audio on join room action');
+        window.audioManager.init().catch(console.error);
+    }
+    
     if (window.audioManager) window.audioManager.playClickSound();
     socket.emit('join-room', { playerName: name, roomCode: roomCode });
 }
@@ -664,6 +678,12 @@ function hideIndividualResult() {
     if (overlay) {
         overlay.style.display = 'none';
         document.body.style.overflow = 'auto'; // Restore scrolling
+        
+        // Ensure cyber-ambient continues playing
+        if (window.audioManager) {
+            console.log('Hiding individual result - ensuring cyber ambient continues');
+            window.audioManager.playMusic('home'); // cyber-ambient
+        }
     }
 }
 
@@ -974,6 +994,11 @@ socket.on('fast-tapper-start', (data) => {
 });
 
 socket.on('challenge-individual-result', (data) => {
+    // Challenge completed - go back to cyber-ambient
+    if (window.audioManager) {
+        console.log('Challenge completed - returning to cyber ambient');
+        window.audioManager.playMusic('home'); // cyber-ambient
+    }
     showIndividualResult(data);
 });
 
@@ -990,6 +1015,13 @@ socket.on('fast-tapper-results', (data) => {
     `).join('');
     
     document.getElementById('challenge-results-content').innerHTML = resultsHtml;
+    
+    // Fast tapper completed - go back to cyber-ambient
+    if (window.audioManager) {
+        console.log('Fast tapper completed - returning to cyber ambient');
+        window.audioManager.playMusic('home'); // cyber-ambient
+    }
+    
     showPage('challengeResults');
 });
 
@@ -1129,17 +1161,10 @@ socket.on('game-over', (data) => {
     console.log('- Length:', data.roundHistory ? data.roundHistory.length : 'N/A');
     console.log('- Content:', data.roundHistory);
     
-    // Play victory or defeat music based on player performance
+    // Play triumph epic ONLY in final winner screen
     if (window.audioManager) {
-        const playerScore = data.scores.find(p => p.name === playerName)?.score || 0;
-        const isWinner = data.winner.name === playerName;
-        const hasWins = playerScore > 0;
-        
-        if (isWinner || hasWins) {
-            window.audioManager.playVictoryMusic();
-        } else {
-            window.audioManager.playDefeatMusic();
-        }
+        console.log('Final winner screen - playing triumph epic');
+        window.audioManager.playMusic('victory'); // triumph-epic
     }
     
     const scoresHtml = data.scores.map((player, index) => {
@@ -1274,10 +1299,44 @@ function addAudioControlsToAllPages() {
     });
 }
 
+// Audio status indicator
+function updateSystemStatus(status, color = 'var(--accent-green)') {
+    const statusText = document.getElementById('status-text');
+    const statusIndicator = document.getElementById('status-indicator');
+    if (statusText) statusText.textContent = status;
+    if (statusIndicator) statusIndicator.style.color = color;
+}
+
+// Monitor audio initialization
+function checkAudioStatus() {
+    if (window.audioManager) {
+        if (window.audioManager.isInitialized) {
+            updateSystemStatus('AUDIO READY', 'var(--accent-green)');
+        } else {
+            // Check if preloading is in progress
+            const preloadCount = window.audioManager.preloadedBuffers ? 
+                Object.keys(window.audioManager.preloadedBuffers).length : 0;
+            
+            if (preloadCount > 0) {
+                updateSystemStatus(`PRELOADED ${preloadCount}/3 - CLICK TO START`, 'var(--accent-yellow)');
+            } else {
+                updateSystemStatus('CLICK TO ENABLE AUDIO', 'var(--accent-yellow)');
+            }
+        }
+    } else {
+        updateSystemStatus('LOADING...', 'var(--accent-yellow)');
+    }
+}
+
+// Check audio status periodically
+setInterval(checkAudioStatus, 1000);
+
 // Initialize
 addAudioControlsToAllPages();
 showPage('home');
 handleMobileKeyboard();
+checkAudioStatus(); // Initial check
+
 // Only focus on desktop to prevent mobile keyboard popup
 if (!/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     playerNameInput.focus();

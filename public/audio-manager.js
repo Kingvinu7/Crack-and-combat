@@ -23,6 +23,7 @@ class AudioManager {
         
         // State tracking
         this.currentTrack = null;
+        this.queuedTrack = null;
         this.isInitialized = false;
         this.preloadPromises = [];
         
@@ -36,19 +37,57 @@ class AudioManager {
         
         // Auto-initialize on user interaction
         this.setupAutoInit();
+        
+        // Start preloading audio files immediately (but don't decode yet)
+        this.preloadAudioFiles();
+    }
+    
+    // Preload audio files in the background for faster playback
+    preloadAudioFiles() {
+        const musicFiles = [
+            '/audio/music/cyber-ambient.mp3',
+            '/audio/music/intense-focus.mp3', 
+            '/audio/music/triumph-epic.mp3'
+        ];
+        
+        console.log('Starting audio file preload...');
+        
+        // Use fetch to start downloading files immediately
+        musicFiles.forEach(url => {
+            fetch(url)
+                .then(response => {
+                    if (response.ok) {
+                        console.log(`Preloaded: ${url}`);
+                        return response.arrayBuffer();
+                    }
+                })
+                .then(buffer => {
+                    // Store the raw buffer for later decoding
+                    if (buffer) {
+                        this.preloadedBuffers = this.preloadedBuffers || {};
+                        this.preloadedBuffers[url] = buffer;
+                    }
+                })
+                .catch(error => {
+                    console.warn(`Failed to preload ${url}:`, error);
+                });
+        });
     }
     
     setupAutoInit() {
         const initOnInteraction = () => {
             if (!this.isInitialized) {
+                console.log('Audio manager: User interaction detected, initializing...');
                 this.init().catch(console.error);
                 document.removeEventListener('click', initOnInteraction);
                 document.removeEventListener('keydown', initOnInteraction);
+                document.removeEventListener('touchstart', initOnInteraction);
             }
         };
         
         document.addEventListener('click', initOnInteraction);
         document.addEventListener('keydown', initOnInteraction);
+        document.addEventListener('touchstart', initOnInteraction); // For mobile
     }
     
     async init() {
@@ -57,6 +96,12 @@ class AudioManager {
         try {
             // Create Web Audio Context
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Resume audio context immediately (required after user interaction)
+            if (this.audioContext.state === 'suspended') {
+                console.log('Resuming suspended audio context...');
+                await this.audioContext.resume();
+            }
             
             // Create gain nodes for volume control
             this.masterGainNode = this.audioContext.createGain();
@@ -82,8 +127,11 @@ class AudioManager {
                 window.showNotification('Audio system ready! 🔊', 'success');
             }
             
-            // Start with home screen music
-            this.playMusic('home');
+            // Play queued track or default to home screen music
+            const trackToPlay = this.queuedTrack || 'home';
+            console.log(`Audio manager: Playing ${trackToPlay} after initialization`);
+            this.playMusic(trackToPlay);
+            this.queuedTrack = null;
             
         } catch (error) {
             console.warn('Audio initialization failed:', error);
@@ -96,18 +144,22 @@ class AudioManager {
         console.log('Using HTML5 audio fallback');
         this.isInitialized = true;
         this.loadAudioAssetsFallback();
+        
+        // Play queued track or default to home screen music
+        const trackToPlay = this.queuedTrack || 'home';
+        console.log(`Audio manager (fallback): Playing ${trackToPlay} after initialization`);
+        setTimeout(() => {
+            this.playMusic(trackToPlay);
+            this.queuedTrack = null;
+        }, 500); // Small delay to ensure assets are loaded
     }
     
     async loadAudioAssets() {
+        // Only load the 3 music files we actually use for faster loading
         const musicFiles = {
-            home: '/audio/music/cyber-ambient.mp3',
-            lobby: '/audio/music/waiting-tension.mp3',
-            oracle: '/audio/music/mysterious-voice.mp3',
-            riddle: '/audio/music/thinking-pressure.mp3',
-            challenge: '/audio/music/intense-focus.mp3',
-            results: '/audio/music/reveal-dramatic.mp3',
-            victory: '/audio/music/triumph-epic.mp3',
-            defeat: '/audio/music/dark-ominous.mp3'
+            home: '/audio/music/cyber-ambient.mp3',        // Default music
+            challenge: '/audio/music/intense-focus.mp3',   // Challenge music  
+            victory: '/audio/music/triumph-epic.mp3'       // Final winner music
         };
         
         const sfxFiles = {
@@ -121,17 +173,21 @@ class AudioManager {
             tap: '/audio/sfx/tap-sound.mp3'
         };
         
-        // Load music tracks
-        for (const [name, url] of Object.entries(musicFiles)) {
-            try {
-                const buffer = await this.loadAudioBuffer(url);
-                if (buffer) {
-                    this.musicTracks[name] = buffer;
+        // Load music tracks (prioritize home track for faster startup)
+        const trackOrder = ['home', 'challenge', 'victory']; // Load home first
+        for (const name of trackOrder) {
+            if (musicFiles[name]) {
+                try {
+                    const buffer = await this.loadAudioBuffer(musicFiles[name]);
+                    if (buffer) {
+                        this.musicTracks[name] = buffer;
+                        console.log(`Music track loaded: ${name}`);
+                    }
+                } catch (error) {
+                    console.warn(`Failed to load music track ${name}:`, error);
+                    // Create fallback HTML5 audio
+                    this.musicTracks[name] = this.createFallbackAudio(musicFiles[name], true);
                 }
-            } catch (error) {
-                console.warn(`Failed to load music track ${name}:`, error);
-                // Create fallback HTML5 audio
-                this.musicTracks[name] = this.createFallbackAudio(url, true);
             }
         }
         
@@ -167,15 +223,11 @@ class AudioManager {
     }
     
     loadAudioAssetsFallback() {
+        // Only load the 3 music files we actually use for faster loading
         const musicFiles = {
-            home: '/audio/music/cyber-ambient.mp3',
-            lobby: '/audio/music/waiting-tension.mp3',
-            oracle: '/audio/music/mysterious-voice.mp3',
-            riddle: '/audio/music/thinking-pressure.mp3',
-            challenge: '/audio/music/intense-focus.mp3',
-            results: '/audio/music/reveal-dramatic.mp3',
-            victory: '/audio/music/triumph-epic.mp3',
-            defeat: '/audio/music/dark-ominous.mp3'
+            home: '/audio/music/cyber-ambient.mp3',        // Default music
+            challenge: '/audio/music/intense-focus.mp3',   // Challenge music  
+            victory: '/audio/music/triumph-epic.mp3'       // Final winner music
         };
         
         const sfxFiles = {
@@ -218,12 +270,26 @@ class AudioManager {
     
     async loadAudioBuffer(url) {
         try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
+            console.log(`Loading audio buffer: ${url}`);
+            
+            let arrayBuffer;
+            
+            // Check if we have a preloaded buffer
+            if (this.preloadedBuffers && this.preloadedBuffers[url]) {
+                console.log(`Using preloaded buffer for: ${url}`);
+                arrayBuffer = this.preloadedBuffers[url];
+            } else {
+                // Fetch if not preloaded
+                console.log(`Fetching audio buffer: ${url}`);
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                arrayBuffer = await response.arrayBuffer();
             }
-            const arrayBuffer = await response.arrayBuffer();
+            
             const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+            console.log(`Successfully loaded audio buffer: ${url} (${audioBuffer.duration.toFixed(2)}s)`);
             return audioBuffer;
         } catch (error) {
             console.warn(`Failed to load ${url}:`, error);
@@ -234,11 +300,19 @@ class AudioManager {
     playMusic(trackName, fadeIn = true) {
         if (!this.isInitialized) {
             // Queue the music to play after initialization
+            console.log(`Audio manager: Queueing music "${trackName}" until initialization`);
+            this.queuedTrack = trackName;
             setTimeout(() => this.playMusic(trackName, fadeIn), 100);
             return;
         }
         
         if (this.isMuted) return;
+        
+        // Check if the same track is already playing
+        if (this.currentTrack === trackName && this.currentMusic) {
+            console.log(`Music "${trackName}" is already playing - no change needed`);
+            return;
+        }
         
         const track = this.musicTracks[trackName];
         if (!track) {
@@ -246,8 +320,9 @@ class AudioManager {
             return;
         }
         
-        // Stop current music
-        this.stopMusic();
+        // Stop current music only if switching to a different track
+        console.log(`Switching music from "${this.currentTrack}" to "${trackName}"`);
+        this.stopMusic(false); // Immediate stop for clean transition
         
         try {
             if (track instanceof AudioBuffer && this.audioContext) {
@@ -283,7 +358,7 @@ class AudioManager {
             }
             
             this.currentTrack = trackName;
-            console.log(`Playing music: ${trackName}`);
+            console.log(`Successfully playing music: ${trackName} (${track instanceof AudioBuffer ? 'Web Audio' : 'HTML5'})`);
             
         } catch (error) {
             console.warn(`Failed to play music ${trackName}:`, error);
@@ -291,7 +366,12 @@ class AudioManager {
     }
     
     stopMusic(fadeOut = true) {
-        if (!this.currentMusic) return;
+        console.log(`Stopping current music: ${this.currentTrack}`);
+        
+        if (!this.currentMusic) {
+            console.log('No current music to stop');
+            return;
+        }
         
         try {
             if (this.currentMusic instanceof AudioBufferSourceNode) {
@@ -299,43 +379,65 @@ class AudioManager {
                 if (fadeOut && this.audioContext) {
                     this.musicGainNode.gain.linearRampToValueAtTime(
                         0, 
-                        this.audioContext.currentTime + 0.5
+                        this.audioContext.currentTime + 0.3
                     );
                     setTimeout(() => {
                         if (this.currentMusic) {
-                            this.currentMusic.stop();
+                            try {
+                                this.currentMusic.stop();
+                            } catch (e) {
+                                console.warn('Error stopping audio source:', e);
+                            }
                             this.currentMusic = null;
                         }
-                    }, 500);
+                        // Reset gain for next track
+                        if (this.musicGainNode) {
+                            this.musicGainNode.gain.setValueAtTime(this.musicVolume, this.audioContext.currentTime);
+                        }
+                    }, 300);
                 } else {
-                    this.currentMusic.stop();
+                    try {
+                        this.currentMusic.stop();
+                    } catch (e) {
+                        console.warn('Error stopping audio source:', e);
+                    }
                     this.currentMusic = null;
+                    // Reset gain immediately
+                    if (this.musicGainNode) {
+                        this.musicGainNode.gain.setValueAtTime(this.musicVolume, this.audioContext.currentTime);
+                    }
                 }
             } else if (this.currentMusic instanceof HTMLAudioElement) {
-                // HTML5 Audio
-                if (fadeOut) {
-                    const audio = this.currentMusic;
-                    const fadeInterval = setInterval(() => {
-                        if (audio.volume > 0.1) {
-                            audio.volume -= 0.1;
-                        } else {
-                            audio.pause();
-                            audio.currentTime = 0;
-                            clearInterval(fadeInterval);
-                        }
-                    }, 50);
-                } else {
-                    this.currentMusic.pause();
-                    this.currentMusic.currentTime = 0;
-                }
+                // HTML5 Audio - immediate stop for better control
+                this.currentMusic.pause();
+                this.currentMusic.currentTime = 0;
                 this.currentMusic = null;
             }
         } catch (error) {
             console.warn('Error stopping music:', error);
-            this.currentMusic = null;
         }
         
+        // Always clear references immediately
+        const previousTrack = this.currentTrack;
+        this.currentMusic = null;
         this.currentTrack = null;
+        
+        console.log(`Music stopped: ${previousTrack}`);
+    }
+    
+    // Stop music immediately without fade
+    stopMusicImmediate() {
+        this.stopMusic(false);
+    }
+    
+    // Debug function to check current music state
+    getCurrentMusicState() {
+        return {
+            currentTrack: this.currentTrack,
+            hasCurrentMusic: !!this.currentMusic,
+            isInitialized: this.isInitialized,
+            isMuted: this.isMuted
+        };
     }
     
     playSound(soundName, volume = 1.0) {
