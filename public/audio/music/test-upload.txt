@@ -1,0 +1,12 @@
+This is a test file to verify the upload directory is working.
+If you can see this file, then the directory is writable and accessible.
+Upload your music files here with these exact names:
+
+- cyber-ambient.mp3
+- waiting-tension.mp3  
+- mysterious-voice.mp3
+- thinking-pressure.mp3
+- intense-focus.mp3
+- reveal-dramatic.mp3
+- triumph-epic.mp3
+- dark-ominous.mp3
