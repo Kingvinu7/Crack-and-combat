@@ -171,13 +171,29 @@ function repositionNotifications() {
     });
 }
 
+// Determine what music should be playing for a given page
+function getMusicForPage(pageName) {
+    switch (pageName) {
+        case 'textChallenge':
+        case 'triviaChallenge':
+        case 'fastTapper':
+            return 'challenge'; // intense-focus
+            
+        case 'gameOver':
+            return 'victory'; // triumph-epic (will be set by game-over handler)
+            
+        default:
+            return 'home'; // cyber-ambient for all other pages
+    }
+}
+
 // Utility functions
 function showPage(pageName) {
     Object.values(pages).forEach(page => page.classList.remove('active'));
     if (pages[pageName]) {
         pages[pageName].classList.add('active');
         
-        // Simplified 3-track music system
+        // Simplified 3-track music system with smart switching
         if (window.audioManager) {
             console.log(`Showing page: ${pageName}, Audio initialized: ${window.audioManager.isInitialized}`);
             
@@ -186,24 +202,16 @@ function showPage(pageName) {
                 window.audioManager.playTransitionSound();
             }
             
-            switch (pageName) {
-                case 'textChallenge':
-                case 'triviaChallenge':
-                case 'fastTapper':
-                    // Play intense focus ONLY during challenge interfaces
-                    console.log('Challenge interface - playing intense focus');
-                    window.audioManager.playMusic('challenge');
-                    break;
-                    
-                case 'gameOver':
-                    // Triumph epic ONLY for final winner screen - set by game-over handler
-                    break;
-                    
-                default:
-                    // ALL other stages play cyber-ambient (home, lobby, oracle, riddle, results, etc.)
-                    console.log(`Default stage (${pageName}) - playing cyber ambient`);
-                    window.audioManager.playMusic('home');
-                    break;
+            // Determine what music should play
+            const requiredMusic = getMusicForPage(pageName);
+            
+            // Only change music if we need a different track
+            if (pageName === 'gameOver') {
+                // Special case: game over music is handled by the game-over event
+                console.log('Game over page - music will be set by game-over handler');
+            } else if (requiredMusic) {
+                console.log(`Page ${pageName} requires music: ${requiredMusic}`);
+                window.audioManager.playMusic(requiredMusic);
             }
         } else {
             console.warn('Audio manager not available when showing page:', pageName);

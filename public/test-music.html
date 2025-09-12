@@ -71,6 +71,7 @@
         
         <br><br>
         <button class="test-button" onclick="stopAllMusic()">⏹️ Stop Music</button>
+        <button class="test-button" onclick="debugMusicState()">🔍 Debug Music State</button>
     </div>
 
     <div class="test-section">
@@ -207,6 +208,14 @@
                 window.audioManager.setVolume(type, value);
                 document.getElementById(type + 'VolDisplay').textContent = Math.round(value * 100) + '%';
                 logResult(`Volume: ${type}`, true, `Set to ${Math.round(value * 100)}%`);
+            }
+        }
+        
+        function debugMusicState() {
+            if (window.audioManager) {
+                const state = window.audioManager.getCurrentMusicState();
+                logResult('Debug State', true, JSON.stringify(state, null, 2));
+                updateStatus(`Current: ${state.currentTrack || 'None'}, Playing: ${state.hasCurrentMusic}`, 'info');
             }
         }
         

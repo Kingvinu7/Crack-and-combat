@@ -259,14 +259,21 @@ class AudioManager {
         
         if (this.isMuted) return;
         
+        // Check if the same track is already playing
+        if (this.currentTrack === trackName && this.currentMusic) {
+            console.log(`Music "${trackName}" is already playing - no change needed`);
+            return;
+        }
+        
         const track = this.musicTracks[trackName];
         if (!track) {
             console.warn(`Music track not found: ${trackName}`);
             return;
         }
         
-        // Stop current music
-        this.stopMusic();
+        // Stop current music only if switching to a different track
+        console.log(`Switching music from "${this.currentTrack}" to "${trackName}"`);
+        this.stopMusic(false); // Immediate stop for clean transition
         
         try {
             if (track instanceof AudioBuffer && this.audioContext) {
@@ -361,9 +368,9 @@ class AudioManager {
             console.warn('Error stopping music:', error);
         }
         
-        // Always clear references
-        this.currentMusic = null;
+        // Always clear references immediately
         const previousTrack = this.currentTrack;
+        this.currentMusic = null;
         this.currentTrack = null;
         
         console.log(`Music stopped: ${previousTrack}`);
@@ -372,6 +379,16 @@ class AudioManager {
     // Stop music immediately without fade
     stopMusicImmediate() {
         this.stopMusic(false);
+    }
+    
+    // Debug function to check current music state
+    getCurrentMusicState() {
+        return {
+            currentTrack: this.currentTrack,
+            hasCurrentMusic: !!this.currentMusic,
+            isInitialized: this.isInitialized,
+            isMuted: this.isMuted
+        };
     }
     
     playSound(soundName, volume = 1.0) {
