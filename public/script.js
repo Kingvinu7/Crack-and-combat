@@ -177,7 +177,7 @@ function showPage(pageName) {
     if (pages[pageName]) {
         pages[pageName].classList.add('active');
         
-        // Play transition sound and switch music based on page
+        // Handle music transitions based on exact requirements
         if (window.audioManager) {
             console.log(`Showing page: ${pageName}, Audio initialized: ${window.audioManager.isInitialized}`);
             
@@ -188,36 +188,64 @@ function showPage(pageName) {
             
             switch (pageName) {
                 case 'home':
-                    window.audioManager.playHomeMusic();
+                    // Play cyber-ambient music on home screen
+                    window.audioManager.playMusic('home');
                     break;
+                    
                 case 'lobby':
-                    window.audioManager.playLobbyMusic();
+                    // Play waiting-tension on lobby
+                    window.audioManager.playMusic('lobby');
                     break;
+                    
                 case 'oracleIntro':
-                    window.audioManager.playOracleMusic();
+                    // Play mysterious voice on AI dialogue
+                    window.audioManager.playMusic('oracle');
                     break;
+                    
                 case 'riddle':
-                    window.audioManager.playRiddleMusic();
+                    // Stop mysterious voice and play thinking pressure in riddle stage
+                    window.audioManager.playMusic('riddle');
                     break;
+                    
+                case 'riddleResults':
+                    // No music in riddle results
+                    window.audioManager.stopMusicImmediate();
+                    break;
+                    
                 case 'textChallenge':
                 case 'triviaChallenge':
                 case 'fastTapper':
-                    window.audioManager.playChallengeMusic();
+                    // Play intense focus in challenges
+                    window.audioManager.playMusic('challenge');
                     break;
-                case 'riddleResults':
-                case 'triviaResults':
+                    
                 case 'challengeResults':
+                    // Music will be set by challenge result handler based on win/loss
+                    // Don't set music here, let the event handler decide
+                    break;
+                    
+                case 'triviaResults':
+                    // Stop music immediately for trivia results
+                    window.audioManager.stopMusicImmediate();
+                    break;
+                    
                 case 'roundSummary':
-                    window.audioManager.playResultsMusic();
+                    // No specific music for round summary
+                    window.audioManager.stopMusicImmediate();
                     break;
+                    
                 case 'gameOver':
-                    // Victory or defeat music will be set by the game-over event handler
+                    // Victory music will be set by the game-over event handler
                     break;
+                    
                 case 'waiting':
-                    // Keep current music for waiting screens
+                    // Keep current music for waiting screens (no change)
                     break;
+                    
                 default:
-                    // Keep current music for unknown pages
+                    // For unknown pages, stop music to be safe
+                    console.log(`Unknown page: ${pageName}, stopping music`);
+                    window.audioManager.stopMusicImmediate();
                     break;
             }
         } else {
@@ -685,6 +713,12 @@ function hideIndividualResult() {
     if (overlay) {
         overlay.style.display = 'none';
         document.body.style.overflow = 'auto'; // Restore scrolling
+        
+        // Stop music when advancing from challenge results
+        if (window.audioManager) {
+            console.log('Hiding individual result - stopping music');
+            window.audioManager.stopMusicImmediate();
+        }
     }
 }
 
@@ -995,6 +1029,24 @@ socket.on('fast-tapper-start', (data) => {
 });
 
 socket.on('challenge-individual-result', (data) => {
+    // Play appropriate music based on result
+    if (window.audioManager) {
+        if (data.passed) {
+            console.log('Challenge won - playing reveal dramatic');
+            window.audioManager.playMusic('results'); // reveal-dramatic
+        } else {
+            console.log('Challenge lost - playing dark ominous');
+            window.audioManager.playMusic('defeat'); // dark-ominous
+        }
+        
+        // Stop music after 5 seconds to prevent it from playing too long
+        setTimeout(() => {
+            if (window.audioManager) {
+                console.log('Auto-stopping challenge result music after 5 seconds');
+                window.audioManager.stopMusicImmediate();
+            }
+        }, 5000);
+    }
     showIndividualResult(data);
 });
 
@@ -1011,6 +1063,27 @@ socket.on('fast-tapper-results', (data) => {
     `).join('');
     
     document.getElementById('challenge-results-content').innerHTML = resultsHtml;
+    
+    // Play appropriate music based on whether player won
+    if (window.audioManager) {
+        const playerResult = data.results.find(r => r.playerName === playerName);
+        if (playerResult && playerResult.won) {
+            console.log('Fast tapper won - playing reveal dramatic');
+            window.audioManager.playMusic('results'); // reveal-dramatic
+        } else {
+            console.log('Fast tapper lost - playing dark ominous');
+            window.audioManager.playMusic('defeat'); // dark-ominous
+        }
+        
+        // Stop music after 5 seconds to prevent it from playing too long
+        setTimeout(() => {
+            if (window.audioManager) {
+                console.log('Auto-stopping fast tapper result music after 5 seconds');
+                window.audioManager.stopMusicImmediate();
+            }
+        }, 5000);
+    }
+    
     showPage('challengeResults');
 });
 
@@ -1150,17 +1223,10 @@ socket.on('game-over', (data) => {
     console.log('- Length:', data.roundHistory ? data.roundHistory.length : 'N/A');
     console.log('- Content:', data.roundHistory);
     
-    // Play victory or defeat music based on player performance
+    // Play triumph epic in final winner screen
     if (window.audioManager) {
-        const playerScore = data.scores.find(p => p.name === playerName)?.score || 0;
-        const isWinner = data.winner.name === playerName;
-        const hasWins = playerScore > 0;
-        
-        if (isWinner || hasWins) {
-            window.audioManager.playVictoryMusic();
-        } else {
-            window.audioManager.playDefeatMusic();
-        }
+        console.log('Final winner screen - playing triumph epic');
+        window.audioManager.playMusic('victory'); // triumph-epic
     }
     
     const scoresHtml = data.scores.map((player, index) => {

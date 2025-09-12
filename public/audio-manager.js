@@ -310,7 +310,12 @@ class AudioManager {
     }
     
     stopMusic(fadeOut = true) {
-        if (!this.currentMusic) return;
+        console.log(`Stopping current music: ${this.currentTrack}`);
+        
+        if (!this.currentMusic) {
+            console.log('No current music to stop');
+            return;
+        }
         
         try {
             if (this.currentMusic instanceof AudioBufferSourceNode) {
@@ -318,43 +323,55 @@ class AudioManager {
                 if (fadeOut && this.audioContext) {
                     this.musicGainNode.gain.linearRampToValueAtTime(
                         0, 
-                        this.audioContext.currentTime + 0.5
+                        this.audioContext.currentTime + 0.3
                     );
                     setTimeout(() => {
                         if (this.currentMusic) {
-                            this.currentMusic.stop();
+                            try {
+                                this.currentMusic.stop();
+                            } catch (e) {
+                                console.warn('Error stopping audio source:', e);
+                            }
                             this.currentMusic = null;
                         }
-                    }, 500);
+                        // Reset gain for next track
+                        if (this.musicGainNode) {
+                            this.musicGainNode.gain.setValueAtTime(this.musicVolume, this.audioContext.currentTime);
+                        }
+                    }, 300);
                 } else {
-                    this.currentMusic.stop();
+                    try {
+                        this.currentMusic.stop();
+                    } catch (e) {
+                        console.warn('Error stopping audio source:', e);
+                    }
                     this.currentMusic = null;
+                    // Reset gain immediately
+                    if (this.musicGainNode) {
+                        this.musicGainNode.gain.setValueAtTime(this.musicVolume, this.audioContext.currentTime);
+                    }
                 }
             } else if (this.currentMusic instanceof HTMLAudioElement) {
-                // HTML5 Audio
-                if (fadeOut) {
-                    const audio = this.currentMusic;
-                    const fadeInterval = setInterval(() => {
-                        if (audio.volume > 0.1) {
-                            audio.volume -= 0.1;
-                        } else {
-                            audio.pause();
-                            audio.currentTime = 0;
-                            clearInterval(fadeInterval);
-                        }
-                    }, 50);
-                } else {
-                    this.currentMusic.pause();
-                    this.currentMusic.currentTime = 0;
-                }
+                // HTML5 Audio - immediate stop for better control
+                this.currentMusic.pause();
+                this.currentMusic.currentTime = 0;
                 this.currentMusic = null;
             }
         } catch (error) {
             console.warn('Error stopping music:', error);
-            this.currentMusic = null;
         }
         
+        // Always clear references
+        this.currentMusic = null;
+        const previousTrack = this.currentTrack;
         this.currentTrack = null;
+        
+        console.log(`Music stopped: ${previousTrack}`);
+    }
+    
+    // Stop music immediately without fade
+    stopMusicImmediate() {
+        this.stopMusic(false);
     }
     
     playSound(soundName, volume = 1.0) {
