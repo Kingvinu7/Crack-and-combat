@@ -132,8 +132,7 @@ body::before {
         inset 0 1px 0 rgba(0, 255, 255, 0.1),
         var(--shadow-deep);
     position: relative;
-    max-height: 95vh;
-    overflow-y: auto;
+    /* Removed max-height and overflow restrictions */
 }
 
 .page-content::before {
@@ -232,7 +231,7 @@ body::before {
     position: relative;
     max-width: clamp(600px, 85vw, 950px);
     width: 100%;
-    max-height: 95vh;
+    /* Removed max-height restrictions */
     overflow: visible;
 }
 
@@ -2393,7 +2392,7 @@ input[type="text"]::placeholder, textarea::placeholder {
         max-width: 100%;
         padding: 15px;
         margin: 10px 0;
-        max-height: 92vh;
+        /* Removed max-height restrictions */
     }
     
     .main-content::before {
@@ -2411,7 +2410,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     
     .page-content {
         padding: 20px 15px;
-        max-height: 92vh;
+        /* Removed max-height restrictions */
     }
     
     .page-content::before {
@@ -2569,7 +2568,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     .main-content {
         padding: 8px;
         margin: 2px 0;
-        max-height: 98vh;
+        /* Removed max-height restrictions */
         border-width: 1px;
     }
     
@@ -2996,13 +2995,11 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 /* ===== MOBILE KEYBOARD ADJUSTMENTS ===== */
 .keyboard-open .page-content {
-    max-height: 50vh;
-    overflow-y: auto;
+    /* Removed max-height and overflow restrictions */
 }
 
 .keyboard-open .main-content {
-    max-height: 50vh;
-    overflow-y: auto;
+    /* Removed max-height and overflow restrictions */
     padding: 10px;
 }
 
@@ -3021,12 +3018,12 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 @media (max-width: 480px) {
     .keyboard-open .page-content {
-        max-height: 40vh;
+        /* Removed max-height restrictions */
         padding: 8px;
     }
     
     .keyboard-open .main-content {
-        max-height: 40vh;
+        /* Removed max-height restrictions */
         padding: 8px;
     }
 }
