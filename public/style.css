@@ -517,25 +517,6 @@ body::before {
     background: rgba(0, 0, 0, 0.8);
 }
 
-/* Shrink cyber input styles when typing */
-.cyber-input.typing {
-    max-width: clamp(200px, 40vw, 300px);
-    height: clamp(35px, 4vh, 45px);
-    min-height: clamp(35px, 4vh, 45px);
-    text-align: left;
-    padding: clamp(6px, 0.8vh, 10px) clamp(10px, 1.2vw, 14px);
-    font-size: clamp(10px, 0.9vw, 12px);
-    line-height: 1.2;
-    transform: scale(0.85);
-    border-color: var(--accent-cyan);
-    box-shadow: 
-        0 0 20px rgba(0, 255, 255, 0.2),
-        inset 0 2px 4px rgba(0, 0, 0, 0.4);
-    margin: clamp(4px, 0.5vh, 8px) auto;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
 
 .cyber-input::placeholder {
     color: var(--text-muted);
@@ -1037,44 +1018,6 @@ input[type="text"], textarea {
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Shrink input styles when typing */
-input[type="text"].typing {
-    max-width: clamp(250px, 50vw, 350px);
-    height: clamp(35px, 4vh, 45px);
-    min-height: clamp(35px, 4vh, 45px);
-    text-align: left;
-    padding: clamp(6px, 0.8vh, 10px) clamp(10px, 1.2vw, 14px);
-    font-size: clamp(11px, 1vw, 13px);
-    line-height: 1.2;
-    transform: scale(0.85);
-    border-color: var(--accent-cyan);
-    box-shadow: 
-        0 0 20px rgba(0, 255, 255, 0.2),
-        inset 0 2px 4px rgba(0, 0, 0, 0.4);
-    margin: clamp(4px, 0.5vh, 8px) auto;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-/* Shrink textarea styles when typing */
-textarea.typing {
-    max-width: clamp(300px, 60vw, 450px);
-    height: clamp(60px, 8vh, 80px);
-    min-height: clamp(60px, 8vh, 80px);
-    text-align: left;
-    padding: clamp(8px, 1vh, 12px) clamp(12px, 1.5vw, 16px);
-    font-size: clamp(11px, 1vw, 13px);
-    line-height: 1.3;
-    resize: none;
-    transform: scale(0.85);
-    border-color: var(--accent-cyan);
-    box-shadow: 
-        0 0 20px rgba(0, 255, 255, 0.2),
-        inset 0 2px 4px rgba(0, 0, 0, 0.4);
-    margin: clamp(4px, 0.5vh, 8px) auto;
-    overflow: hidden;
-}
 
 input[type="text"]:focus, textarea:focus {
     outline: none;
@@ -1103,30 +1046,8 @@ input[type="text"]::placeholder, textarea::placeholder {
     font-size: clamp(14px, 1.1vw, 16px);
     line-height: 1.5;
     padding: clamp(16px, 2vh, 24px);
-    /* Better scrolling behavior */
-    overflow-y: auto;
-    scroll-behavior: smooth;
 }
 
-/* Shrink response textarea when typing */
-.response-textarea.typing {
-    max-width: clamp(300px, 60vw, 450px);
-    height: clamp(70px, 10vh, 90px);
-    min-height: clamp(70px, 10vh, 90px);
-    max-height: clamp(70px, 10vh, 90px);
-    text-align: left;
-    padding: clamp(8px, 1vh, 12px) clamp(12px, 1.5vw, 16px);
-    font-size: clamp(11px, 1vw, 13px);
-    line-height: 1.3;
-    resize: none;
-    transform: scale(0.85);
-    border-color: var(--accent-cyan);
-    box-shadow: 
-        0 0 20px rgba(0, 255, 255, 0.2),
-        inset 0 2px 4px rgba(0, 0, 0, 0.4);
-    margin: clamp(4px, 0.5vh, 8px) auto;
-    overflow: hidden;
-}
 
 /* ===== ACTION SECTIONS ===== */
 .action-section, .answer-section {
