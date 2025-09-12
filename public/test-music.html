@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Integration Test - Crack and Combat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #00ff00;
+        }
+        .test-button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .test-button:hover {
+            background: #00cc00;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success { background: #004400; }
+        .error { background: #440000; }
+        .info { background: #004444; }
+        .current-track {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffff00;
+        }
+    </style>
+    <script src="audio-samples.js"></script>
+    <script src="audio-manager.js"></script>
+</head>
+<body>
+    <h1>🎵 Music Integration Test - Crack and Combat</h1>
+    
+    <div class="test-section">
+        <h2>Audio System Status</h2>
+        <div id="audio-status" class="status info">Initializing audio system...</div>
+        <div id="current-track" class="current-track">Current Track: None</div>
+        <button class="test-button" onclick="initializeAudio()">Initialize Audio</button>
+        <button class="test-button" onclick="toggleMute()">Toggle Mute</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Game State Music Tests</h2>
+        <p>Test each game state's background music:</p>
+        
+        <button class="test-button" onclick="testMusic('home')">🏠 Home Screen</button>
+        <button class="test-button" onclick="testMusic('lobby')">👥 Lobby</button>
+        <button class="test-button" onclick="testMusic('oracle')">🤖 Oracle Intro</button>
+        <button class="test-button" onclick="testMusic('riddle')">🧩 Riddle Phase</button>
+        <button class="test-button" onclick="testMusic('challenge')">⚡ Challenge Phase</button>
+        <button class="test-button" onclick="testMusic('results')">📊 Results</button>
+        <button class="test-button" onclick="testMusic('victory')">🏆 Victory</button>
+        <button class="test-button" onclick="testMusic('defeat')">💀 Defeat</button>
+        
+        <br><br>
+        <button class="test-button" onclick="stopAllMusic()">⏹️ Stop Music</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Sound Effects Tests</h2>
+        <p>Test game sound effects:</p>
+        
+        <button class="test-button" onclick="testSFX('click')">🖱️ Click</button>
+        <button class="test-button" onclick="testSFX('submit')">📤 Submit</button>
+        <button class="test-button" onclick="testSFX('correct')">✅ Correct</button>
+        <button class="test-button" onclick="testSFX('incorrect')">❌ Incorrect</button>
+        <button class="test-button" onclick="testSFX('notification')">🔔 Notification</button>
+        <button class="test-button" onclick="testSFX('transition')">🔄 Transition</button>
+        <button class="test-button" onclick="testSFX('tap')">👆 Tap</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Volume Controls</h2>
+        <div>
+            <label>Master Volume: <input type="range" id="masterVol" min="0" max="100" value="70" onchange="setVolume('master', this.value/100)"> <span id="masterVolDisplay">70%</span></label>
+        </div>
+        <div>
+            <label>Music Volume: <input type="range" id="musicVol" min="0" max="100" value="60" onchange="setVolume('music', this.value/100)"> <span id="musicVolDisplay">60%</span></label>
+        </div>
+        <div>
+            <label>SFX Volume: <input type="range" id="sfxVol" min="0" max="100" value="80" onchange="setVolume('sfx', this.value/100)"> <span id="sfxVolDisplay">80%</span></label>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <script>
+        let testResults = [];
+        
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('audio-status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+        
+        function updateCurrentTrack(trackName) {
+            document.getElementById('current-track').textContent = `Current Track: ${trackName || 'None'}`;
+        }
+        
+        function logResult(test, success, message) {
+            testResults.push({
+                test: test,
+                success: success,
+                message: message,
+                timestamp: new Date().toLocaleTimeString()
+            });
+            updateTestResults();
+        }
+        
+        function updateTestResults() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = testResults.map(result => 
+                `<div class="${result.success ? 'success' : 'error'}" style="margin: 5px 0; padding: 8px; border-radius: 4px;">
+                    [${result.timestamp}] ${result.test}: ${result.success ? '✅' : '❌'} ${result.message}
+                </div>`
+            ).join('');
+        }
+        
+        function initializeAudio() {
+            if (window.audioManager) {
+                updateStatus('Audio manager found, initializing...', 'info');
+                window.audioManager.init().then(() => {
+                    updateStatus('Audio system initialized successfully!', 'success');
+                    logResult('Audio Init', true, 'Audio system ready');
+                }).catch(error => {
+                    updateStatus(`Audio initialization failed: ${error.message}`, 'error');
+                    logResult('Audio Init', false, error.message);
+                });
+            } else {
+                updateStatus('Audio manager not found!', 'error');
+                logResult('Audio Init', false, 'Audio manager not loaded');
+            }
+        }
+        
+        function testMusic(trackName) {
+            if (window.audioManager) {
+                try {
+                    window.audioManager.playMusic(trackName);
+                    updateCurrentTrack(trackName);
+                    updateStatus(`Playing ${trackName} music...`, 'success');
+                    logResult(`Music: ${trackName}`, true, 'Track started successfully');
+                } catch (error) {
+                    updateStatus(`Failed to play ${trackName}: ${error.message}`, 'error');
+                    logResult(`Music: ${trackName}`, false, error.message);
+                }
+            } else {
+                updateStatus('Audio manager not initialized!', 'error');
+                logResult(`Music: ${trackName}`, false, 'Audio manager not available');
+            }
+        }
+        
+        function testSFX(soundName) {
+            if (window.audioManager) {
+                try {
+                    window.audioManager.playSound(soundName);
+                    updateStatus(`Played ${soundName} sound effect`, 'success');
+                    logResult(`SFX: ${soundName}`, true, 'Sound played successfully');
+                } catch (error) {
+                    updateStatus(`Failed to play ${soundName}: ${error.message}`, 'error');
+                    logResult(`SFX: ${soundName}`, false, error.message);
+                }
+            } else {
+                updateStatus('Audio manager not initialized!', 'error');
+                logResult(`SFX: ${soundName}`, false, 'Audio manager not available');
+            }
+        }
+        
+        function stopAllMusic() {
+            if (window.audioManager) {
+                window.audioManager.stopMusic();
+                updateCurrentTrack(null);
+                updateStatus('Music stopped', 'info');
+                logResult('Stop Music', true, 'All music stopped');
+            }
+        }
+        
+        function toggleMute() {
+            if (window.audioManager) {
+                const isMuted = window.audioManager.toggleMute();
+                updateStatus(`Audio ${isMuted ? 'muted' : 'unmuted'}`, 'info');
+                logResult('Toggle Mute', true, `Audio is now ${isMuted ? 'muted' : 'unmuted'}`);
+            }
+        }
+        
+        function setVolume(type, value) {
+            if (window.audioManager) {
+                window.audioManager.setVolume(type, value);
+                document.getElementById(type + 'VolDisplay').textContent = Math.round(value * 100) + '%';
+                logResult(`Volume: ${type}`, true, `Set to ${Math.round(value * 100)}%`);
+            }
+        }
+        
+        // Auto-initialize when page loads
+        window.addEventListener('load', () => {
+            updateStatus('Page loaded, audio manager available: ' + (window.audioManager ? 'Yes' : 'No'), 'info');
+            
+            // Check if files are accessible
+            const testFile = '/audio/music/cyber-ambient.mp3';
+            fetch(testFile, { method: 'HEAD' })
+                .then(response => {
+                    if (response.ok) {
+                        logResult('File Access', true, 'Music files are accessible');
+                    } else {
+                        logResult('File Access', false, `HTTP ${response.status} for ${testFile}`);
+                    }
+                })
+                .catch(error => {
+                    logResult('File Access', false, `Network error: ${error.message}`);
+                });
+        });
+        
+        // Auto-initialize audio on first user interaction
+        document.addEventListener('click', () => {
+            if (window.audioManager && !window.audioManager.isInitialized) {
+                initializeAudio();
+            }
+        }, { once: true });
+    </script>
+</body>
+</html>
