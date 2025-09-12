@@ -38,6 +38,8 @@
     
     <link rel="stylesheet" href="style.css">
     <script src="/socket.io/socket.io.js"></script>
+    <script src="audio-samples.js"></script>
+    <script src="audio-manager.js"></script>
 </head>
 <body>
     <!-- Clean background without distracting animations -->
@@ -46,6 +48,18 @@
     <div id="home-screen" class="page active">
         <!-- Matrix Background Effect -->
         <div class="matrix-bg"></div>
+        
+        <!-- Top Audio Controls Bar -->
+        <div class="top-audio-bar">
+            <div class="audio-controls-top">
+                <button id="audio-toggle-btn" class="audio-btn-top" title="Toggle Audio">
+                    <span class="audio-icon">🔊</span>
+                </button>
+                <button id="audio-settings-btn" class="audio-btn-top" title="Audio Settings">
+                    <span class="audio-icon">⚙️</span>
+                </button>
+            </div>
+        </div>
         
         <!-- Clean Centered Layout -->
         <div class="clean-layout">
@@ -380,6 +394,55 @@
     <div id="result-overlay" class="result-overlay" style="display: none;">
         <div class="result-overlay-content">
             <div id="individual-result-content"></div>
+        </div>
+    </div>
+
+    <!-- Audio Settings Modal -->
+    <div id="audio-settings-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔊 AUDIO SETTINGS</h2>
+                <button id="close-audio-settings" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="audio-settings">
+                    <div class="setting-section">
+                        <h3>Volume Controls</h3>
+                        
+                        <div class="volume-control">
+                            <label for="master-volume">Master Volume</label>
+                            <div class="volume-slider-container">
+                                <input type="range" id="master-volume" class="volume-slider" min="0" max="100" value="70">
+                                <span class="volume-value">70%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="volume-control">
+                            <label for="music-volume">Music Volume</label>
+                            <div class="volume-slider-container">
+                                <input type="range" id="music-volume" class="volume-slider" min="0" max="100" value="60">
+                                <span class="volume-value">60%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="volume-control">
+                            <label for="sfx-volume">Sound Effects Volume</label>
+                            <div class="volume-slider-container">
+                                <input type="range" id="sfx-volume" class="volume-slider" min="0" max="100" value="80">
+                                <span class="volume-value">80%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-section">
+                        <h3>Audio Options</h3>
+                        <div class="audio-option">
+                            <button id="test-music-btn" class="btn secondary">Test Music</button>
+                            <button id="test-sfx-btn" class="btn secondary">Test Sound Effects</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

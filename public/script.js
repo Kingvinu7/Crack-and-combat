@@ -35,6 +35,15 @@ const howToPlayBtn = document.getElementById('how-to-play-btn');
 const howToPlayModal = document.getElementById('how-to-play-modal');
 const closeHowToPlayBtn = document.getElementById('close-how-to-play');
 
+// Audio control elements
+const audioSettingsModal = document.getElementById('audio-settings-modal');
+const closeAudioSettingsBtn = document.getElementById('close-audio-settings');
+const masterVolumeSlider = document.getElementById('master-volume');
+const musicVolumeSlider = document.getElementById('music-volume');
+const sfxVolumeSlider = document.getElementById('sfx-volume');
+const testMusicBtn = document.getElementById('test-music-btn');
+const testSfxBtn = document.getElementById('test-sfx-btn');
+
 const roomCodeDisplay = document.getElementById('room-code-display');
 const playersListEl = document.getElementById('players-list');
 const oracleIntroMessage = document.getElementById('oracle-intro-message');
@@ -47,6 +56,16 @@ startGameBtn.addEventListener('click', startGame);
 submitRiddleBtn.addEventListener('click', submitRiddleAnswer);
 howToPlayBtn.addEventListener('click', showHowToPlay);
 closeHowToPlayBtn.addEventListener('click', hideHowToPlay);
+
+// Audio settings modal event listeners
+closeAudioSettingsBtn.addEventListener('click', hideAudioSettings);
+testMusicBtn.addEventListener('click', testMusic);
+testSfxBtn.addEventListener('click', testSoundEffects);
+
+// Volume slider event listeners
+masterVolumeSlider.addEventListener('input', updateMasterVolume);
+musicVolumeSlider.addEventListener('input', updateMusicVolume);
+sfxVolumeSlider.addEventListener('input', updateSfxVolume);
 playerNameInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') createRoom();
 });
@@ -64,10 +83,21 @@ howToPlayModal.addEventListener('click', (e) => {
     }
 });
 
+audioSettingsModal.addEventListener('click', (e) => {
+    if (e.target === audioSettingsModal) {
+        hideAudioSettings();
+    }
+});
+
 // Close modal with Escape key
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && howToPlayModal.classList.contains('show')) {
-        hideHowToPlay();
+    if (e.key === 'Escape') {
+        if (howToPlayModal.classList.contains('show')) {
+            hideHowToPlay();
+        }
+        if (audioSettingsModal.classList.contains('show')) {
+            hideAudioSettings();
+        }
     }
 });
 
@@ -146,6 +176,46 @@ function showPage(pageName) {
     Object.values(pages).forEach(page => page.classList.remove('active'));
     if (pages[pageName]) {
         pages[pageName].classList.add('active');
+        
+        // Play transition sound and switch music based on page
+        if (window.audioManager) {
+            window.audioManager.playTransitionSound();
+            
+            switch (pageName) {
+                case 'home':
+                    window.audioManager.playHomeMusic();
+                    break;
+                case 'lobby':
+                    window.audioManager.playLobbyMusic();
+                    break;
+                case 'oracleIntro':
+                    window.audioManager.playOracleMusic();
+                    break;
+                case 'riddle':
+                    window.audioManager.playRiddleMusic();
+                    break;
+                case 'textChallenge':
+                case 'triviaChallenge':
+                case 'fastTapper':
+                    window.audioManager.playChallengeMusic();
+                    break;
+                case 'riddleResults':
+                case 'triviaResults':
+                case 'challengeResults':
+                case 'roundSummary':
+                    window.audioManager.playResultsMusic();
+                    break;
+                case 'gameOver':
+                    // Victory or defeat music will be set by the game-over event handler
+                    break;
+                case 'waiting':
+                    // Keep current music for waiting screens
+                    break;
+                default:
+                    // Keep current music for unknown pages
+                    break;
+            }
+        }
     }
 }
 
@@ -153,13 +223,16 @@ function createRoom() {
     const name = playerNameInput.value.trim();
     if (!name) {
         showNotification('Please enter your name', 'warning');
+        if (window.audioManager) window.audioManager.playIncorrectSound();
         return;
     }
     if (name.length > 15) {
         showNotification('Name must be 15 characters or less', 'warning');
+        if (window.audioManager) window.audioManager.playIncorrectSound();
         return;
     }
     playerName = name;
+    if (window.audioManager) window.audioManager.playClickSound();
     socket.emit('create-room', { playerName: name });
 }
 
@@ -168,22 +241,27 @@ function joinRoom() {
     const roomCode = roomCodeInput.value.trim().toUpperCase();
     if (!name || !roomCode) {
         showNotification('Please enter your name and room code', 'warning');
+        if (window.audioManager) window.audioManager.playIncorrectSound();
         return;
     }
     if (name.length > 15) {
         showNotification('Name must be 15 characters or less', 'warning');
+        if (window.audioManager) window.audioManager.playIncorrectSound();
         return;
     }
     if (roomCode.length !== 6) {
         showNotification('Room code must be 6 characters', 'warning');
+        if (window.audioManager) window.audioManager.playIncorrectSound();
         return;
     }
     playerName = name;
+    if (window.audioManager) window.audioManager.playClickSound();
     socket.emit('join-room', { playerName: name, roomCode: roomCode });
 }
 
 function startGame() {
     if (currentRoom) {
+        if (window.audioManager) window.audioManager.playClickSound();
         socket.emit('start-game', { roomCode: currentRoom });
     }
 }
@@ -191,6 +269,7 @@ function startGame() {
 function submitRiddleAnswer() {
     const answer = riddleAnswer.value.trim();
     if (!answer || !currentRoom) return;
+    if (window.audioManager) window.audioManager.playSubmitSound();
     socket.emit('submit-riddle-answer', { roomCode: currentRoom, answer: answer });
     riddleAnswer.disabled = true;
     submitRiddleBtn.disabled = true;
@@ -229,6 +308,7 @@ function submitChallengeResponse(isAutoSubmit = false) {
 function onTap() {
     if (!tapperActive) return;
     tapCount++;
+    if (window.audioManager) window.audioManager.playTapSound();
     document.getElementById('tap-count').textContent = tapCount.toString();
     const button = document.getElementById('tap-button');
     const countDisplay = document.getElementById('tap-count');
@@ -245,6 +325,8 @@ function onTap() {
 function onTriviaOptionClick(event) {
     const selectedOption = parseInt(event.target.dataset.option);
     const buttons = document.querySelectorAll('.trivia-option');
+    
+    if (window.audioManager) window.audioManager.playSubmitSound();
     
     // Disable all buttons and highlight selected
     buttons.forEach(btn => {
@@ -615,6 +697,97 @@ function hideHowToPlay() {
     document.body.style.overflow = 'auto'; // Restore scrolling
 }
 
+// Audio control functions
+function toggleAudio() {
+    if (window.audioManager) {
+        const isMuted = window.audioManager.toggleMute();
+        
+        // Update all audio toggle buttons
+        document.querySelectorAll('.audio-toggle-btn .audio-icon').forEach(icon => {
+            icon.textContent = isMuted ? '🔇' : '🔊';
+        });
+        
+        document.querySelectorAll('.audio-toggle-btn').forEach(btn => {
+            btn.title = isMuted ? 'Enable Audio' : 'Disable Audio';
+        });
+        
+        if (!isMuted) {
+            window.audioManager.playClickSound();
+        }
+    }
+}
+
+function showAudioSettings() {
+    if (window.audioManager) {
+        window.audioManager.playClickSound();
+        
+        // Update sliders with current values
+        masterVolumeSlider.value = Math.round(window.audioManager.masterVolume * 100);
+        musicVolumeSlider.value = Math.round(window.audioManager.musicVolume * 100);
+        sfxVolumeSlider.value = Math.round(window.audioManager.sfxVolume * 100);
+        
+        updateVolumeDisplays();
+        
+        audioSettingsModal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function hideAudioSettings() {
+    audioSettingsModal.classList.remove('show');
+    document.body.style.overflow = 'auto';
+}
+
+function updateMasterVolume(event) {
+    const value = event.target.value / 100;
+    if (window.audioManager) {
+        window.audioManager.setVolume('master', value);
+    }
+    updateVolumeDisplays();
+}
+
+function updateMusicVolume(event) {
+    const value = event.target.value / 100;
+    if (window.audioManager) {
+        window.audioManager.setVolume('music', value);
+    }
+    updateVolumeDisplays();
+}
+
+function updateSfxVolume(event) {
+    const value = event.target.value / 100;
+    if (window.audioManager) {
+        window.audioManager.setVolume('sfx', value);
+        window.audioManager.playClickSound();
+    }
+    updateVolumeDisplays();
+}
+
+function updateVolumeDisplays() {
+    const masterValue = document.querySelector('#master-volume').value;
+    const musicValue = document.querySelector('#music-volume').value;
+    const sfxValue = document.querySelector('#sfx-volume').value;
+    
+    document.querySelector('#master-volume').nextElementSibling.textContent = masterValue + '%';
+    document.querySelector('#music-volume').nextElementSibling.textContent = musicValue + '%';
+    document.querySelector('#sfx-volume').nextElementSibling.textContent = sfxValue + '%';
+}
+
+function testMusic() {
+    if (window.audioManager) {
+        window.audioManager.playMusic('home');
+        window.audioManager.playClickSound();
+    }
+}
+
+function testSoundEffects() {
+    if (window.audioManager) {
+        window.audioManager.playCorrectSound();
+        setTimeout(() => window.audioManager.playNotificationSound(), 300);
+        setTimeout(() => window.audioManager.playSubmitSound(), 600);
+    }
+}
+
 // Socket event listeners
 socket.on('room-created', (data) => {
     currentRoom = data.roomCode;
@@ -956,6 +1129,19 @@ socket.on('game-over', (data) => {
     console.log('- Length:', data.roundHistory ? data.roundHistory.length : 'N/A');
     console.log('- Content:', data.roundHistory);
     
+    // Play victory or defeat music based on player performance
+    if (window.audioManager) {
+        const playerScore = data.scores.find(p => p.name === playerName)?.score || 0;
+        const isWinner = data.winner.name === playerName;
+        const hasWins = playerScore > 0;
+        
+        if (isWinner || hasWins) {
+            window.audioManager.playVictoryMusic();
+        } else {
+            window.audioManager.playDefeatMusic();
+        }
+    }
+    
     const scoresHtml = data.scores.map((player, index) => {
         const medal = index === 0 ? 'GOLD' : index === 1 ? 'SILVER' : index === 2 ? 'BRONZE' : 'FINISHER';
         return `
@@ -1049,7 +1235,47 @@ function handleMobileKeyboard() {
 }
 
 
+// Add audio controls to all pages
+function addAudioControlsToAllPages() {
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(page => {
+        // Skip if already has audio controls
+        if (page.querySelector('.top-audio-bar')) return;
+        
+        const audioBar = document.createElement('div');
+        audioBar.className = 'top-audio-bar';
+        audioBar.innerHTML = `
+            <div class="audio-controls-top">
+                <button class="audio-toggle-btn audio-btn-top" title="Toggle Audio">
+                    <span class="audio-icon">🔊</span>
+                </button>
+                <button class="audio-settings-btn audio-btn-top" title="Audio Settings">
+                    <span class="audio-icon">⚙️</span>
+                </button>
+            </div>
+        `;
+        
+        // Insert as first child after matrix-bg if it exists
+        const matrixBg = page.querySelector('.matrix-bg');
+        if (matrixBg) {
+            matrixBg.insertAdjacentElement('afterend', audioBar);
+        } else {
+            page.insertBefore(audioBar, page.firstChild);
+        }
+    });
+    
+    // Add event listeners to all audio control buttons
+    document.querySelectorAll('.audio-toggle-btn').forEach(btn => {
+        btn.addEventListener('click', toggleAudio);
+    });
+    
+    document.querySelectorAll('.audio-settings-btn').forEach(btn => {
+        btn.addEventListener('click', showAudioSettings);
+    });
+}
+
 // Initialize
+addAudioControlsToAllPages();
 showPage('home');
 handleMobileKeyboard();
 // Only focus on desktop to prevent mobile keyboard popup
