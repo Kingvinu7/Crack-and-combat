@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio System Test - Crack and Combat</title>
+    <style>
+        body {
+            background: #0a0a0f;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #00ffff;
+            border-radius: 5px;
+        }
+        button {
+            background: #1a1a24;
+            color: #00ffff;
+            border: 1px solid #00ffff;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
+        button:hover {
+            background: #00ffff;
+            color: #0a0a0f;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            background: #1a1a24;
+            border-radius: 3px;
+        }
+        .success { color: #00ff88; }
+        .error { color: #ff0044; }
+        .warning { color: #ffd700; }
+    </style>
+</head>
+<body>
+    <h1>🔊 Crack and Combat - Audio System Test</h1>
+    
+    <div class="test-section">
+        <h2>Audio System Status</h2>
+        <div id="audio-status" class="status">Initializing audio system...</div>
+        <button onclick="initializeAudio()">Initialize Audio</button>
+        <button onclick="toggleMute()">Toggle Mute</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Background Music Tests</h2>
+        <button onclick="testMusic('home')">Home Music</button>
+        <button onclick="testMusic('lobby')">Lobby Music</button>
+        <button onclick="testMusic('oracle')">Oracle Music</button>
+        <button onclick="testMusic('riddle')">Riddle Music</button>
+        <button onclick="testMusic('challenge')">Challenge Music</button>
+        <button onclick="testMusic('results')">Results Music</button>
+        <button onclick="testMusic('victory')">Victory Music</button>
+        <button onclick="testMusic('defeat')">Defeat Music</button>
+        <button onclick="stopMusic()">Stop Music</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Sound Effects Tests</h2>
+        <button onclick="testSfx('click')">Click</button>
+        <button onclick="testSfx('submit')">Submit</button>
+        <button onclick="testSfx('correct')">Correct</button>
+        <button onclick="testSfx('incorrect')">Incorrect</button>
+        <button onclick="testSfx('timer')">Timer</button>
+        <button onclick="testSfx('notification')">Notification</button>
+        <button onclick="testSfx('transition')">Transition</button>
+        <button onclick="testSfx('tap')">Tap</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Volume Controls</h2>
+        <div>
+            <label>Master Volume: </label>
+            <input type="range" id="master-vol" min="0" max="100" value="70" onchange="setVolume('master', this.value)">
+            <span id="master-val">70%</span>
+        </div>
+        <div>
+            <label>Music Volume: </label>
+            <input type="range" id="music-vol" min="0" max="100" value="60" onchange="setVolume('music', this.value)">
+            <span id="music-val">60%</span>
+        </div>
+        <div>
+            <label>SFX Volume: </label>
+            <input type="range" id="sfx-vol" min="0" max="100" value="80" onchange="setVolume('sfx', this.value)">
+            <span id="sfx-val">80%</span>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Log</h2>
+        <div id="test-log" class="status"></div>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <script src="audio-samples.js"></script>
+    <script src="audio-manager.js"></script>
+    <script>
+        let logEntries = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            logEntries.push(`[${timestamp}] ${message}`);
+            updateLog();
+            
+            const statusEl = document.getElementById('audio-status');
+            statusEl.className = `status ${type}`;
+            statusEl.textContent = message;
+        }
+        
+        function updateLog() {
+            const logEl = document.getElementById('test-log');
+            logEl.innerHTML = logEntries.slice(-10).join('<br>');
+        }
+        
+        function clearLog() {
+            logEntries = [];
+            updateLog();
+        }
+        
+        async function initializeAudio() {
+            try {
+                log('Initializing audio system...', 'warning');
+                if (window.audioManager) {
+                    await window.audioManager.init();
+                    log('Audio system initialized successfully!', 'success');
+                } else {
+                    log('Audio manager not found', 'error');
+                }
+            } catch (error) {
+                log(`Audio initialization failed: ${error.message}`, 'error');
+            }
+        }
+        
+        function toggleMute() {
+            if (window.audioManager) {
+                const isMuted = window.audioManager.toggleMute();
+                log(`Audio ${isMuted ? 'muted' : 'unmuted'}`, 'success');
+            } else {
+                log('Audio manager not available', 'error');
+            }
+        }
+        
+        function testMusic(track) {
+            if (window.audioManager) {
+                window.audioManager.playMusic(track);
+                log(`Playing music: ${track}`, 'success');
+            } else {
+                log('Audio manager not available', 'error');
+            }
+        }
+        
+        function stopMusic() {
+            if (window.audioManager) {
+                window.audioManager.stopMusic();
+                log('Music stopped', 'success');
+            } else {
+                log('Audio manager not available', 'error');
+            }
+        }
+        
+        function testSfx(sound) {
+            if (window.audioManager) {
+                window.audioManager.playSound(sound);
+                log(`Playing sound: ${sound}`, 'success');
+            } else {
+                log('Audio manager not available', 'error');
+            }
+        }
+        
+        function setVolume(type, value) {
+            if (window.audioManager) {
+                window.audioManager.setVolume(type, value / 100);
+                document.getElementById(`${type}-val`).textContent = value + '%';
+                log(`${type} volume set to ${value}%`, 'success');
+            } else {
+                log('Audio manager not available', 'error');
+            }
+        }
+        
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            log('Page loaded. Click "Initialize Audio" to start.', 'warning');
+        });
+        
+        // Auto-initialize on first user interaction
+        document.addEventListener('click', () => {
+            if (window.audioManager && !window.audioManager.isInitialized) {
+                initializeAudio();
+            }
+        }, { once: true });
+    </script>
+</body>
+</html>

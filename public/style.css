@@ -604,6 +604,11 @@ body::before {
     margin-top: clamp(10px, 1vh, 25px);
     z-index: 2;
     position: relative;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .help-btn {
@@ -634,6 +639,139 @@ body::before {
 .help-icon {
     font-size: 12px;
     font-weight: bold;
+}
+
+/* Audio Controls */
+.audio-controls {
+    display: flex;
+    gap: 5px;
+}
+
+.audio-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(8px, 1vh, 12px) clamp(10px, 1.5vw, 16px);
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-dim);
+    border-radius: 4px;
+    color: var(--accent-green);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: clamp(32px, 4vh, 40px);
+    min-height: clamp(32px, 4vh, 40px);
+}
+
+.audio-btn:hover {
+    border-color: var(--accent-green);
+    background: rgba(0, 255, 136, 0.05);
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+.audio-btn .audio-icon {
+    font-size: clamp(14px, 1.5vw, 18px);
+}
+
+/* Audio Settings Modal */
+.audio-settings {
+    max-width: 400px;
+}
+
+.setting-section {
+    margin-bottom: 25px;
+}
+
+.setting-section h3 {
+    color: var(--accent-cyan);
+    font-size: 16px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.volume-control {
+    margin-bottom: 15px;
+}
+
+.volume-control label {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.volume-slider-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.volume-slider {
+    flex: 1;
+    height: 6px;
+    background: var(--bg-tertiary);
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    border: 1px solid var(--border-dim);
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--accent-green);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+    transition: all 0.2s ease;
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+    background: var(--accent-cyan);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+}
+
+.volume-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: var(--accent-green);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+    transition: all 0.2s ease;
+}
+
+.volume-slider::-moz-range-thumb:hover {
+    background: var(--accent-cyan);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+}
+
+.volume-value {
+    color: var(--accent-green);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: bold;
+    min-width: 40px;
+    text-align: right;
+}
+
+.audio-option {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.audio-option .btn {
+    flex: 1;
+    min-width: 120px;
 }
 
 
