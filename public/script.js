@@ -992,11 +992,43 @@ function handleMobileKeyboard() {
     }
 }
 
+// Input shrinking functionality
+function addInputShrinkingBehavior() {
+    // Get all input and textarea elements
+    const inputs = document.querySelectorAll('input[type="text"], textarea');
+    
+    inputs.forEach(input => {
+        // Add typing class when user starts typing
+        input.addEventListener('input', function() {
+            if (this.value.trim().length > 0) {
+                this.classList.add('typing');
+            } else {
+                this.classList.remove('typing');
+            }
+        });
+        
+        // Remove typing class when input loses focus and is empty
+        input.addEventListener('blur', function() {
+            if (this.value.trim().length === 0) {
+                this.classList.remove('typing');
+            }
+        });
+        
+        // Also check on focus if there's already content
+        input.addEventListener('focus', function() {
+            if (this.value.trim().length > 0) {
+                this.classList.add('typing');
+            }
+        });
+    });
+}
+
 // Initialize
 showPage('home');
 handleMobileKeyboard();
+addInputShrinkingBehavior();
 // Only focus on desktop to prevent mobile keyboard popup
 if (!/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     playerNameInput.focus();
 }
-console.log('Frontend loaded - Crack and Combat v4.8 (Enhanced Mobile + Auto-Advance)');
+console.log('Frontend loaded - Crack and Combat v4.8 (Enhanced Mobile + Auto-Advance + Input Shrinking)');

@@ -519,18 +519,20 @@ body::before {
 
 /* Shrink cyber input styles when typing */
 .cyber-input.typing {
-    max-height: clamp(50px, 6vh, 70px);
-    height: clamp(50px, 6vh, 70px);
+    max-width: clamp(200px, 40vw, 300px);
+    max-height: clamp(60px, 8vh, 80px);
+    height: clamp(60px, 8vh, 80px);
     overflow-y: auto;
     text-align: left;
     padding: clamp(8px, 1vh, 12px) clamp(12px, 1.5vw, 16px);
     font-size: clamp(11px, 1vw, 13px);
     line-height: 1.4;
-    transform: scale(0.95);
+    transform: scale(0.9);
     border-color: var(--accent-cyan);
     box-shadow: 
         0 0 20px rgba(0, 255, 255, 0.2),
         inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    margin: clamp(4px, 0.5vh, 8px) auto;
 }
 
 .cyber-input::placeholder {
@@ -1035,19 +1037,21 @@ input[type="text"], textarea {
 
 /* Shrink input styles when typing */
 input[type="text"].typing, textarea.typing {
-    max-height: clamp(60px, 8vh, 80px);
-    height: clamp(60px, 8vh, 80px);
+    max-width: clamp(250px, 50vw, 400px);
+    max-height: clamp(80px, 12vh, 120px);
+    height: clamp(80px, 12vh, 120px);
     overflow-y: auto;
     text-align: left;
     padding: clamp(8px, 1vh, 12px) clamp(12px, 1.5vw, 16px);
     font-size: clamp(12px, 1vw, 14px);
     line-height: 1.4;
     resize: none;
-    transform: scale(0.95);
+    transform: scale(0.85);
     border-color: var(--accent-cyan);
     box-shadow: 
         0 0 20px rgba(0, 255, 255, 0.2),
         inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    margin: clamp(4px, 0.5vh, 8px) auto;
 }
 
 input[type="text"]:focus, textarea:focus {
