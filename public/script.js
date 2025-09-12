@@ -233,10 +233,18 @@ function createRoom() {
     }
     playerName = name;
     
-    // Ensure audio is initialized on user action
+    // Ensure audio is initialized on user action with fallback music start
     if (window.audioManager && !window.audioManager.isInitialized) {
         console.log('Initializing audio on create room action');
-        window.audioManager.init().catch(console.error);
+        window.audioManager.init().then(() => {
+            // Ensure home music starts playing after init
+            setTimeout(() => {
+                if (window.audioManager && window.audioManager.isInitialized) {
+                    console.log('Starting home music after manual init');
+                    window.audioManager.playMusic('home');
+                }
+            }, 200);
+        }).catch(console.error);
     }
     
     if (window.audioManager) window.audioManager.playClickSound();
@@ -263,10 +271,18 @@ function joinRoom() {
     }
     playerName = name;
     
-    // Ensure audio is initialized on user action
+    // Ensure audio is initialized on user action with fallback music start
     if (window.audioManager && !window.audioManager.isInitialized) {
         console.log('Initializing audio on join room action');
-        window.audioManager.init().catch(console.error);
+        window.audioManager.init().then(() => {
+            // Ensure home music starts playing after init
+            setTimeout(() => {
+                if (window.audioManager && window.audioManager.isInitialized) {
+                    console.log('Starting home music after manual init');
+                    window.audioManager.playMusic('home');
+                }
+            }, 200);
+        }).catch(console.error);
     }
     
     if (window.audioManager) window.audioManager.playClickSound();
@@ -1330,6 +1346,25 @@ function checkAudioStatus() {
 
 // Check audio status periodically
 setInterval(checkAudioStatus, 1000);
+
+// Add a global click handler to ensure audio starts on any click
+document.addEventListener('click', function(event) {
+    if (window.audioManager && !window.audioManager.isInitialized) {
+        console.log('Global click detected - initializing audio');
+        window.audioManager.init().then(() => {
+            console.log('Audio initialized from global click - starting home music');
+            setTimeout(() => {
+                if (window.audioManager && window.audioManager.isInitialized) {
+                    window.audioManager.playMusic('home');
+                }
+            }, 100);
+        }).catch(console.error);
+    } else if (window.audioManager && window.audioManager.isInitialized && !window.audioManager.currentTrack) {
+        // If audio is initialized but no music is playing, start home music
+        console.log('Audio initialized but no music playing - starting home music');
+        window.audioManager.playMusic('home');
+    }
+}, { once: false }); // Don't use once, so it can retry
 
 // Initialize
 addAudioControlsToAllPages();

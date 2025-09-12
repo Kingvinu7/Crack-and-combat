@@ -75,16 +75,24 @@ class AudioManager {
     }
     
     setupAutoInit() {
-        const initOnInteraction = () => {
+        const initOnInteraction = (event) => {
+            console.log('Audio manager: User interaction detected:', event.type);
             if (!this.isInitialized) {
-                console.log('Audio manager: User interaction detected, initializing...');
-                this.init().catch(console.error);
+                console.log('Audio manager: Starting initialization...');
+                this.init().then(() => {
+                    console.log('Audio manager: Initialization completed successfully');
+                }).catch(error => {
+                    console.error('Audio manager: Initialization failed:', error);
+                });
                 document.removeEventListener('click', initOnInteraction);
                 document.removeEventListener('keydown', initOnInteraction);
                 document.removeEventListener('touchstart', initOnInteraction);
+            } else {
+                console.log('Audio manager: Already initialized');
             }
         };
         
+        console.log('Audio manager: Setting up auto-init listeners');
         document.addEventListener('click', initOnInteraction);
         document.addEventListener('keydown', initOnInteraction);
         document.addEventListener('touchstart', initOnInteraction); // For mobile
@@ -130,8 +138,14 @@ class AudioManager {
             // Play queued track or default to home screen music
             const trackToPlay = this.queuedTrack || 'home';
             console.log(`Audio manager: Playing ${trackToPlay} after initialization`);
-            this.playMusic(trackToPlay);
-            this.queuedTrack = null;
+            console.log(`Available tracks:`, Object.keys(this.musicTracks));
+            console.log(`Audio context state:`, this.audioContext.state);
+            
+            // Small delay to ensure everything is ready
+            setTimeout(() => {
+                this.playMusic(trackToPlay);
+                this.queuedTrack = null;
+            }, 100);
             
         } catch (error) {
             console.warn('Audio initialization failed:', error);
@@ -317,8 +331,16 @@ class AudioManager {
         const track = this.musicTracks[trackName];
         if (!track) {
             console.warn(`Music track not found: ${trackName}`);
+            console.log(`Available tracks:`, Object.keys(this.musicTracks));
             return;
         }
+        
+        console.log(`Attempting to play track: ${trackName}`, {
+            trackType: track.constructor.name,
+            audioContextState: this.audioContext?.state,
+            isMuted: this.isMuted,
+            isInitialized: this.isInitialized
+        });
         
         // Stop current music only if switching to a different track
         console.log(`Switching music from "${this.currentTrack}" to "${trackName}"`);
