@@ -64,14 +64,10 @@
         <h2>Game State Music Tests</h2>
         <p>Test each game state's background music:</p>
         
-        <button class="test-button" onclick="testMusic('home')">🏠 Home (Cyber Ambient)</button>
-        <button class="test-button" onclick="testMusic('lobby')">👥 Lobby (Waiting Tension)</button>
-        <button class="test-button" onclick="testMusic('oracle')">🤖 Oracle Dialogue (Mysterious Voice)</button>
-        <button class="test-button" onclick="testMusic('riddle')">🧩 Riddle (Thinking Pressure)</button>
-        <button class="test-button" onclick="testMusic('challenge')">⚡ Challenge (Intense Focus)</button>
-        <button class="test-button" onclick="testMusic('results')">📊 Won Challenge (Reveal Dramatic)</button>
-        <button class="test-button" onclick="testMusic('defeat')">💀 Lost Challenge (Dark Ominous)</button>
-        <button class="test-button" onclick="testMusic('victory')">🏆 Final Winner (Triumph Epic)</button>
+        <h3>🎵 Simplified 3-Track System:</h3>
+        <button class="test-button" onclick="testMusic('home')">🏠 Default Music (Cyber Ambient) - All stages except challenges & final</button>
+        <button class="test-button" onclick="testMusic('challenge')">⚡ Challenge Music (Intense Focus) - Only during challenges</button>
+        <button class="test-button" onclick="testMusic('victory')">🏆 Final Winner (Triumph Epic) - Only final winner screen</button>
         
         <br><br>
         <button class="test-button" onclick="stopAllMusic()">⏹️ Stop Music</button>

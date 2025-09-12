@@ -177,7 +177,7 @@ function showPage(pageName) {
     if (pages[pageName]) {
         pages[pageName].classList.add('active');
         
-        // Handle music transitions based on exact requirements
+        // Simplified 3-track music system
         if (window.audioManager) {
             console.log(`Showing page: ${pageName}, Audio initialized: ${window.audioManager.isInitialized}`);
             
@@ -187,65 +187,22 @@ function showPage(pageName) {
             }
             
             switch (pageName) {
-                case 'home':
-                    // Play cyber-ambient music on home screen
-                    window.audioManager.playMusic('home');
-                    break;
-                    
-                case 'lobby':
-                    // Play waiting-tension on lobby
-                    window.audioManager.playMusic('lobby');
-                    break;
-                    
-                case 'oracleIntro':
-                    // Play mysterious voice on AI dialogue
-                    window.audioManager.playMusic('oracle');
-                    break;
-                    
-                case 'riddle':
-                    // Stop mysterious voice and play thinking pressure in riddle stage
-                    window.audioManager.playMusic('riddle');
-                    break;
-                    
-                case 'riddleResults':
-                    // No music in riddle results
-                    window.audioManager.stopMusicImmediate();
-                    break;
-                    
                 case 'textChallenge':
                 case 'triviaChallenge':
                 case 'fastTapper':
-                    // Play intense focus in challenges
+                    // Play intense focus ONLY during challenge interfaces
+                    console.log('Challenge interface - playing intense focus');
                     window.audioManager.playMusic('challenge');
                     break;
                     
-                case 'challengeResults':
-                    // Music will be set by challenge result handler based on win/loss
-                    // Don't set music here, let the event handler decide
-                    break;
-                    
-                case 'triviaResults':
-                    // Stop music immediately for trivia results
-                    window.audioManager.stopMusicImmediate();
-                    break;
-                    
-                case 'roundSummary':
-                    // No specific music for round summary
-                    window.audioManager.stopMusicImmediate();
-                    break;
-                    
                 case 'gameOver':
-                    // Victory music will be set by the game-over event handler
-                    break;
-                    
-                case 'waiting':
-                    // Keep current music for waiting screens (no change)
+                    // Triumph epic ONLY for final winner screen - set by game-over handler
                     break;
                     
                 default:
-                    // For unknown pages, stop music to be safe
-                    console.log(`Unknown page: ${pageName}, stopping music`);
-                    window.audioManager.stopMusicImmediate();
+                    // ALL other stages play cyber-ambient (home, lobby, oracle, riddle, results, etc.)
+                    console.log(`Default stage (${pageName}) - playing cyber ambient`);
+                    window.audioManager.playMusic('home');
                     break;
             }
         } else {
@@ -714,10 +671,10 @@ function hideIndividualResult() {
         overlay.style.display = 'none';
         document.body.style.overflow = 'auto'; // Restore scrolling
         
-        // Stop music when advancing from challenge results
+        // Ensure cyber-ambient continues playing
         if (window.audioManager) {
-            console.log('Hiding individual result - stopping music');
-            window.audioManager.stopMusicImmediate();
+            console.log('Hiding individual result - ensuring cyber ambient continues');
+            window.audioManager.playMusic('home'); // cyber-ambient
         }
     }
 }
@@ -1029,23 +986,10 @@ socket.on('fast-tapper-start', (data) => {
 });
 
 socket.on('challenge-individual-result', (data) => {
-    // Play appropriate music based on result
+    // Challenge completed - go back to cyber-ambient
     if (window.audioManager) {
-        if (data.passed) {
-            console.log('Challenge won - playing reveal dramatic');
-            window.audioManager.playMusic('results'); // reveal-dramatic
-        } else {
-            console.log('Challenge lost - playing dark ominous');
-            window.audioManager.playMusic('defeat'); // dark-ominous
-        }
-        
-        // Stop music after 5 seconds to prevent it from playing too long
-        setTimeout(() => {
-            if (window.audioManager) {
-                console.log('Auto-stopping challenge result music after 5 seconds');
-                window.audioManager.stopMusicImmediate();
-            }
-        }, 5000);
+        console.log('Challenge completed - returning to cyber ambient');
+        window.audioManager.playMusic('home'); // cyber-ambient
     }
     showIndividualResult(data);
 });
@@ -1064,24 +1008,10 @@ socket.on('fast-tapper-results', (data) => {
     
     document.getElementById('challenge-results-content').innerHTML = resultsHtml;
     
-    // Play appropriate music based on whether player won
+    // Fast tapper completed - go back to cyber-ambient
     if (window.audioManager) {
-        const playerResult = data.results.find(r => r.playerName === playerName);
-        if (playerResult && playerResult.won) {
-            console.log('Fast tapper won - playing reveal dramatic');
-            window.audioManager.playMusic('results'); // reveal-dramatic
-        } else {
-            console.log('Fast tapper lost - playing dark ominous');
-            window.audioManager.playMusic('defeat'); // dark-ominous
-        }
-        
-        // Stop music after 5 seconds to prevent it from playing too long
-        setTimeout(() => {
-            if (window.audioManager) {
-                console.log('Auto-stopping fast tapper result music after 5 seconds');
-                window.audioManager.stopMusicImmediate();
-            }
-        }, 5000);
+        console.log('Fast tapper completed - returning to cyber ambient');
+        window.audioManager.playMusic('home'); // cyber-ambient
     }
     
     showPage('challengeResults');
@@ -1223,7 +1153,7 @@ socket.on('game-over', (data) => {
     console.log('- Length:', data.roundHistory ? data.roundHistory.length : 'N/A');
     console.log('- Content:', data.roundHistory);
     
-    // Play triumph epic in final winner screen
+    // Play triumph epic ONLY in final winner screen
     if (window.audioManager) {
         console.log('Final winner screen - playing triumph epic');
         window.audioManager.playMusic('victory'); // triumph-epic
