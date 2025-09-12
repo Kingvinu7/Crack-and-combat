@@ -132,8 +132,7 @@ body::before {
         inset 0 1px 0 rgba(0, 255, 255, 0.1),
         var(--shadow-deep);
     position: relative;
-    max-height: 95vh;
-    overflow-y: auto;
+    /* Removed max-height and overflow restrictions */
 }
 
 .page-content::before {
@@ -232,7 +231,7 @@ body::before {
     position: relative;
     max-width: clamp(600px, 85vw, 950px);
     width: 100%;
-    max-height: 95vh;
+    /* Removed max-height restrictions */
     overflow: visible;
 }
 
@@ -516,6 +515,7 @@ body::before {
         inset 0 0 10px rgba(0, 255, 255, 0.1);
     background: rgba(0, 0, 0, 0.8);
 }
+
 
 .cyber-input::placeholder {
     color: var(--text-muted);
@@ -1017,6 +1017,7 @@ input[type="text"], textarea {
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+
 input[type="text"]:focus, textarea:focus {
     outline: none;
     border-color: var(--accent-cyan);
@@ -1044,10 +1045,8 @@ input[type="text"]::placeholder, textarea::placeholder {
     font-size: clamp(14px, 1.1vw, 16px);
     line-height: 1.5;
     padding: clamp(16px, 2vh, 24px);
-    /* Better scrolling behavior */
-    overflow-y: auto;
-    scroll-behavior: smooth;
 }
+
 
 /* ===== ACTION SECTIONS ===== */
 .action-section, .answer-section {
@@ -2393,7 +2392,7 @@ input[type="text"]::placeholder, textarea::placeholder {
         max-width: 100%;
         padding: 15px;
         margin: 10px 0;
-        max-height: 92vh;
+        /* Removed max-height restrictions */
     }
     
     .main-content::before {
@@ -2411,7 +2410,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     
     .page-content {
         padding: 20px 15px;
-        max-height: 92vh;
+        /* Removed max-height restrictions */
     }
     
     .page-content::before {
@@ -2569,7 +2568,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     .main-content {
         padding: 8px;
         margin: 2px 0;
-        max-height: 98vh;
+        /* Removed max-height restrictions */
         border-width: 1px;
     }
     
@@ -2996,13 +2995,11 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 /* ===== MOBILE KEYBOARD ADJUSTMENTS ===== */
 .keyboard-open .page-content {
-    max-height: 50vh;
-    overflow-y: auto;
+    /* Removed max-height and overflow restrictions */
 }
 
 .keyboard-open .main-content {
-    max-height: 50vh;
-    overflow-y: auto;
+    /* Removed max-height and overflow restrictions */
     padding: 10px;
 }
 
@@ -3021,12 +3018,12 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 @media (max-width: 480px) {
     .keyboard-open .page-content {
-        max-height: 40vh;
+        /* Removed max-height restrictions */
         padding: 8px;
     }
     
     .keyboard-open .main-content {
-        max-height: 40vh;
+        /* Removed max-height restrictions */
         padding: 8px;
     }
 }
@@ -3131,6 +3128,116 @@ textarea:focus {
 * {
     scrollbar-width: thin;
     scrollbar-color: var(--accent-red) var(--bg-secondary);
+}
+
+/* ===== CUSTOM NOTIFICATIONS ===== */
+.custom-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    max-width: 400px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--accent-cyan);
+    border-radius: 8px;
+    box-shadow: 
+        0 0 30px rgba(0, 255, 255, 0.3),
+        var(--shadow-deep);
+    z-index: 15000;
+    animation: notificationSlideIn 0.3s ease-out;
+    backdrop-filter: blur(15px);
+}
+
+.custom-notification.warning {
+    border-color: #ff9800;
+    box-shadow: 
+        0 0 30px rgba(255, 152, 0, 0.3),
+        var(--shadow-deep);
+}
+
+.custom-notification.error {
+    border-color: var(--accent-red);
+    box-shadow: 
+        0 0 30px rgba(255, 0, 68, 0.3),
+        var(--shadow-deep);
+}
+
+.custom-notification.success {
+    border-color: #00ff88;
+    box-shadow: 
+        0 0 30px rgba(0, 255, 136, 0.3),
+        var(--shadow-deep);
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    gap: 15px;
+}
+
+.notification-message {
+    color: var(--text-primary);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+    flex: 1;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.notification-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+@keyframes notificationSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Stack multiple notifications */
+.custom-notification:nth-child(n+2) {
+    top: calc(20px + (80px * var(--notification-index, 0)));
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+    .custom-notification {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+    
+    .notification-content {
+        padding: 12px 15px;
+    }
+    
+    .notification-message {
+        font-size: 13px;
+    }
 }
 
 /* ===== FINAL TOUCHES ===== */
