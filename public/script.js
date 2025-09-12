@@ -1313,7 +1313,15 @@ function checkAudioStatus() {
         if (window.audioManager.isInitialized) {
             updateSystemStatus('AUDIO READY', 'var(--accent-green)');
         } else {
-            updateSystemStatus('CLICK TO ENABLE AUDIO', 'var(--accent-yellow)');
+            // Check if preloading is in progress
+            const preloadCount = window.audioManager.preloadedBuffers ? 
+                Object.keys(window.audioManager.preloadedBuffers).length : 0;
+            
+            if (preloadCount > 0) {
+                updateSystemStatus(`PRELOADED ${preloadCount}/3 - CLICK TO START`, 'var(--accent-yellow)');
+            } else {
+                updateSystemStatus('CLICK TO ENABLE AUDIO', 'var(--accent-yellow)');
+            }
         }
     } else {
         updateSystemStatus('LOADING...', 'var(--accent-yellow)');

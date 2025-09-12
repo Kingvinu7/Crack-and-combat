@@ -37,6 +37,41 @@ class AudioManager {
         
         // Auto-initialize on user interaction
         this.setupAutoInit();
+        
+        // Start preloading audio files immediately (but don't decode yet)
+        this.preloadAudioFiles();
+    }
+    
+    // Preload audio files in the background for faster playback
+    preloadAudioFiles() {
+        const musicFiles = [
+            '/audio/music/cyber-ambient.mp3',
+            '/audio/music/intense-focus.mp3', 
+            '/audio/music/triumph-epic.mp3'
+        ];
+        
+        console.log('Starting audio file preload...');
+        
+        // Use fetch to start downloading files immediately
+        musicFiles.forEach(url => {
+            fetch(url)
+                .then(response => {
+                    if (response.ok) {
+                        console.log(`Preloaded: ${url}`);
+                        return response.arrayBuffer();
+                    }
+                })
+                .then(buffer => {
+                    // Store the raw buffer for later decoding
+                    if (buffer) {
+                        this.preloadedBuffers = this.preloadedBuffers || {};
+                        this.preloadedBuffers[url] = buffer;
+                    }
+                })
+                .catch(error => {
+                    console.warn(`Failed to preload ${url}:`, error);
+                });
+        });
     }
     
     setupAutoInit() {
@@ -61,6 +96,12 @@ class AudioManager {
         try {
             // Create Web Audio Context
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Resume audio context immediately (required after user interaction)
+            if (this.audioContext.state === 'suspended') {
+                console.log('Resuming suspended audio context...');
+                await this.audioContext.resume();
+            }
             
             // Create gain nodes for volume control
             this.masterGainNode = this.audioContext.createGain();
@@ -114,15 +155,11 @@ class AudioManager {
     }
     
     async loadAudioAssets() {
+        // Only load the 3 music files we actually use for faster loading
         const musicFiles = {
-            home: '/audio/music/cyber-ambient.mp3',
-            lobby: '/audio/music/waiting-tension.mp3',
-            oracle: '/audio/music/mysterious-voice.mp3',
-            riddle: '/audio/music/thinking-pressure.mp3',
-            challenge: '/audio/music/intense-focus.mp3',
-            results: '/audio/music/reveal-dramatic.mp3',
-            victory: '/audio/music/triumph-epic.mp3',
-            defeat: '/audio/music/dark-ominous.mp3'
+            home: '/audio/music/cyber-ambient.mp3',        // Default music
+            challenge: '/audio/music/intense-focus.mp3',   // Challenge music  
+            victory: '/audio/music/triumph-epic.mp3'       // Final winner music
         };
         
         const sfxFiles = {
@@ -136,17 +173,21 @@ class AudioManager {
             tap: '/audio/sfx/tap-sound.mp3'
         };
         
-        // Load music tracks
-        for (const [name, url] of Object.entries(musicFiles)) {
-            try {
-                const buffer = await this.loadAudioBuffer(url);
-                if (buffer) {
-                    this.musicTracks[name] = buffer;
+        // Load music tracks (prioritize home track for faster startup)
+        const trackOrder = ['home', 'challenge', 'victory']; // Load home first
+        for (const name of trackOrder) {
+            if (musicFiles[name]) {
+                try {
+                    const buffer = await this.loadAudioBuffer(musicFiles[name]);
+                    if (buffer) {
+                        this.musicTracks[name] = buffer;
+                        console.log(`Music track loaded: ${name}`);
+                    }
+                } catch (error) {
+                    console.warn(`Failed to load music track ${name}:`, error);
+                    // Create fallback HTML5 audio
+                    this.musicTracks[name] = this.createFallbackAudio(musicFiles[name], true);
                 }
-            } catch (error) {
-                console.warn(`Failed to load music track ${name}:`, error);
-                // Create fallback HTML5 audio
-                this.musicTracks[name] = this.createFallbackAudio(url, true);
             }
         }
         
@@ -182,15 +223,11 @@ class AudioManager {
     }
     
     loadAudioAssetsFallback() {
+        // Only load the 3 music files we actually use for faster loading
         const musicFiles = {
-            home: '/audio/music/cyber-ambient.mp3',
-            lobby: '/audio/music/waiting-tension.mp3',
-            oracle: '/audio/music/mysterious-voice.mp3',
-            riddle: '/audio/music/thinking-pressure.mp3',
-            challenge: '/audio/music/intense-focus.mp3',
-            results: '/audio/music/reveal-dramatic.mp3',
-            victory: '/audio/music/triumph-epic.mp3',
-            defeat: '/audio/music/dark-ominous.mp3'
+            home: '/audio/music/cyber-ambient.mp3',        // Default music
+            challenge: '/audio/music/intense-focus.mp3',   // Challenge music  
+            victory: '/audio/music/triumph-epic.mp3'       // Final winner music
         };
         
         const sfxFiles = {
@@ -234,11 +271,23 @@ class AudioManager {
     async loadAudioBuffer(url) {
         try {
             console.log(`Loading audio buffer: ${url}`);
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
+            
+            let arrayBuffer;
+            
+            // Check if we have a preloaded buffer
+            if (this.preloadedBuffers && this.preloadedBuffers[url]) {
+                console.log(`Using preloaded buffer for: ${url}`);
+                arrayBuffer = this.preloadedBuffers[url];
+            } else {
+                // Fetch if not preloaded
+                console.log(`Fetching audio buffer: ${url}`);
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                arrayBuffer = await response.arrayBuffer();
             }
-            const arrayBuffer = await response.arrayBuffer();
+            
             const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
             console.log(`Successfully loaded audio buffer: ${url} (${audioBuffer.duration.toFixed(2)}s)`);
             return audioBuffer;
