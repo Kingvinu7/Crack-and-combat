@@ -51,27 +51,41 @@ class AudioManager {
         ];
         
         console.log('Starting audio file preload...');
+        this.preloadedBuffers = {};
         
-        // Use fetch to start downloading files immediately
-        musicFiles.forEach(url => {
-            fetch(url)
+        // Use fetch to start downloading files immediately with priority for home music
+        const loadFile = (url, priority = false) => {
+            const startTime = performance.now();
+            return fetch(url, { priority: priority ? 'high' : 'auto' })
                 .then(response => {
                     if (response.ok) {
-                        console.log(`Preloaded: ${url}`);
+                        const loadTime = performance.now() - startTime;
+                        console.log(`Preloaded: ${url} (${loadTime.toFixed(2)}ms)`);
                         return response.arrayBuffer();
                     }
+                    throw new Error(`HTTP ${response.status}`);
                 })
                 .then(buffer => {
                     // Store the raw buffer for later decoding
                     if (buffer) {
-                        this.preloadedBuffers = this.preloadedBuffers || {};
                         this.preloadedBuffers[url] = buffer;
+                        console.log(`Buffered: ${url} (${(buffer.byteLength / 1024 / 1024).toFixed(2)}MB)`);
                     }
+                    return buffer;
                 })
                 .catch(error => {
                     console.warn(`Failed to preload ${url}:`, error);
                 });
+        };
+        
+        // Load home music first (highest priority)
+        loadFile('/audio/music/cyber-ambient.mp3', true).then(() => {
+            console.log('Home music preloaded - ready for immediate playback');
         });
+        
+        // Load other files in parallel
+        loadFile('/audio/music/intense-focus.mp3');
+        loadFile('/audio/music/triumph-epic.mp3');
     }
     
     setupAutoInit() {
@@ -141,11 +155,9 @@ class AudioManager {
             console.log(`Available tracks:`, Object.keys(this.musicTracks));
             console.log(`Audio context state:`, this.audioContext.state);
             
-            // Small delay to ensure everything is ready
-            setTimeout(() => {
-                this.playMusic(trackToPlay);
-                this.queuedTrack = null;
-            }, 100);
+            // Immediate playback for faster response
+            this.playMusic(trackToPlay);
+            this.queuedTrack = null;
             
         } catch (error) {
             console.warn('Audio initialization failed:', error);
@@ -162,10 +174,9 @@ class AudioManager {
         // Play queued track or default to home screen music
         const trackToPlay = this.queuedTrack || 'home';
         console.log(`Audio manager (fallback): Playing ${trackToPlay} after initialization`);
-        setTimeout(() => {
-            this.playMusic(trackToPlay);
-            this.queuedTrack = null;
-        }, 500); // Small delay to ensure assets are loaded
+        // Immediate playback for HTML5 fallback
+        this.playMusic(trackToPlay);
+        this.queuedTrack = null;
     }
     
     async loadAudioAssets() {
@@ -279,6 +290,9 @@ class AudioManager {
             console.warn(`Failed to load audio: ${url}`);
         });
         
+        // Start loading immediately for faster playback
+        audio.load();
+        
         return audio;
     }
     
@@ -316,7 +330,8 @@ class AudioManager {
             // Queue the music to play after initialization
             console.log(`Audio manager: Queueing music "${trackName}" until initialization`);
             this.queuedTrack = trackName;
-            setTimeout(() => this.playMusic(trackName, fadeIn), 100);
+            // Try again immediately instead of waiting
+            setTimeout(() => this.playMusic(trackName, fadeIn), 10);
             return;
         }
         
