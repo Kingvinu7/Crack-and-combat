@@ -168,6 +168,8 @@ body::before {
     z-index: 1;
     opacity: 0.8; /* Increased from 0.4 for better visibility */
     pointer-events: none;
+    will-change: transform; /* GPU acceleration */
+    transform: translateZ(0); /* Force GPU layer */
 }
 
 /* Alternative: smaller matrix background for overlay use */
@@ -195,6 +197,9 @@ body::before {
     width: 100%;
     height: 200%;
     background-repeat: repeat;
+    will-change: transform;
+    transform: translateZ(0); /* Force GPU layer */
+    backface-visibility: hidden; /* Prevent flickering */
 }
 
 .matrix-bg::before {
@@ -299,13 +304,13 @@ body::before {
     letter-spacing: 2px;
 }
 
-/* Continuous seamless matrix fall animation */
+/* Continuous seamless matrix fall animation - optimized */
 @keyframes matrixFall {
     0% { 
-        transform: translateY(0);
+        transform: translateY(0) translateZ(0);
     }
     100% { 
-        transform: translateY(100%);
+        transform: translateY(100%) translateZ(0);
     }
 }
 
@@ -720,10 +725,10 @@ body::before {
 
 @keyframes buttonPulse {
     0%, 100% {
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        opacity: 0.95;
     }
     50% {
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        opacity: 1;
     }
 }
 
@@ -792,14 +797,10 @@ body::before {
 
 @keyframes buttonPulseRed {
     0%, 100% {
-        box-shadow: 
-            0 0 30px rgba(255, 0, 68, 0.4),
-            inset 0 0 20px rgba(255, 0, 68, 0.1);
+        opacity: 0.95;
     }
     50% {
-        box-shadow: 
-            0 0 40px rgba(255, 0, 68, 0.6),
-            inset 0 0 25px rgba(255, 0, 68, 0.15);
+        opacity: 1;
     }
 }
 
@@ -850,14 +851,10 @@ body::before {
 
 @keyframes buttonPulseCyan {
     0%, 100% {
-        box-shadow: 
-            0 0 30px rgba(0, 255, 255, 0.4),
-            inset 0 0 20px rgba(0, 255, 255, 0.1);
+        opacity: 0.95;
     }
     50% {
-        box-shadow: 
-            0 0 40px rgba(0, 255, 255, 0.6),
-            inset 0 0 25px rgba(0, 255, 255, 0.15);
+        opacity: 1;
     }
 }
 
@@ -1767,23 +1764,30 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .players-section {
-    background: var(--glass-bg);
-    backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(12px) saturate(1.3);
+    -webkit-backdrop-filter: blur(12px) saturate(1.3);
     padding: 24px;
     border-radius: 12px;
     margin: 24px 0;
     border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-soft);
+    box-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.6),
+        inset 0 0 30px rgba(0, 0, 0, 0.3),
+        var(--shadow-soft);
 }
 
 .players-section h3 {
-    color: var(--accent-cyan);
+    color: white;
     margin-bottom: 20px;
     font-size: 1.4em;
     font-family: 'Rajdhani', sans-serif;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 2px;
+    text-shadow: 
+        0 0 10px var(--accent-cyan),
+        0 2px 4px rgba(0, 0, 0, 0.9);
 }
 
 #players-list {
@@ -2086,7 +2090,9 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .challenge-description {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(15px) saturate(1.3);
+    -webkit-backdrop-filter: blur(15px) saturate(1.3);
     border: 1px solid var(--border-secondary);
     border-left: 4px solid var(--accent-red);
     border-radius: 8px;
@@ -2094,12 +2100,12 @@ input[type="text"]::placeholder, textarea::placeholder {
     margin: 25px 0;
     line-height: 1.8;
     font-size: 1.15em;
-    backdrop-filter: blur(15px);
     box-shadow: 
         inset 0 1px 0 rgba(255, 255, 255, 0.05),
-        0 0 20px rgba(255, 8, 68, 0.1);
+        0 4px 20px rgba(0, 0, 0, 0.6),
+        inset 0 0 30px rgba(0, 0, 0, 0.3);
     position: relative;
-    color: var(--text-primary);
+    color: white;
     font-style: normal;
     font-weight: 400;
     font-family: 'JetBrains Mono', monospace;
@@ -2107,6 +2113,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     word-break: break-word;
     white-space: pre-wrap;
     overflow-wrap: break-word;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
     /* Remove scrolling - let content expand naturally */
     height: auto;
     max-height: none;
@@ -3713,6 +3720,14 @@ textarea:focus {
         transition-duration: 0.01ms !important;
     }
     
+    /* Disable matrix rain on reduced motion */
+    .matrix-bg,
+    .matrix-layer-1,
+    .matrix-layer-2,
+    .matrix-layer-3 {
+        display: none !important;
+    }
+    
     .tap-btn:active {
         transform: none !important;
     }
@@ -3789,6 +3804,48 @@ textarea:focus {
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--accent-cyan);
+}
+
+/* ===== PERFORMANCE OPTIMIZATIONS ===== */
+/* Reduce complexity on mobile for better performance */
+@media (max-width: 768px) {
+    /* Reduce matrix layers on mobile */
+    .matrix-layer-2,
+    .matrix-layer-3 {
+        display: none;
+    }
+    
+    /* Simplify matrix animation */
+    .matrix-bg {
+        opacity: 0.5;
+    }
+    
+    /* Reduce backdrop filter intensity */
+    .page-content,
+    .cyber-btn,
+    .btn,
+    input[type="text"],
+    textarea,
+    .trivia-option,
+    .riddle-question,
+    .challenge-description {
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+    }
+    
+    /* Disable complex animations on mobile */
+    .cyber-btn::before,
+    .cyber-btn::after,
+    .btn::before,
+    .btn::after {
+        display: none;
+    }
+    
+    /* Simplify hover effects */
+    .cyber-btn:hover,
+    .btn:hover {
+        transform: translateY(-2px);
+    }
 }
 
 /* Firefox scrollbar */
