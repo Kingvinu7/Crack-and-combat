@@ -208,7 +208,7 @@ body::before {
             transparent 40px);
     background-size: 50px 100%;
     background-position: 0 0, 25px 0, 50px 0;
-    animation: matrixFall 2s linear infinite;
+    animation: matrixFall 6s linear infinite;
 }
 
 .matrix-bg::after {
@@ -224,8 +224,8 @@ body::before {
             transparent 50px);
     background-size: 70px 100%;
     background-position: 35px 0, 70px 0;
-    animation: matrixFall 2.5s linear infinite;
-    animation-delay: -0.5s;
+    animation: matrixFall 7s linear infinite;
+    animation-delay: -1s;
 }
 
 .matrix-layer-1 {
@@ -241,8 +241,8 @@ body::before {
             transparent 60px);
     background-size: 90px 100%;
     background-position: 15px 0, 45px 0, 75px 0;
-    animation: matrixFall 3s linear infinite;
-    animation-delay: -1s;
+    animation: matrixFall 8s linear infinite;
+    animation-delay: -2s;
 }
 
 .matrix-layer-2 {
@@ -258,8 +258,8 @@ body::before {
             transparent 70px);
     background-size: 110px 100%;
     background-position: 55px 0, 110px 0;
-    animation: matrixFall 3.5s linear infinite;
-    animation-delay: -1.5s;
+    animation: matrixFall 9s linear infinite;
+    animation-delay: -3s;
 }
 
 .matrix-layer-3 {
@@ -275,8 +275,8 @@ body::before {
             transparent 80px);
     background-size: 130px 100%;
     background-position: 65px 0, 130px 0;
-    animation: matrixFall 4s linear infinite;
-    animation-delay: -2s;
+    animation: matrixFall 10s linear infinite;
+    animation-delay: -4s;
 }
 
 /* Matrix characters falling */
