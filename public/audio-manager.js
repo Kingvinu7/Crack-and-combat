@@ -75,27 +75,35 @@ class AudioManager {
     }
     
     setupAutoInit() {
-        const initOnInteraction = (event) => {
+        const initOnInteraction = async (event) => {
             console.log('Audio manager: User interaction detected:', event.type);
             if (!this.isInitialized) {
-                console.log('Audio manager: Starting initialization...');
-                this.init().then(() => {
-                    console.log('Audio manager: Initialization completed successfully');
-                }).catch(error => {
-                    console.error('Audio manager: Initialization failed:', error);
-                });
+                // Remove listeners immediately to prevent multiple init calls
                 document.removeEventListener('click', initOnInteraction);
                 document.removeEventListener('keydown', initOnInteraction);
                 document.removeEventListener('touchstart', initOnInteraction);
+                document.removeEventListener('touchend', initOnInteraction);
+                document.removeEventListener('mousedown', initOnInteraction);
+                
+                console.log('Audio manager: Starting immediate initialization...');
+                try {
+                    await this.init();
+                    console.log('Audio manager: Initialization completed successfully');
+                } catch (error) {
+                    console.error('Audio manager: Initialization failed:', error);
+                }
             } else {
                 console.log('Audio manager: Already initialized');
             }
         };
         
         console.log('Audio manager: Setting up auto-init listeners');
-        document.addEventListener('click', initOnInteraction);
-        document.addEventListener('keydown', initOnInteraction);
-        document.addEventListener('touchstart', initOnInteraction); // For mobile
+        // Use capture phase for faster response
+        document.addEventListener('click', initOnInteraction, true);
+        document.addEventListener('keydown', initOnInteraction, true);
+        document.addEventListener('touchstart', initOnInteraction, true); // For mobile
+        document.addEventListener('touchend', initOnInteraction, true); // Alternative mobile event
+        document.addEventListener('mousedown', initOnInteraction, true); // Even faster than click
     }
     
     async init() {
@@ -124,28 +132,37 @@ class AudioManager {
             // Set initial volumes
             this.updateVolumes();
             
-            // Load audio assets
-            await this.loadAudioAssets();
-            
             this.isInitialized = true;
             console.log('Audio Manager initialized successfully');
+            
+            // Start playing immediately while loading assets in parallel
+            const trackToPlay = this.queuedTrack || 'home';
+            this.queuedTrack = null;
+            
+            // Load and play home track first for immediate feedback
+            if (trackToPlay === 'home' && this.preloadedBuffers && this.preloadedBuffers['/audio/music/cyber-ambient.mp3']) {
+                try {
+                    const buffer = await this.audioContext.decodeAudioData(
+                        this.preloadedBuffers['/audio/music/cyber-ambient.mp3'].slice(0)
+                    );
+                    this.musicTracks['home'] = buffer;
+                    this.playMusic('home', false); // No fade for immediate playback
+                } catch (e) {
+                    console.warn('Failed to decode preloaded home track:', e);
+                }
+            }
+            
+            // Load remaining audio assets in background
+            this.loadAudioAssets().then(() => {
+                console.log('All audio assets loaded');
+            }).catch(error => {
+                console.warn('Some audio assets failed to load:', error);
+            });
             
             // Show audio initialization success
             if (window.showNotification) {
                 window.showNotification('Audio system ready! 🔊', 'success');
             }
-            
-            // Play queued track or default to home screen music
-            const trackToPlay = this.queuedTrack || 'home';
-            console.log(`Audio manager: Playing ${trackToPlay} after initialization`);
-            console.log(`Available tracks:`, Object.keys(this.musicTracks));
-            console.log(`Audio context state:`, this.audioContext.state);
-            
-            // Small delay to ensure everything is ready
-            setTimeout(() => {
-                this.playMusic(trackToPlay);
-                this.queuedTrack = null;
-            }, 100);
             
         } catch (error) {
             console.warn('Audio initialization failed:', error);
@@ -187,9 +204,11 @@ class AudioManager {
             tap: '/audio/sfx/tap-sound.mp3'
         };
         
-        // Load music tracks (prioritize home track for faster startup)
-        const trackOrder = ['home', 'challenge', 'victory']; // Load home first
-        for (const name of trackOrder) {
+        // Skip home track if already loaded
+        const trackOrder = this.musicTracks['home'] ? ['challenge', 'victory'] : ['home', 'challenge', 'victory'];
+        
+        // Load music tracks in parallel for faster loading
+        const musicPromises = trackOrder.map(async (name) => {
             if (musicFiles[name]) {
                 try {
                     const buffer = await this.loadAudioBuffer(musicFiles[name]);
@@ -203,7 +222,9 @@ class AudioManager {
                     this.musicTracks[name] = this.createFallbackAudio(musicFiles[name], true);
                 }
             }
-        }
+        });
+        
+        await Promise.all(musicPromises);
         
         // Load sound effects
         for (const [name, url] of Object.entries(sfxFiles)) {
@@ -316,8 +337,7 @@ class AudioManager {
             // Queue the music to play after initialization
             console.log(`Audio manager: Queueing music "${trackName}" until initialization`);
             this.queuedTrack = trackName;
-            setTimeout(() => this.playMusic(trackName, fadeIn), 100);
-            return;
+            return; // Don't retry, let init handle it
         }
         
         if (this.isMuted) return;
