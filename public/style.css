@@ -162,9 +162,9 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    overflow: visible;
+    overflow: hidden;
     z-index: 1;
-    opacity: 0.35;
+    opacity: 0.4;
     pointer-events: none;
 }
 
@@ -177,26 +177,101 @@ body::before {
     height: 100%;
     overflow: hidden;
     z-index: 1;
-    opacity: 0.15;
+    opacity: 0.2;
     pointer-events: none;
 }
 
-/* Simplified static matrix background */
-.matrix-bg {
-    overflow: hidden;
+/* Matrix rain animation */
+.matrix-bg::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: 0;
+    width: 100%;
+    height: 150%;
+    background-image: 
+        linear-gradient(0deg, transparent 0%, rgba(0, 255, 65, 0.03) 2%, transparent 4%),
+        linear-gradient(0deg, transparent 0%, rgba(0, 255, 65, 0.05) 1%, transparent 3%),
+        linear-gradient(0deg, transparent 0%, rgba(0, 255, 65, 0.02) 3%, transparent 6%);
+    background-size: 50px 200px, 80px 300px, 120px 400px;
+    background-position: 0 0, 25px -100px, 60px -200px;
+    animation: matrixRain1 15s linear infinite, matrixRain2 20s linear infinite, matrixRain3 25s linear infinite;
 }
 
-.matrix-bg, .matrix-bg-overlay {
+.matrix-bg::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: 0;
+    width: 100%;
+    height: 150%;
     background-image: 
-        /* Very subtle static background lines */
-        repeating-linear-gradient(
-            0deg,
-            transparent 0px,
-            rgba(0, 255, 65, 0.02) 1px,
-            transparent 2px,
-            transparent clamp(20px, 3vw, 40px)
-        );
-    background-size: 100% 100%;
+        linear-gradient(0deg, transparent 0%, rgba(0, 255, 65, 0.04) 1.5%, transparent 3.5%),
+        linear-gradient(0deg, transparent 0%, rgba(0, 255, 65, 0.03) 2.5%, transparent 5%);
+    background-size: 70px 250px, 100px 350px;
+    background-position: 35px -150px, 85px -250px;
+    animation: matrixRain4 18s linear infinite, matrixRain5 22s linear infinite;
+}
+
+/* Matrix characters falling */
+.matrix-bg-overlay::before {
+    content: '0101001010100101110010101001010111001010100101011100101010010101110010101001010111001010100101011100101010010101110010101001010111001010100101011100';
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 200%;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: rgba(0, 255, 65, 0.1);
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    line-height: 1.2;
+    animation: matrixText 30s linear infinite;
+    letter-spacing: 2px;
+}
+
+@keyframes matrixRain1 {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+}
+
+@keyframes matrixRain2 {
+    0% { transform: translateY(-100%) translateX(10px); }
+    100% { transform: translateY(100%) translateX(-10px); }
+}
+
+@keyframes matrixRain3 {
+    0% { transform: translateY(-100%) translateX(-5px); }
+    100% { transform: translateY(100%) translateX(5px); }
+}
+
+@keyframes matrixRain4 {
+    0% { transform: translateY(-100%) translateX(15px); }
+    100% { transform: translateY(100%) translateX(-15px); }
+}
+
+@keyframes matrixRain5 {
+    0% { transform: translateY(-100%) translateX(-10px); }
+    100% { transform: translateY(100%) translateX(10px); }
+}
+
+@keyframes matrixText {
+    0% { transform: translateY(-100%); opacity: 0; }
+    10% { opacity: 0.1; }
+    90% { opacity: 0.1; }
+    100% { transform: translateY(100%); opacity: 0; }
+}
+
+/* Enhanced matrix effect for special screens */
+.page.active .matrix-bg {
+    animation: matrixIntensify 2s ease-out;
+}
+
+@keyframes matrixIntensify {
+    0% { opacity: 0.1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 0.4; }
 }
 
 /* ===== CLEAN CENTERED LAYOUT ===== */
@@ -550,10 +625,54 @@ body::before {
     text-transform: uppercase;
     letter-spacing: clamp(1px, 0.15vw, 3px);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
     position: relative;
     overflow: hidden;
     min-height: clamp(40px, 5vh, 50px);
+}
+
+.cyber-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    z-index: 1;
+}
+
+.cyber-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.cyber-btn:hover::before {
+    left: 100%;
+}
+
+.cyber-btn:hover::after {
+    width: 300px;
+    height: 300px;
+}
+
+.cyber-btn:active {
+    transform: translateY(1px) scale(0.98);
+}
+
+.cyber-btn .btn-text {
+    position: relative;
+    z-index: 2;
 }
 
 .cyber-btn.primary {
@@ -563,14 +682,29 @@ body::before {
     box-shadow: 0 0 20px rgba(255, 0, 68, 0.2);
 }
 
+.cyber-btn.primary::before {
+    background: linear-gradient(90deg, transparent, rgba(255, 0, 68, 0.4), transparent);
+}
+
+.cyber-btn.primary::after {
+    background: radial-gradient(circle, rgba(255, 0, 68, 0.4) 0%, transparent 70%);
+}
+
 .cyber-btn.primary:hover {
     background: linear-gradient(135deg, rgba(255, 0, 68, 0.3), rgba(255, 0, 68, 0.1));
     color: white;
     box-shadow: 
         0 0 30px rgba(255, 0, 68, 0.4),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
+    transform: translateY(-3px) scale(1.02);
     border-color: var(--accent-red-bright);
+}
+
+.cyber-btn.primary:active {
+    transform: translateY(-1px) scale(0.98);
+    box-shadow: 
+        0 0 20px rgba(255, 0, 68, 0.6),
+        inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .cyber-btn.secondary {
@@ -580,14 +714,29 @@ body::before {
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
 }
 
+.cyber-btn.secondary::before {
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.4), transparent);
+}
+
+.cyber-btn.secondary::after {
+    background: radial-gradient(circle, rgba(0, 255, 255, 0.4) 0%, transparent 70%);
+}
+
 .cyber-btn.secondary:hover {
     background: linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(0, 255, 255, 0.1));
     color: var(--bg-primary);
     box-shadow: 
         0 0 30px rgba(0, 255, 255, 0.4),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
+    transform: translateY(-3px) scale(1.02);
     border-color: var(--accent-cyan-bright);
+}
+
+.cyber-btn.secondary:active {
+    transform: translateY(-1px) scale(0.98);
+    box-shadow: 
+        0 0 20px rgba(0, 255, 255, 0.6),
+        inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .btn-prefix, .btn-suffix {
@@ -644,19 +793,65 @@ body::before {
     border-radius: 6px;
     color: var(--accent-green);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
     font-size: 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+.audio-btn-top::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.3), transparent);
+    transition: left 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.audio-btn-top::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(0, 255, 136, 0.4) 0%, transparent 70%);
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
 }
 
 .audio-btn-top:hover {
     border-color: var(--accent-green);
     background: rgba(0, 255, 136, 0.1);
     box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
-    transform: translateY(-2px);
+    transform: translateY(-3px) scale(1.05);
+}
+
+.audio-btn-top:hover::before {
+    left: 100%;
+}
+
+.audio-btn-top:hover::after {
+    width: 60px;
+    height: 60px;
 }
 
 .audio-btn-top:active {
-    transform: translateY(0);
+    transform: translateY(-1px) scale(0.95);
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+.audio-btn-top .audio-icon {
+    position: relative;
+    z-index: 1;
+    transition: all 0.2s ease;
+}
+
+.audio-btn-top:hover .audio-icon {
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
 }
 
 .audio-btn-top .audio-icon {
@@ -736,14 +931,43 @@ body::before {
     text-transform: uppercase;
     letter-spacing: clamp(0.5px, 0.1vw, 1.5px);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
     min-height: clamp(32px, 4vh, 40px);
+    position: relative;
+    overflow: hidden;
+}
+
+.help-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
+    transition: left 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .help-btn:hover {
     border-color: var(--accent-cyan);
     color: var(--accent-cyan);
     background: rgba(0, 255, 255, 0.05);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+}
+
+.help-btn:hover::before {
+    left: 100%;
+}
+
+.help-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.help-btn .help-icon,
+.help-btn .help-text {
+    position: relative;
+    z-index: 1;
 }
 
 .help-icon {
@@ -1119,13 +1343,36 @@ h2 {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    transition: left 0.5s;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    z-index: 1;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
     z-index: 1;
 }
 
 .btn:hover::before {
     left: 100%;
+}
+
+.btn:hover::after {
+    width: 200px;
+    height: 200px;
+}
+
+.btn:active {
+    transform: translateY(1px) scale(0.98);
 }
 
 .btn.primary {
@@ -1154,13 +1401,20 @@ h2 {
 }
 
 .btn.primary:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px) scale(1.02);
     box-shadow: 
         0 0 35px rgba(255, 0, 68, 0.5),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
     border-color: var(--accent-red-bright);
     background: rgba(255, 0, 68, 0.3);
     color: white;
+}
+
+.btn.primary:active {
+    transform: translateY(-1px) scale(0.98);
+    box-shadow: 
+        0 0 25px rgba(255, 0, 68, 0.7),
+        inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .btn.secondary {
@@ -1171,13 +1425,20 @@ h2 {
 }
 
 .btn.secondary:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px) scale(1.02);
     box-shadow: 
         0 0 35px rgba(0, 255, 255, 0.5),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
     border-color: var(--accent-cyan-bright);
     background: rgba(0, 255, 255, 0.3);
     color: var(--bg-primary);
+}
+
+.btn.secondary:active {
+    transform: translateY(-1px) scale(0.98);
+    box-shadow: 
+        0 0 25px rgba(0, 255, 255, 0.7),
+        inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .btn.tertiary {

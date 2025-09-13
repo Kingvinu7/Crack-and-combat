@@ -1313,6 +1313,20 @@ function addAudioControlsToAllPages() {
     document.querySelectorAll('.audio-settings-btn').forEach(btn => {
         btn.addEventListener('click', showAudioSettings);
     });
+    
+    // Add event listeners for home screen specific buttons (by ID)
+    const homeAudioToggle = document.getElementById('audio-toggle-btn');
+    const homeAudioSettings = document.getElementById('audio-settings-btn');
+    
+    if (homeAudioToggle) {
+        homeAudioToggle.addEventListener('click', toggleAudio);
+        console.log('Home screen audio toggle button event listener added');
+    }
+    
+    if (homeAudioSettings) {
+        homeAudioSettings.addEventListener('click', showAudioSettings);
+        console.log('Home screen audio settings button event listener added');
+    }
 }
 
 // Audio status indicator
