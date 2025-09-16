@@ -104,29 +104,18 @@
                         </div>
                     </div>
                     
-                    <div class="input-section">
-                        <label class="cyber-label">OPERATOR_ID</label>
-                        <input type="text" id="player-name" class="cyber-input" placeholder="ENTER_CODENAME" maxlength="15">
-                    </div>
-                    
-                    <div class="action-section">
-                        <button id="create-room-btn" class="cyber-btn primary">
+                    <div class="action-section" style="display: flex; flex-direction: column; gap: 15px; width: 100%;">
+                        <button id="initialize-btn" class="cyber-btn primary" style="width: 100%;">
                             <span class="btn-prefix">[</span>
                             <span class="btn-text">INITIALIZE</span>
                             <span class="btn-suffix">]</span>
                         </button>
-                    </div>
-                    
-                    <div class="join-section">
-                        <label class="cyber-label">SESSION_KEY</label>
-                        <div class="join-controls">
-                            <input type="text" id="room-code" class="cyber-input code-input" placeholder="######" maxlength="6">
-                            <button id="join-room-btn" class="cyber-btn secondary">
-                                <span class="btn-prefix">[</span>
-                                <span class="btn-text">CONNECT</span>
-                                <span class="btn-suffix">]</span>
-                            </button>
-                        </div>
+                        
+                        <button id="connect-btn" class="cyber-btn secondary" style="width: 100%;">
+                            <span class="btn-prefix">[</span>
+                            <span class="btn-text">CONNECT</span>
+                            <span class="btn-suffix">]</span>
+                        </button>
                     </div>
                 </div>
 
@@ -494,6 +483,46 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden inputs for backward compatibility -->
+    <input type="hidden" id="player-name">
+    <input type="hidden" id="room-code">
+
+    <!-- Initialize Popup Modal -->
+    <div id="initialize-popup" class="popup-modal">
+        <div class="popup-content">
+            <button class="popup-close" onclick="closeInitializePopup()">×</button>
+            <h2 class="popup-title">INITIALIZE GAME</h2>
+            <div class="popup-input-group">
+                <label class="popup-label">Enter Your Name</label>
+                <input type="text" id="popup-player-name" class="popup-input" placeholder="Enter your codename" maxlength="15" autocomplete="off">
+            </div>
+            <div class="popup-buttons">
+                <button class="popup-btn confirm" onclick="confirmInitialize()">CREATE ROOM</button>
+                <button class="popup-btn cancel" onclick="closeInitializePopup()">CANCEL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Connect Popup Modal -->
+    <div id="connect-popup" class="popup-modal">
+        <div class="popup-content">
+            <button class="popup-close" onclick="closeConnectPopup()">×</button>
+            <h2 class="popup-title">CONNECT TO ROOM</h2>
+            <div class="popup-input-group">
+                <label class="popup-label">Your Name</label>
+                <input type="text" id="popup-connect-name" class="popup-input" placeholder="Enter your codename" maxlength="15" autocomplete="off">
+            </div>
+            <div class="popup-input-group">
+                <label class="popup-label">Room Code</label>
+                <input type="text" id="popup-room-code" class="popup-input" placeholder="Enter 6-digit code" maxlength="6" style="letter-spacing: 4px;" autocomplete="off">
+            </div>
+            <div class="popup-buttons">
+                <button class="popup-btn confirm" onclick="confirmConnect()">JOIN ROOM</button>
+                <button class="popup-btn cancel" onclick="closeConnectPopup()">CANCEL</button>
             </div>
         </div>
     </div>

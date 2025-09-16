@@ -52,7 +52,7 @@
 
 body {
     font-family: 'JetBrains Mono', 'Consolas', monospace;
-    background: var(--bg-primary);
+    background: rgba(0, 0, 0, 1);
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
@@ -72,7 +72,7 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--bg-primary);
+    background: rgba(0, 0, 0, 1);
     pointer-events: none;
     z-index: -1;
     overflow: hidden;
@@ -123,18 +123,21 @@ body::before {
     margin: 0 auto;
     padding: clamp(25px, 3vh, 60px);
     text-align: center;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(12px) saturate(1.3);
-    -webkit-backdrop-filter: blur(12px) saturate(1.3);
-    border: 2px solid var(--accent-cyan);
-    border-radius: 8px;
+    background: rgba(0, 0, 0, 1);
+    backdrop-filter: blur(15px) saturate(1.3);
+    -webkit-backdrop-filter: blur(15px) saturate(1.3);
+    border: 3px solid var(--accent-cyan);
+    border-radius: 12px;
     box-shadow: 
-        0 0 50px rgba(0, 255, 255, 0.15),
-        inset 0 1px 0 rgba(0, 255, 255, 0.1),
-        0 8px 32px rgba(0, 0, 0, 0.8),
-        inset 0 0 40px rgba(0, 0, 0, 0.4);
+        0 0 60px rgba(0, 255, 255, 0.25),
+        inset 0 1px 0 rgba(0, 255, 255, 0.2),
+        0 12px 40px rgba(0, 0, 0, 0.9),
+        inset 0 0 50px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(0, 255, 255, 0.1);
     position: relative;
     /* Removed max-height and overflow restrictions */
+    outline: 1px solid rgba(0, 255, 255, 0.05);
+    outline-offset: -10px;
 }
 
 .page-content::before {
@@ -156,6 +159,32 @@ body::before {
     border-radius: 6px;
 }
 
+/* Border glow animation for enhanced containers */
+@keyframes borderGlow {
+    0%, 100% {
+        border-color: var(--accent-cyan);
+        box-shadow: 
+            0 0 60px rgba(0, 255, 255, 0.25),
+            inset 0 1px 0 rgba(0, 255, 255, 0.2),
+            0 12px 40px rgba(0, 0, 0, 0.9),
+            inset 0 0 50px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(0, 255, 255, 0.1);
+    }
+    50% {
+        border-color: rgba(0, 255, 255, 0.8);
+        box-shadow: 
+            0 0 80px rgba(0, 255, 255, 0.35),
+            inset 0 1px 0 rgba(0, 255, 255, 0.3),
+            0 12px 40px rgba(0, 0, 0, 0.9),
+            inset 0 0 60px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(0, 255, 255, 0.2);
+    }
+}
+
+.enhanced-border {
+    animation: borderGlow 4s ease-in-out infinite;
+}
+
 /* ===== MATRIX BACKGROUND EFFECT ===== */
 /* Reusable matrix background class for any page */
 .matrix-bg {
@@ -166,7 +195,7 @@ body::before {
     height: 100%;
     overflow: hidden;
     z-index: 1;
-    opacity: 0.8; /* Increased from 0.4 for better visibility */
+    opacity: 0.4; /* Reduced by 50% from 0.8 for less intensity */
     pointer-events: none;
     will-change: transform; /* GPU acceleration */
     transform: translateZ(0); /* Force GPU layer */
@@ -327,9 +356,9 @@ body::before {
 }
 
 @keyframes matrixIntensify {
-    0% { opacity: 0.1; }
-    50% { opacity: 0.6; }
-    100% { opacity: 0.4; }
+    0% { opacity: 0.05; }
+    50% { opacity: 0.3; }
+    100% { opacity: 0.2; }
 }
 
 /* ===== CLEAN CENTERED LAYOUT ===== */
@@ -345,17 +374,77 @@ body::before {
     box-sizing: border-box;
 }
 
+/* Enhanced Game Container - Creates strong visual separation from matrix background */
+.game-container-outline {
+    background: linear-gradient(135deg, 
+        rgba(0, 0, 0, 0.95) 0%, 
+        rgba(10, 10, 15, 0.95) 50%, 
+        rgba(0, 0, 0, 0.95) 100%);
+    border: 4px solid;
+    border-image: linear-gradient(
+        135deg,
+        var(--accent-cyan) 0%,
+        var(--accent-red) 50%,
+        var(--accent-cyan) 100%
+    ) 1;
+    border-radius: 16px;
+    padding: 4px;
+    box-shadow: 
+        /* Outer glow */
+        0 0 80px rgba(0, 255, 255, 0.3),
+        0 0 40px rgba(255, 0, 68, 0.2),
+        /* Deep shadow for depth */
+        0 20px 60px rgba(0, 0, 0, 0.95),
+        /* Inner shadows */
+        inset 0 0 60px rgba(0, 0, 0, 0.6),
+        inset 0 2px 4px rgba(0, 255, 255, 0.1),
+        /* Multiple border effect */
+        0 0 0 1px rgba(0, 255, 255, 0.2),
+        0 0 0 2px rgba(0, 0, 0, 0.8),
+        0 0 0 3px rgba(255, 0, 68, 0.1);
+    position: relative;
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+}
+
+.game-container-outline::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(0, 255, 255, 0.1) 50%,
+        transparent 70%
+    );
+    border-radius: 16px;
+    opacity: 0;
+    animation: containerShimmer 8s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes containerShimmer {
+    0%, 100% { opacity: 0; transform: translateX(-100%); }
+    50% { opacity: 0.3; transform: translateX(100%); }
+}
+
 
 /* Main Content Area */
 .main-content {
-    background: rgba(0, 0, 0, 0.12);
-    border: 2px solid var(--accent-cyan);
-    border-radius: 8px;
-    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 1);
+    border: 3px solid var(--accent-cyan);
+    border-radius: 12px;
+    backdrop-filter: blur(15px) saturate(1.3);
+    -webkit-backdrop-filter: blur(15px) saturate(1.3);
     box-shadow: 
-        0 0 50px rgba(0, 255, 255, 0.15),
-        inset 0 1px 0 rgba(0, 255, 255, 0.1),
-        var(--shadow-deep);
+        0 0 60px rgba(0, 255, 255, 0.25),
+        inset 0 1px 0 rgba(0, 255, 255, 0.2),
+        0 12px 40px rgba(0, 0, 0, 0.9),
+        inset 0 0 50px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(0, 255, 255, 0.1);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -366,6 +455,8 @@ body::before {
     width: 100%;
     /* Removed max-height restrictions */
     overflow: visible;
+    outline: 1px solid rgba(0, 255, 255, 0.05);
+    outline-offset: -10px;
 }
 
 .main-content::before {
@@ -404,6 +495,10 @@ body::before {
     text-transform: uppercase;
     letter-spacing: 4px;
     line-height: 0.9;
+    text-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.9),
+        0 4px 8px rgba(0, 0, 0, 0.8),
+        0 0 20px rgba(0, 0, 0, 0.6);
 }
 
 .title-crack {
@@ -476,7 +571,7 @@ body::before {
         0 0 10px rgba(0, 0, 0, 0.9),
         0 2px 4px rgba(0, 0, 0, 0.9),
         0 0 20px currentColor;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 1);
     padding: 8px 16px;
     border-radius: 4px;
     backdrop-filter: blur(8px);
@@ -588,13 +683,18 @@ body::before {
     z-index: 2;
     max-width: clamp(400px, 70vw, 650px);
     width: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 20px;
-    border-radius: 8px;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 1);
+    padding: 25px;
+    border-radius: 10px;
+    backdrop-filter: blur(12px) saturate(1.2);
+    -webkit-backdrop-filter: blur(12px) saturate(1.2);
+    border: 2px solid rgba(0, 255, 255, 0.2);
+    box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.8),
+        inset 0 0 30px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(0, 255, 255, 0.05);
+    outline: 1px solid rgba(0, 255, 255, 0.03);
+    outline-offset: -8px;
 }
 
 .controls-title {
@@ -639,16 +739,17 @@ body::before {
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
     font-weight: 600;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 8px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .cyber-input {
     width: 100%;
     padding: clamp(12px, 1.5vh, 16px) clamp(16px, 2vw, 24px);
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 1);
     backdrop-filter: blur(10px) saturate(1.3);
     -webkit-backdrop-filter: blur(10px) saturate(1.3);
     border: 2px solid var(--border-dim);
@@ -673,7 +774,7 @@ body::before {
         0 0 25px rgba(0, 255, 255, 0.3),
         inset 0 2px 4px rgba(0, 0, 0, 0.4),
         inset 0 0 10px rgba(0, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 1);
 }
 
 
@@ -701,7 +802,7 @@ body::before {
     align-items: center;
     justify-content: center;
     padding: clamp(12px, 1.5vh, 18px) clamp(24px, 3vw, 40px);
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(0, 0, 0, 1);
     backdrop-filter: blur(10px) saturate(1.5);
     -webkit-backdrop-filter: blur(10px) saturate(1.5);
     border: 2px solid var(--border-dim);
@@ -717,7 +818,7 @@ body::before {
     overflow: hidden;
     min-height: clamp(40px, 5vh, 50px);
     animation: buttonPulse 3s ease-in-out infinite;
-    text-shadow: 0 0 8px currentColor, 0 2px 4px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 0 8px currentColor, 0 2px 4px rgba(0, 0, 0, 0.9);
     box-shadow: 
         0 4px 20px rgba(0, 0, 0, 0.6),
         inset 0 0 20px rgba(0, 0, 0, 0.3);
@@ -907,7 +1008,7 @@ body::before {
 .audio-controls-top {
     display: flex;
     gap: 8px;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 1);
     backdrop-filter: blur(10px);
     border: 1px solid var(--border-dim);
     border-radius: 8px;
@@ -933,7 +1034,7 @@ body::before {
     justify-content: center;
     width: 40px;
     height: 40px;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 1);
     border: 1px solid var(--border-dim);
     border-radius: 6px;
     color: var(--accent-green);
@@ -1066,7 +1167,7 @@ body::before {
     align-items: center;
     gap: clamp(6px, 0.8vw, 10px);
     padding: clamp(8px, 1vh, 12px) clamp(16px, 2vw, 24px);
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 1);
     border: 1px solid var(--border-dim);
     border-radius: 4px;
     color: var(--text-muted);
@@ -1162,7 +1263,7 @@ body::before {
 .volume-slider {
     flex: 1;
     height: 6px;
-    background: var(--bg-tertiary);
+    background: rgba(0, 0, 0, 1);
     border-radius: 3px;
     outline: none;
     -webkit-appearance: none;
@@ -1245,7 +1346,7 @@ body::before {
 .player-input, .code-input {
     width: 100%;
     padding: 15px 20px;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--border-secondary);
     border-radius: 10px;
     color: var(--text-primary);
@@ -1286,7 +1387,7 @@ body::before {
     justify-content: center;
     gap: 12px;
     padding: 18px 30px;
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--border-primary);
     border-radius: 12px;
     color: var(--text-primary);
@@ -1409,7 +1510,7 @@ body::before {
 
 /* Status Bar */
 .status-bar {
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 1);
     border: 1px solid var(--border-secondary);
     border-radius: 10px;
     padding: 15px 20px;
@@ -1476,7 +1577,7 @@ h2 {
     overflow: hidden;
     text-transform: uppercase;
     letter-spacing: clamp(0.5px, 0.1vw, 2px);
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(0, 0, 0, 1);
     backdrop-filter: blur(12px) saturate(1.5);
     -webkit-backdrop-filter: blur(12px) saturate(1.5);
     min-height: clamp(44px, 5vh, 54px);
@@ -1648,7 +1749,7 @@ input[type="text"], textarea {
     width: 100%;
     max-width: clamp(350px, 60vw, 500px);
     padding: clamp(14px, 1.5vh, 20px) clamp(20px, 2.5vw, 30px);
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--border-dim);
     border-radius: 6px;
     color: var(--text-primary);
@@ -1674,7 +1775,7 @@ input[type="text"]:focus, textarea:focus {
         0 0 25px rgba(0, 255, 255, 0.4),
         inset 0 2px 4px rgba(0, 0, 0, 0.4),
         inset 0 0 10px rgba(0, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 1);
     transform: translateY(-1px);
 }
 
@@ -1742,7 +1843,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .room-info {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--accent-red);
     padding: 16px 24px;
     border-radius: 8px;
@@ -1764,17 +1865,20 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .players-section {
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(12px) saturate(1.3);
-    -webkit-backdrop-filter: blur(12px) saturate(1.3);
+    background: rgba(0, 0, 0, 1);
+    backdrop-filter: blur(15px) saturate(1.4);
+    -webkit-backdrop-filter: blur(15px) saturate(1.4);
     padding: 24px;
     border-radius: 12px;
     margin: 24px 0;
-    border: 1px solid var(--glass-border);
+    border: 2px solid var(--glass-border);
     box-shadow: 
-        0 4px 20px rgba(0, 0, 0, 0.6),
-        inset 0 0 30px rgba(0, 0, 0, 0.3),
-        var(--shadow-soft);
+        0 6px 30px rgba(0, 0, 0, 0.8),
+        inset 0 0 40px rgba(0, 0, 0, 0.4),
+        var(--shadow-soft),
+        0 0 0 1px rgba(0, 255, 255, 0.05);
+    outline: 1px solid rgba(0, 255, 255, 0.02);
+    outline-offset: -8px;
 }
 
 .players-section h3 {
@@ -1799,7 +1903,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .player {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--border-secondary);
     padding: 12px 18px;
     border-radius: 8px;
@@ -1834,7 +1938,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .player.owner-player {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     border-color: var(--accent-yellow);
     color: var(--accent-yellow);
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
@@ -1934,7 +2038,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .oracle-message {
-    background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--accent-red);
     padding: 20px 24px;
     border-radius: 8px;
@@ -1981,7 +2085,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     font-size: clamp(3em, 8vw, 5em);
     font-weight: 800;
     color: white;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 1);
     border: 3px solid var(--accent-cyan);
     padding: clamp(15px, 3vh, 25px) clamp(30px, 5vw, 50px);
     margin: 0 auto clamp(10px, 2vh, 20px);
@@ -2076,25 +2180,28 @@ input[type="text"]::placeholder, textarea::placeholder {
     line-height: 1.7;
     font-size: 1.15em;
     padding: 24px;
-    background: rgba(0, 0, 0, 0.8);
-    border: 1px solid var(--border-secondary);
-    border-left: 4px solid var(--accent-cyan);
+    background: rgba(0, 0, 0, 1);
+    border: 2px solid var(--border-secondary);
+    border-left: 5px solid var(--accent-cyan);
     border-radius: 8px;
-    backdrop-filter: blur(15px) saturate(1.3);
-    -webkit-backdrop-filter: blur(15px) saturate(1.3);
+    backdrop-filter: blur(18px) saturate(1.4);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
     box-shadow: 
         inset 0 1px 0 rgba(255, 255, 255, 0.05),
-        0 4px 20px rgba(0, 0, 0, 0.6),
-        inset 0 0 30px rgba(0, 0, 0, 0.3);
+        0 6px 30px rgba(0, 0, 0, 0.8),
+        inset 0 0 40px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(0, 255, 255, 0.05);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    outline: 1px solid rgba(0, 255, 255, 0.02);
+    outline-offset: -6px;
 }
 
 .challenge-description {
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(15px) saturate(1.3);
-    -webkit-backdrop-filter: blur(15px) saturate(1.3);
-    border: 1px solid var(--border-secondary);
-    border-left: 4px solid var(--accent-red);
+    background: rgba(0, 0, 0, 1);
+    backdrop-filter: blur(18px) saturate(1.4);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    border: 2px solid var(--border-secondary);
+    border-left: 5px solid var(--accent-red);
     border-radius: 8px;
     padding: 25px 30px;
     margin: 25px 0;
@@ -2102,8 +2209,9 @@ input[type="text"]::placeholder, textarea::placeholder {
     font-size: 1.15em;
     box-shadow: 
         inset 0 1px 0 rgba(255, 255, 255, 0.05),
-        0 4px 20px rgba(0, 0, 0, 0.6),
-        inset 0 0 30px rgba(0, 0, 0, 0.3);
+        0 6px 30px rgba(0, 0, 0, 0.8),
+        inset 0 0 40px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 0, 68, 0.05);
     position: relative;
     color: white;
     font-style: normal;
@@ -2114,6 +2222,8 @@ input[type="text"]::placeholder, textarea::placeholder {
     white-space: pre-wrap;
     overflow-wrap: break-word;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    outline: 1px solid rgba(255, 0, 68, 0.02);
+    outline-offset: -6px;
     /* Remove scrolling - let content expand naturally */
     height: auto;
     max-height: none;
@@ -2142,7 +2252,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     text-align: center;
     margin-top: 20px;
     padding: 16px;
-    background: var(--glass-bg);
+    background: rgba(0, 0, 0, 1);
     border: 1px solid var(--glass-border);
     border-radius: 8px;
     backdrop-filter: blur(5px);
@@ -2181,7 +2291,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .answer-item {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--border-secondary);
     padding: 20px;
     border-radius: 8px;
@@ -2212,19 +2322,19 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 .answer-item.correct {
     border-color: #00ff88;
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
 }
 
 .answer-item.incorrect {
     border-color: var(--accent-red);
-    background: linear-gradient(135deg, rgba(255, 8, 68, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     box-shadow: 0 0 20px rgba(255, 8, 68, 0.2);
 }
 
 .answer-item.winner {
     border-color: var(--accent-yellow);
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
 }
 
@@ -2244,7 +2354,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .answer-order {
-    background: var(--bg-tertiary);
+    background: rgba(0, 0, 0, 1);
     color: var(--accent-purple);
     padding: 4px 10px;
     border-radius: 4px;
@@ -2312,7 +2422,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .trivia-question-text {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--accent-cyan);
     border-radius: 12px;
     padding: 25px 30px;
@@ -2381,7 +2491,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     align-items: center;
     justify-content: flex-start;
     border: 3px solid var(--border-secondary) !important;
-    background: rgba(0, 0, 0, 0.75) !important;
+    background: rgba(0, 0, 0, 1) !important;
     backdrop-filter: blur(12px) saturate(1.3);
     -webkit-backdrop-filter: blur(12px) saturate(1.3);
     transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
@@ -2436,7 +2546,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     transform: none !important;
     border-color: var(--border-secondary) !important;
     box-shadow: none !important;
-    background: var(--glass-bg) !important;
+    background: rgba(0, 0, 0, 1) !important;
 }
 
 /* Trivia Results Styles */
@@ -2446,7 +2556,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .correct-answer-display {
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     border: 2px solid #00ff88;
     border-radius: 12px;
     padding: 25px;
@@ -2549,7 +2659,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 /* ===== CHALLENGE RESULTS ===== */
 .challenge-result-item, .tap-result-item {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--border-secondary);
     border-radius: 8px;
     margin: 16px 0;
@@ -2577,13 +2687,13 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 .challenge-result-item.passed {
     border-color: #00ff88;
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
 }
 
 .challenge-result-item.failed {
     border-color: var(--accent-red);
-    background: linear-gradient(135deg, rgba(255, 8, 68, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     box-shadow: 0 0 20px rgba(255, 8, 68, 0.2);
 }
 
@@ -2627,7 +2737,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .challenge-response {
-    background: var(--bg-primary);
+    background: rgba(0, 0, 0, 1);
     border: 1px solid var(--border-secondary);
     border-radius: 6px;
     padding: 12px;
@@ -2668,7 +2778,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 .tap-result-item.winner {
     border-color: var(--accent-yellow);
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
     animation: winnerGlow 2s ease-in-out infinite alternate;
 }
@@ -2708,7 +2818,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 1);
     display: none;
     align-items: center;
     justify-content: center;
@@ -2736,7 +2846,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .individual-result {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 3px solid;
     border-radius: 12px;
     padding: 30px;
@@ -2764,13 +2874,13 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 .individual-result.passed {
     border-color: #00ff88;
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     box-shadow: 0 0 40px rgba(0, 255, 136, 0.3);
 }
 
 .individual-result.failed {
     border-color: var(--accent-red);
-    background: linear-gradient(135deg, rgba(255, 8, 68, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     box-shadow: 0 0 40px rgba(255, 8, 68, 0.3);
 }
 
@@ -2806,7 +2916,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .result-response {
-    background: var(--bg-primary);
+    background: rgba(0, 0, 0, 1);
     border: 1px solid var(--border-secondary);
     border-radius: 6px;
     padding: 12px;
@@ -2854,7 +2964,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 /* ===== POINTS TABLE SYSTEM ===== */
 .points-table-container,
 .final-points-table-container {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--border-secondary);
     padding: 24px;
     border-radius: 8px;
@@ -2881,7 +2991,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .points-table-header {
-    background: var(--bg-tertiary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--accent-red);
     color: var(--text-primary);
     font-weight: 700;
@@ -2890,7 +3000,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .points-table-row {
-    background: var(--glass-bg);
+    background: rgba(0, 0, 0, 1);
     border: 1px solid var(--glass-border);
     align-items: center;
     transition: all 0.3s ease;
@@ -2948,7 +3058,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     padding: 20px;
     color: var(--text-muted);
     font-style: italic;
-    background: var(--glass-bg);
+    background: rgba(0, 0, 0, 1);
     border-radius: 8px;
     border: 1px solid var(--border-secondary);
 }
@@ -2995,7 +3105,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     align-items: center;
     padding: 16px 20px;
     margin: 8px 0;
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--border-secondary);
     border-radius: 8px;
     font-family: 'Rajdhani', sans-serif;
@@ -3010,7 +3120,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 .final-score.winner {
     border-color: var(--accent-yellow);
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
     animation: winnerGlow 2s ease-in-out infinite alternate;
 }
@@ -3067,6 +3177,11 @@ input[type="text"]::placeholder, textarea::placeholder {
         padding: 15px;
         margin: 10px 0;
         /* Removed max-height restrictions */
+        border-width: 2px;
+        box-shadow: 
+            0 0 40px rgba(0, 255, 255, 0.2),
+            0 8px 30px rgba(0, 0, 0, 0.8),
+            inset 0 0 30px rgba(0, 0, 0, 0.4);
     }
     
     .main-content::before {
@@ -3085,6 +3200,11 @@ input[type="text"]::placeholder, textarea::placeholder {
     .page-content {
         padding: 20px 15px;
         /* Removed max-height restrictions */
+        border-width: 2px;
+        box-shadow: 
+            0 0 40px rgba(0, 255, 255, 0.2),
+            0 8px 30px rgba(0, 0, 0, 0.8),
+            inset 0 0 30px rgba(0, 0, 0, 0.4);
     }
     
     .page-content::before {
@@ -3102,6 +3222,8 @@ input[type="text"]::placeholder, textarea::placeholder {
     .game-controls {
         gap: 10px;
         margin: 15px 0;
+        padding: 20px 15px;
+        border-width: 2px;
     }
     
     .help-section {
@@ -3427,6 +3549,11 @@ input[type="text"]::placeholder, textarea::placeholder {
         padding: 6px;
         margin: 1px 0;
         border-radius: 4px;
+        border-width: 2px;
+        box-shadow: 
+            0 0 30px rgba(0, 255, 255, 0.15),
+            0 6px 20px rgba(0, 0, 0, 0.7),
+            inset 0 0 20px rgba(0, 0, 0, 0.3);
     }
     
     .cyber-title {
@@ -3794,7 +3921,7 @@ textarea:focus {
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -3817,7 +3944,7 @@ textarea:focus {
     
     /* Simplify matrix animation */
     .matrix-bg {
-        opacity: 0.5;
+        opacity: 0.25;
     }
     
     /* Reduce backdrop filter intensity */
@@ -3860,7 +3987,7 @@ textarea:focus {
     top: 20px;
     right: 20px;
     max-width: 400px;
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--accent-cyan);
     border-radius: 8px;
     box-shadow: 
@@ -4000,14 +4127,14 @@ body::before { z-index: -1; }
 
 /* Duplicate challenge description styles removed - already defined above */
 
-/* ===== HOW TO PLAY MODAL ===== */
+/* ===== MODAL SYSTEM ===== */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -4021,6 +4148,237 @@ body::before { z-index: -1; }
     padding: 20px;
 }
 
+/* ===== GAME INITIALIZATION POPUPS ===== */
+.popup-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20000;
+    backdrop-filter: blur(20px);
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+}
+
+.popup-modal.active {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.popup-content {
+    background: rgba(0, 0, 0, 1);
+    border: 2px solid var(--accent-cyan);
+    border-radius: 12px;
+    padding: 40px 30px;
+    max-width: 450px;
+    width: 90%;
+    text-align: center;
+    animation: popupSlideIn 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    backdrop-filter: blur(20px) saturate(1.3);
+    -webkit-backdrop-filter: blur(20px) saturate(1.3);
+    box-shadow: 
+        0 0 50px rgba(0, 245, 255, 0.3),
+        var(--shadow-deep);
+    position: relative;
+}
+
+@keyframes popupSlideIn {
+    0% { 
+        opacity: 0; 
+        transform: scale(0.9) translateY(-30px);
+    }
+    100% { 
+        opacity: 1; 
+        transform: scale(1) translateY(0);
+    }
+}
+
+.popup-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 2em;
+    font-weight: 800;
+    color: var(--accent-cyan);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 25px;
+    text-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+}
+
+.popup-input-group {
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.popup-label {
+    display: block;
+    color: var(--text-secondary);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.popup-input {
+    width: 100%;
+    padding: 15px 20px;
+    background: rgba(0, 0, 0, 1);
+    border: 2px solid var(--border-dim);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 1.1em;
+    font-family: 'JetBrains Mono', monospace;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.popup-input:focus {
+    outline: none;
+    border-color: var(--accent-cyan);
+    box-shadow: 
+        0 0 25px rgba(0, 255, 255, 0.3),
+        inset 0 0 10px rgba(0, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.popup-input::placeholder {
+    color: var(--text-muted);
+    text-transform: none;
+    letter-spacing: 1px;
+}
+
+.popup-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.popup-btn {
+    padding: 14px 28px;
+    border: 2px solid;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 1em;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 1);
+    backdrop-filter: blur(12px);
+}
+
+.popup-btn.confirm {
+    border-color: var(--accent-cyan);
+    color: white;
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(0, 255, 255, 0.2));
+}
+
+.popup-btn.confirm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+    border-color: var(--accent-cyan-bright);
+}
+
+.popup-btn.cancel {
+    border-color: var(--border-dim);
+    color: var(--text-secondary);
+    background: rgba(0, 0, 0, 1);
+}
+
+.popup-btn.cancel:hover {
+    border-color: var(--accent-red);
+    color: var(--accent-red);
+    box-shadow: 0 0 20px rgba(255, 0, 68, 0.3);
+}
+
+.popup-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.popup-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--accent-red);
+    transform: rotate(90deg);
+}
+
+/* Mobile responsive for popups */
+@media (max-width: 768px) {
+    .popup-content {
+        padding: 30px 20px;
+        max-width: 90%;
+    }
+    
+    .popup-title {
+        font-size: 1.6em;
+    }
+    
+    .popup-input {
+        padding: 12px 16px;
+        font-size: 1em;
+    }
+    
+    .popup-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .popup-btn {
+        width: 100%;
+        padding: 12px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .popup-content {
+        padding: 25px 15px;
+        max-width: 95%;
+    }
+    
+    .popup-title {
+        font-size: 1.4em;
+        margin-bottom: 20px;
+    }
+    
+    .popup-input {
+        padding: 10px 14px;
+        font-size: 0.95em;
+    }
+}
+
+/* ===== HOW TO PLAY MODAL ===== */<parameter>
+</invoke>
+
 .modal-overlay.show {
     visibility: visible !important;
     opacity: 1 !important;
@@ -4033,7 +4391,7 @@ body::before { z-index: -1; }
 }
 
 .modal-content {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--accent-cyan);
     border-radius: 12px;
     max-width: 90%;
@@ -4117,7 +4475,7 @@ body::before { z-index: -1; }
 }
 
 .rule-section {
-    background: var(--glass-bg);
+    background: rgba(0, 0, 0, 1);
     border: 1px solid var(--glass-border);
     border-radius: 8px;
     padding: 20px;

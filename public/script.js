@@ -49,9 +49,33 @@ const playersListEl = document.getElementById('players-list');
 const oracleIntroMessage = document.getElementById('oracle-intro-message');
 const riddleText = document.getElementById('riddle-text');
 
-// Event listeners
-createRoomBtn.addEventListener('click', createRoom);
-joinRoomBtn.addEventListener('click', joinRoom);
+// Get new button elements
+const initializeBtn = document.getElementById('initialize-btn');
+const connectBtn = document.getElementById('connect-btn');
+
+// Get popup elements
+const initializePopup = document.getElementById('initialize-popup');
+const connectPopup = document.getElementById('connect-popup');
+const popupPlayerName = document.getElementById('popup-player-name');
+const popupConnectName = document.getElementById('popup-connect-name');
+const popupRoomCode = document.getElementById('popup-room-code');
+
+// Event listeners for new buttons
+if (initializeBtn) {
+    initializeBtn.addEventListener('click', showInitializePopup);
+}
+if (connectBtn) {
+    connectBtn.addEventListener('click', showConnectPopup);
+}
+
+// Keep old event listeners for backward compatibility
+if (createRoomBtn) {
+    createRoomBtn.addEventListener('click', createRoom);
+}
+if (joinRoomBtn) {
+    joinRoomBtn.addEventListener('click', joinRoom);
+}
+
 startGameBtn.addEventListener('click', startGame);
 submitRiddleBtn.addEventListener('click', submitRiddleAnswer);
 howToPlayBtn.addEventListener('click', showHowToPlay);
@@ -218,6 +242,123 @@ function showPage(pageName) {
         }
     }
 }
+
+// Popup functions
+function showInitializePopup() {
+    if (initializePopup) {
+        initializePopup.classList.add('active');
+        if (popupPlayerName) {
+            popupPlayerName.focus();
+        }
+        if (window.audioManager) window.audioManager.playCorrectSound();
+    }
+}
+
+function closeInitializePopup() {
+    if (initializePopup) {
+        initializePopup.classList.remove('active');
+    }
+}
+
+function showConnectPopup() {
+    if (connectPopup) {
+        connectPopup.classList.add('active');
+        if (popupConnectName) {
+            popupConnectName.focus();
+        }
+        if (window.audioManager) window.audioManager.playCorrectSound();
+    }
+}
+
+function closeConnectPopup() {
+    if (connectPopup) {
+        connectPopup.classList.remove('active');
+    }
+}
+
+function confirmInitialize() {
+    const name = popupPlayerName ? popupPlayerName.value.trim() : '';
+    if (!name) {
+        showNotification('Please enter your name', 'warning');
+        if (window.audioManager) window.audioManager.playIncorrectSound();
+        return;
+    }
+    if (name.length > 15) {
+        showNotification('Name must be 15 characters or less', 'warning');
+        if (window.audioManager) window.audioManager.playIncorrectSound();
+        return;
+    }
+    
+    // Set the hidden input value for backward compatibility
+    if (playerNameInput) {
+        playerNameInput.value = name;
+    }
+    
+    closeInitializePopup();
+    createRoom();
+}
+
+function confirmConnect() {
+    const name = popupConnectName ? popupConnectName.value.trim() : '';
+    const code = popupRoomCode ? popupRoomCode.value.trim().toUpperCase() : '';
+    
+    if (!name) {
+        showNotification('Please enter your name', 'warning');
+        if (window.audioManager) window.audioManager.playIncorrectSound();
+        return;
+    }
+    if (name.length > 15) {
+        showNotification('Name must be 15 characters or less', 'warning');
+        if (window.audioManager) window.audioManager.playIncorrectSound();
+        return;
+    }
+    if (!code) {
+        showNotification('Please enter a room code', 'warning');
+        if (window.audioManager) window.audioManager.playIncorrectSound();
+        return;
+    }
+    if (code.length !== 6) {
+        showNotification('Room code must be 6 characters', 'warning');
+        if (window.audioManager) window.audioManager.playIncorrectSound();
+        return;
+    }
+    
+    // Set the hidden input values for backward compatibility
+    if (playerNameInput) {
+        playerNameInput.value = name;
+    }
+    if (roomCodeInput) {
+        roomCodeInput.value = code;
+    }
+    
+    closeConnectPopup();
+    joinRoom();
+}
+
+// Make popup functions global for onclick handlers
+window.showInitializePopup = showInitializePopup;
+window.closeInitializePopup = closeInitializePopup;
+window.showConnectPopup = showConnectPopup;
+window.closeConnectPopup = closeConnectPopup;
+window.confirmInitialize = confirmInitialize;
+window.confirmConnect = confirmConnect;
+
+// Add keyboard support for popups
+document.addEventListener('keydown', function(e) {
+    if (initializePopup && initializePopup.classList.contains('active')) {
+        if (e.key === 'Enter') {
+            confirmInitialize();
+        } else if (e.key === 'Escape') {
+            closeInitializePopup();
+        }
+    } else if (connectPopup && connectPopup.classList.contains('active')) {
+        if (e.key === 'Enter') {
+            confirmConnect();
+        } else if (e.key === 'Escape') {
+            closeConnectPopup();
+        }
+    }
+});
 
 function createRoom() {
     const name = playerNameInput.value.trim();
