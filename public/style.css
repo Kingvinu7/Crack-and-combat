@@ -52,7 +52,7 @@
 
 body {
     font-family: 'JetBrains Mono', 'Consolas', monospace;
-    background: var(--bg-primary);
+    background: rgba(0, 0, 0, 1);
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
@@ -72,7 +72,7 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--bg-primary);
+    background: rgba(0, 0, 0, 1);
     pointer-events: none;
     z-index: -1;
     overflow: hidden;
@@ -571,7 +571,7 @@ body::before {
         0 0 10px rgba(0, 0, 0, 0.9),
         0 2px 4px rgba(0, 0, 0, 0.9),
         0 0 20px currentColor;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 1);
     padding: 8px 16px;
     border-radius: 4px;
     backdrop-filter: blur(8px);
@@ -749,7 +749,7 @@ body::before {
 .cyber-input {
     width: 100%;
     padding: clamp(12px, 1.5vh, 16px) clamp(16px, 2vw, 24px);
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 1);
     backdrop-filter: blur(10px) saturate(1.3);
     -webkit-backdrop-filter: blur(10px) saturate(1.3);
     border: 2px solid var(--border-dim);
@@ -774,7 +774,7 @@ body::before {
         0 0 25px rgba(0, 255, 255, 0.3),
         inset 0 2px 4px rgba(0, 0, 0, 0.4),
         inset 0 0 10px rgba(0, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 1);
 }
 
 
@@ -802,7 +802,7 @@ body::before {
     align-items: center;
     justify-content: center;
     padding: clamp(12px, 1.5vh, 18px) clamp(24px, 3vw, 40px);
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 1);
     backdrop-filter: blur(10px) saturate(1.5);
     -webkit-backdrop-filter: blur(10px) saturate(1.5);
     border: 2px solid var(--border-dim);
@@ -1008,7 +1008,7 @@ body::before {
 .audio-controls-top {
     display: flex;
     gap: 8px;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 1);
     backdrop-filter: blur(10px);
     border: 1px solid var(--border-dim);
     border-radius: 8px;
@@ -1034,7 +1034,7 @@ body::before {
     justify-content: center;
     width: 40px;
     height: 40px;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 1);
     border: 1px solid var(--border-dim);
     border-radius: 6px;
     color: var(--accent-green);
@@ -1167,7 +1167,7 @@ body::before {
     align-items: center;
     gap: clamp(6px, 0.8vw, 10px);
     padding: clamp(8px, 1vh, 12px) clamp(16px, 2vw, 24px);
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 1);
     border: 1px solid var(--border-dim);
     border-radius: 4px;
     color: var(--text-muted);
@@ -1263,7 +1263,7 @@ body::before {
 .volume-slider {
     flex: 1;
     height: 6px;
-    background: var(--bg-tertiary);
+    background: rgba(0, 0, 0, 1);
     border-radius: 3px;
     outline: none;
     -webkit-appearance: none;
@@ -1346,7 +1346,7 @@ body::before {
 .player-input, .code-input {
     width: 100%;
     padding: 15px 20px;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--border-secondary);
     border-radius: 10px;
     color: var(--text-primary);
@@ -1387,7 +1387,7 @@ body::before {
     justify-content: center;
     gap: 12px;
     padding: 18px 30px;
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--border-primary);
     border-radius: 12px;
     color: var(--text-primary);
@@ -1510,7 +1510,7 @@ body::before {
 
 /* Status Bar */
 .status-bar {
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 1);
     border: 1px solid var(--border-secondary);
     border-radius: 10px;
     padding: 15px 20px;
@@ -1577,7 +1577,7 @@ h2 {
     overflow: hidden;
     text-transform: uppercase;
     letter-spacing: clamp(0.5px, 0.1vw, 2px);
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(0, 0, 0, 1);
     backdrop-filter: blur(12px) saturate(1.5);
     -webkit-backdrop-filter: blur(12px) saturate(1.5);
     min-height: clamp(44px, 5vh, 54px);
@@ -1749,7 +1749,7 @@ input[type="text"], textarea {
     width: 100%;
     max-width: clamp(350px, 60vw, 500px);
     padding: clamp(14px, 1.5vh, 20px) clamp(20px, 2.5vw, 30px);
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--border-dim);
     border-radius: 6px;
     color: var(--text-primary);
@@ -1775,7 +1775,7 @@ input[type="text"]:focus, textarea:focus {
         0 0 25px rgba(0, 255, 255, 0.4),
         inset 0 2px 4px rgba(0, 0, 0, 0.4),
         inset 0 0 10px rgba(0, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 1);
     transform: translateY(-1px);
 }
 
@@ -1843,7 +1843,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .room-info {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--accent-red);
     padding: 16px 24px;
     border-radius: 8px;
@@ -1903,7 +1903,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .player {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--border-secondary);
     padding: 12px 18px;
     border-radius: 8px;
@@ -1938,7 +1938,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .player.owner-player {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     border-color: var(--accent-yellow);
     color: var(--accent-yellow);
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
@@ -2038,7 +2038,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .oracle-message {
-    background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--accent-red);
     padding: 20px 24px;
     border-radius: 8px;
@@ -2085,7 +2085,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     font-size: clamp(3em, 8vw, 5em);
     font-weight: 800;
     color: white;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 1);
     border: 3px solid var(--accent-cyan);
     padding: clamp(15px, 3vh, 25px) clamp(30px, 5vw, 50px);
     margin: 0 auto clamp(10px, 2vh, 20px);
@@ -2252,7 +2252,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     text-align: center;
     margin-top: 20px;
     padding: 16px;
-    background: var(--glass-bg);
+    background: rgba(0, 0, 0, 1);
     border: 1px solid var(--glass-border);
     border-radius: 8px;
     backdrop-filter: blur(5px);
@@ -2291,7 +2291,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .answer-item {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--border-secondary);
     padding: 20px;
     border-radius: 8px;
@@ -2322,19 +2322,19 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 .answer-item.correct {
     border-color: #00ff88;
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
 }
 
 .answer-item.incorrect {
     border-color: var(--accent-red);
-    background: linear-gradient(135deg, rgba(255, 8, 68, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     box-shadow: 0 0 20px rgba(255, 8, 68, 0.2);
 }
 
 .answer-item.winner {
     border-color: var(--accent-yellow);
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
 }
 
@@ -2354,7 +2354,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .answer-order {
-    background: var(--bg-tertiary);
+    background: rgba(0, 0, 0, 1);
     color: var(--accent-purple);
     padding: 4px 10px;
     border-radius: 4px;
@@ -2422,7 +2422,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .trivia-question-text {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--accent-cyan);
     border-radius: 12px;
     padding: 25px 30px;
@@ -2491,7 +2491,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     align-items: center;
     justify-content: flex-start;
     border: 3px solid var(--border-secondary) !important;
-    background: rgba(0, 0, 0, 0.75) !important;
+    background: rgba(0, 0, 0, 1) !important;
     backdrop-filter: blur(12px) saturate(1.3);
     -webkit-backdrop-filter: blur(12px) saturate(1.3);
     transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
@@ -2546,7 +2546,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     transform: none !important;
     border-color: var(--border-secondary) !important;
     box-shadow: none !important;
-    background: var(--glass-bg) !important;
+    background: rgba(0, 0, 0, 1) !important;
 }
 
 /* Trivia Results Styles */
@@ -2556,7 +2556,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .correct-answer-display {
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     border: 2px solid #00ff88;
     border-radius: 12px;
     padding: 25px;
@@ -2659,7 +2659,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 /* ===== CHALLENGE RESULTS ===== */
 .challenge-result-item, .tap-result-item {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--border-secondary);
     border-radius: 8px;
     margin: 16px 0;
@@ -2687,13 +2687,13 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 .challenge-result-item.passed {
     border-color: #00ff88;
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
 }
 
 .challenge-result-item.failed {
     border-color: var(--accent-red);
-    background: linear-gradient(135deg, rgba(255, 8, 68, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     box-shadow: 0 0 20px rgba(255, 8, 68, 0.2);
 }
 
@@ -2737,7 +2737,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .challenge-response {
-    background: var(--bg-primary);
+    background: rgba(0, 0, 0, 1);
     border: 1px solid var(--border-secondary);
     border-radius: 6px;
     padding: 12px;
@@ -2778,7 +2778,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 .tap-result-item.winner {
     border-color: var(--accent-yellow);
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
     animation: winnerGlow 2s ease-in-out infinite alternate;
 }
@@ -2818,7 +2818,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 1);
     display: none;
     align-items: center;
     justify-content: center;
@@ -2846,7 +2846,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .individual-result {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 3px solid;
     border-radius: 12px;
     padding: 30px;
@@ -2874,13 +2874,13 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 .individual-result.passed {
     border-color: #00ff88;
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     box-shadow: 0 0 40px rgba(0, 255, 136, 0.3);
 }
 
 .individual-result.failed {
     border-color: var(--accent-red);
-    background: linear-gradient(135deg, rgba(255, 8, 68, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     box-shadow: 0 0 40px rgba(255, 8, 68, 0.3);
 }
 
@@ -2916,7 +2916,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .result-response {
-    background: var(--bg-primary);
+    background: rgba(0, 0, 0, 1);
     border: 1px solid var(--border-secondary);
     border-radius: 6px;
     padding: 12px;
@@ -2964,7 +2964,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 /* ===== POINTS TABLE SYSTEM ===== */
 .points-table-container,
 .final-points-table-container {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--border-secondary);
     padding: 24px;
     border-radius: 8px;
@@ -2991,7 +2991,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .points-table-header {
-    background: var(--bg-tertiary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--accent-red);
     color: var(--text-primary);
     font-weight: 700;
@@ -3000,7 +3000,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .points-table-row {
-    background: var(--glass-bg);
+    background: rgba(0, 0, 0, 1);
     border: 1px solid var(--glass-border);
     align-items: center;
     transition: all 0.3s ease;
@@ -3058,7 +3058,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     padding: 20px;
     color: var(--text-muted);
     font-style: italic;
-    background: var(--glass-bg);
+    background: rgba(0, 0, 0, 1);
     border-radius: 8px;
     border: 1px solid var(--border-secondary);
 }
@@ -3105,7 +3105,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     align-items: center;
     padding: 16px 20px;
     margin: 8px 0;
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--border-secondary);
     border-radius: 8px;
     font-family: 'Rajdhani', sans-serif;
@@ -3120,7 +3120,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 .final-score.winner {
     border-color: var(--accent-yellow);
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), var(--bg-secondary));
+    background: rgba(0, 0, 0, 1);
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
     animation: winnerGlow 2s ease-in-out infinite alternate;
 }
@@ -3921,7 +3921,7 @@ textarea:focus {
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -3987,7 +3987,7 @@ textarea:focus {
     top: 20px;
     right: 20px;
     max-width: 400px;
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--accent-cyan);
     border-radius: 8px;
     box-shadow: 
@@ -4134,7 +4134,7 @@ body::before { z-index: -1; }
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -4231,7 +4231,7 @@ body::before { z-index: -1; }
 .popup-input {
     width: 100%;
     padding: 15px 20px;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--border-dim);
     border-radius: 8px;
     color: var(--text-primary);
@@ -4279,7 +4279,7 @@ body::before { z-index: -1; }
     transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
     position: relative;
     overflow: hidden;
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(0, 0, 0, 1);
     backdrop-filter: blur(12px);
 }
 
@@ -4298,7 +4298,7 @@ body::before { z-index: -1; }
 .popup-btn.cancel {
     border-color: var(--border-dim);
     color: var(--text-secondary);
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 1);
 }
 
 .popup-btn.cancel:hover {
@@ -4475,7 +4475,7 @@ body::before { z-index: -1; }
 }
 
 .rule-section {
-    background: var(--glass-bg);
+    background: rgba(0, 0, 0, 1);
     border: 1px solid var(--glass-border);
     border-radius: 8px;
     padding: 20px;
