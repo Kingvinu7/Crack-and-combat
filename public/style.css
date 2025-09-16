@@ -69,13 +69,40 @@ body {
     font-variant-ligatures: none;
 }
 
-/* Enhanced text clarity against stronger background */
-body, h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, label {
+/* Enhanced visibility for game content areas */
+.page-content, .game-container-outline, .lobby-container, .challenge-container, 
+.riddle-container, .results-container, .modal-content, .popup-content,
+.oracle-message, .riddle-question, .trivia-question-text, .answer-item,
+.player, .room-info, .players-section, .status-bar, .points-table-container,
+.final-score, .individual-result, .result-response, .custom-notification {
+    background: rgba(0, 0, 0, 0.9) !important;
+    backdrop-filter: blur(25px) saturate(2) !important;
+    -webkit-backdrop-filter: blur(25px) saturate(2) !important;
+}
+
+/* Enhanced containers with better visual separation */
+.page-content, .game-container-outline, .modal-content, .popup-content {
+    border-radius: 12px;
+    box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.9),
+        0 0 30px rgba(255, 255, 255, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced text visibility for specific elements */
+h1, h2, h3, .title, .section-title, .game-title {
     text-shadow: 
-        0 0 12px rgba(0, 0, 0, 0.9),
-        0 3px 6px rgba(0, 0, 0, 1),
-        0 1px 3px rgba(0, 0, 0, 1),
-        0 0 20px rgba(0, 0, 0, 0.7);
+        0 0 15px rgba(0, 0, 0, 0.8),
+        0 2px 4px rgba(0, 0, 0, 1),
+        0 0 25px rgba(0, 0, 0, 0.6);
+}
+
+/* Button text enhancement */
+button, .btn, .cyber-btn {
+    text-shadow: 
+        0 0 10px rgba(0, 0, 0, 0.9),
+        0 2px 4px rgba(0, 0, 0, 1);
 }
 
 /* ===== ANIMATED GAME BACKGROUND ===== */
@@ -2308,9 +2335,9 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .challenge-description {
-    background: rgba(0, 0, 0, 1);
-    backdrop-filter: blur(18px) saturate(1.4);
-    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(25px) saturate(1.8);
+    -webkit-backdrop-filter: blur(25px) saturate(1.8);
     border: 2px solid var(--border-secondary);
     border-left: 5px solid var(--accent-red);
     border-radius: 8px;
@@ -2770,7 +2797,9 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 /* ===== CHALLENGE RESULTS ===== */
 .challenge-result-item, .tap-result-item {
-    background: rgba(0, 0, 0, 1);
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(20px) saturate(1.6);
+    -webkit-backdrop-filter: blur(20px) saturate(1.6);
     border: 2px solid var(--border-secondary);
     border-radius: 8px;
     margin: 16px 0;
@@ -2798,14 +2827,14 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 .challenge-result-item.passed {
     border-color: #00ff88;
-    background: rgba(0, 0, 0, 1);
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+    background: rgba(0, 0, 0, 0.9);
+    box-shadow: 0 0 25px rgba(0, 255, 136, 0.3);
 }
 
 .challenge-result-item.failed {
     border-color: var(--accent-red);
-    background: rgba(0, 0, 0, 1);
-    box-shadow: 0 0 20px rgba(255, 8, 68, 0.2);
+    background: rgba(0, 0, 0, 0.9);
+    box-shadow: 0 0 25px rgba(255, 8, 68, 0.3);
 }
 
 .challenge-result-header {
@@ -2848,7 +2877,9 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .challenge-response {
-    background: rgba(0, 0, 0, 1);
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(15px) saturate(1.4);
+    -webkit-backdrop-filter: blur(15px) saturate(1.4);
     border: 1px solid var(--border-secondary);
     border-radius: 6px;
     padding: 12px;
