@@ -185,8 +185,8 @@ body::before {
     animation: borderGlow 4s ease-in-out infinite;
 }
 
-/* ===== MATRIX BACKGROUND EFFECT ===== */
-/* Reusable matrix background class for any page */
+/* ===== GENTLE BACKGROUND EFFECTS ===== */
+/* Motion-sickness-free background animations - multiple gentle options */
 .matrix-bg {
     position: fixed;
     top: 0;
@@ -195,13 +195,13 @@ body::before {
     height: 100%;
     overflow: hidden;
     z-index: 1;
-    opacity: 0.4; /* Reduced by 50% from 0.8 for less intensity */
+    opacity: 0.3;
     pointer-events: none;
-    will-change: transform; /* GPU acceleration */
-    transform: translateZ(0); /* Force GPU layer */
+    will-change: transform;
+    transform: translateZ(0);
 }
 
-/* Alternative: smaller matrix background for overlay use */
+/* Alternative: gentle overlay background */
 .matrix-bg-overlay {
     position: absolute;
     top: 0;
@@ -210,155 +210,233 @@ body::before {
     height: 100%;
     overflow: hidden;
     z-index: 1;
-    opacity: 0.2;
+    opacity: 0.15;
     pointer-events: none;
 }
 
-/* Matrix rain animation - continuous seamless layers */
-.matrix-bg::before,
-.matrix-bg::after,
-.matrix-layer-1,
-.matrix-layer-2,
-.matrix-layer-3 {
+/* Gentle gradient waves - slow and smooth */
+.matrix-bg::before {
     content: '';
     position: absolute;
-    left: 0;
-    width: 100%;
-    height: 200%;
-    background-repeat: repeat;
-    will-change: transform;
-    transform: translateZ(0); /* Force GPU layer */
-    backface-visibility: hidden; /* Prevent flickering */
+    top: 0;
+    left: -50%;
+    width: 200%;
+    height: 100%;
+    background: radial-gradient(ellipse at center,
+        rgba(0, 255, 255, 0.05) 0%,
+        rgba(0, 255, 65, 0.03) 25%,
+        transparent 50%,
+        rgba(0, 100, 200, 0.02) 75%,
+        transparent 100%);
+    animation: gentleWave 25s ease-in-out infinite;
+    transform: translateZ(0);
 }
 
-.matrix-bg::before {
-    top: -100%;
-    background-image: 
-        repeating-linear-gradient(180deg, 
-            transparent 0px,
-            transparent 10px,
-            rgba(0, 255, 65, 0.2) 12px,
-            rgba(0, 255, 65, 0.3) 14px,
-            rgba(0, 255, 65, 0.2) 16px,
-            transparent 18px,
-            transparent 40px);
-    background-size: 50px 100%;
-    background-position: 0 0, 25px 0, 50px 0;
-    animation: matrixFall 12s linear infinite;
-}
-
+/* Subtle geometric pattern overlay */
 .matrix-bg::after {
-    top: -100%;
-    background-image: 
-        repeating-linear-gradient(180deg, 
-            transparent 0px,
-            transparent 15px,
-            rgba(0, 255, 65, 0.15) 17px,
-            rgba(0, 255, 65, 0.25) 19px,
-            rgba(0, 255, 65, 0.15) 21px,
-            transparent 23px,
-            transparent 50px);
-    background-size: 70px 100%;
-    background-position: 35px 0, 70px 0;
-    animation: matrixFall 14s linear infinite;
-    animation-delay: -2s;
-}
-
-.matrix-layer-1 {
-    top: -100%;
-    background-image: 
-        repeating-linear-gradient(180deg, 
-            transparent 0px,
-            transparent 20px,
-            rgba(0, 255, 65, 0.1) 22px,
-            rgba(0, 255, 65, 0.2) 24px,
-            rgba(0, 255, 65, 0.1) 26px,
-            transparent 28px,
-            transparent 60px);
-    background-size: 90px 100%;
-    background-position: 15px 0, 45px 0, 75px 0;
-    animation: matrixFall 16s linear infinite;
-    animation-delay: -4s;
-}
-
-.matrix-layer-2 {
-    top: -100%;
-    background-image: 
-        repeating-linear-gradient(180deg, 
-            transparent 0px,
-            transparent 25px,
-            rgba(0, 255, 65, 0.18) 27px,
-            rgba(0, 255, 65, 0.28) 29px,
-            rgba(0, 255, 65, 0.18) 31px,
-            transparent 33px,
-            transparent 70px);
-    background-size: 110px 100%;
-    background-position: 55px 0, 110px 0;
-    animation: matrixFall 18s linear infinite;
-    animation-delay: -6s;
-}
-
-.matrix-layer-3 {
-    top: -100%;
-    background-image: 
-        repeating-linear-gradient(180deg, 
-            transparent 0px,
-            transparent 30px,
-            rgba(0, 255, 65, 0.12) 32px,
-            rgba(0, 255, 65, 0.22) 34px,
-            rgba(0, 255, 65, 0.12) 36px,
-            transparent 38px,
-            transparent 80px);
-    background-size: 130px 100%;
-    background-position: 65px 0, 130px 0;
-    animation: matrixFall 20s linear infinite;
-    animation-delay: -8s;
-}
-
-/* Matrix characters falling */
-.matrix-bg-overlay::before {
-    content: '0101001010100101110010101001010111001010100101011100101010010101110010101001010111001010100101011100101010010101110010101001010111001010100101011100';
+    content: '';
     position: absolute;
-    top: -100%;
+    top: 0;
     left: 0;
     width: 100%;
-    height: 200%;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: rgba(0, 255, 65, 0.1);
-    word-wrap: break-word;
-    white-space: pre-wrap;
-    line-height: 1.2;
-    animation: matrixText 30s linear infinite;
-    letter-spacing: 2px;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 25% 25%, rgba(0, 255, 255, 0.02) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(0, 255, 65, 0.02) 0%, transparent 50%),
+        radial-gradient(circle at 75% 25%, rgba(0, 150, 255, 0.01) 0%, transparent 50%),
+        radial-gradient(circle at 25% 75%, rgba(100, 255, 100, 0.01) 0%, transparent 50%);
+    background-size: 400px 400px, 300px 300px, 500px 500px, 350px 350px;
+    background-position: 0 0, 100px 100px, 200px 0, 50px 200px;
+    animation: gentleFloat 30s ease-in-out infinite;
 }
 
-/* Continuous seamless matrix fall animation - optimized */
-@keyframes matrixFall {
+/* Soft particle layer 1 */
+.matrix-layer-1 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle, rgba(0, 255, 255, 0.04) 1px, transparent 1px),
+        radial-gradient(circle, rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+        radial-gradient(circle, rgba(0, 200, 150, 0.02) 1px, transparent 1px);
+    background-size: 80px 80px, 120px 120px, 200px 200px;
+    background-position: 0 0, 40px 40px, 100px 100px;
+    animation: gentleDrift 40s linear infinite;
+}
+
+/* Soft particle layer 2 */
+.matrix-layer-2 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle, rgba(0, 255, 200, 0.02) 0.5px, transparent 0.5px),
+        radial-gradient(circle, rgba(100, 255, 100, 0.02) 0.5px, transparent 0.5px);
+    background-size: 150px 150px, 250px 250px;
+    background-position: 75px 75px, 125px 125px;
+    animation: gentleDrift 50s linear infinite reverse;
+}
+
+/* Breathing light layer */
+.matrix-layer-3 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center,
+        rgba(0, 255, 255, 0.01) 0%,
+        rgba(0, 255, 65, 0.005) 40%,
+        transparent 70%);
+    animation: gentleBreathe 20s ease-in-out infinite;
+}
+
+/* Gentle wave animation - very slow horizontal movement */
+@keyframes gentleWave {
     0% { 
-        transform: translateY(0) translateZ(0);
+        transform: translateX(0) scale(1) translateZ(0);
+        opacity: 0.3;
+    }
+    25% { 
+        transform: translateX(-10%) scale(1.05) translateZ(0);
+        opacity: 0.4;
+    }
+    50% { 
+        transform: translateX(-5%) scale(1.1) translateZ(0);
+        opacity: 0.35;
+    }
+    75% { 
+        transform: translateX(5%) scale(1.05) translateZ(0);
+        opacity: 0.4;
     }
     100% { 
-        transform: translateY(100%) translateZ(0);
+        transform: translateX(0) scale(1) translateZ(0);
+        opacity: 0.3;
     }
 }
 
-@keyframes matrixText {
-    0% { transform: translateY(-100%); opacity: 0; }
-    10% { opacity: 0.1; }
-    90% { opacity: 0.1; }
-    100% { transform: translateY(100%); opacity: 0; }
+/* Gentle floating animation */
+@keyframes gentleFloat {
+    0% { 
+        transform: translate(0, 0) rotate(0deg) translateZ(0);
+        opacity: 0.8;
+    }
+    33% { 
+        transform: translate(20px, -15px) rotate(1deg) translateZ(0);
+        opacity: 1;
+    }
+    66% { 
+        transform: translate(-15px, 10px) rotate(-0.5deg) translateZ(0);
+        opacity: 0.9;
+    }
+    100% { 
+        transform: translate(0, 0) rotate(0deg) translateZ(0);
+        opacity: 0.8;
+    }
 }
 
-/* Enhanced matrix effect for special screens */
+/* Very slow drift animation */
+@keyframes gentleDrift {
+    0% { 
+        transform: translate(0, 0) translateZ(0);
+    }
+    100% { 
+        transform: translate(-50px, -30px) translateZ(0);
+    }
+}
+
+/* Breathing effect - very subtle */
+@keyframes gentleBreathe {
+    0% { 
+        transform: scale(1) translateZ(0);
+        opacity: 0.5;
+    }
+    50% { 
+        transform: scale(1.02) translateZ(0);
+        opacity: 0.7;
+    }
+    100% { 
+        transform: scale(1) translateZ(0);
+        opacity: 0.5;
+    }
+}
+
+/* Enhanced gentle effect for special screens */
 .page.active .matrix-bg {
-    animation: matrixIntensify 2s ease-out;
+    animation: gentleIntensify 3s ease-out;
 }
 
-@keyframes matrixIntensify {
-    0% { opacity: 0.05; }
-    50% { opacity: 0.3; }
-    100% { opacity: 0.2; }
+@keyframes gentleIntensify {
+    0% { opacity: 0.1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 0.3; }
+}
+
+/* Alternative gentle animation set - even more subtle */
+.matrix-bg.ultra-gentle::before {
+    animation: ultraGentleWave 45s ease-in-out infinite;
+}
+
+.matrix-bg.ultra-gentle::after {
+    animation: ultraGentleFloat 60s ease-in-out infinite;
+}
+
+.matrix-bg.ultra-gentle .matrix-layer-1 {
+    animation: ultraGentleDrift 90s linear infinite;
+}
+
+.matrix-bg.ultra-gentle .matrix-layer-2 {
+    animation: ultraGentleDrift 120s linear infinite reverse;
+}
+
+.matrix-bg.ultra-gentle .matrix-layer-3 {
+    animation: ultraGentleBreathe 40s ease-in-out infinite;
+}
+
+@keyframes ultraGentleWave {
+    0%, 100% { 
+        transform: translateX(0) scale(1) translateZ(0);
+        opacity: 0.2;
+    }
+    50% { 
+        transform: translateX(-2%) scale(1.01) translateZ(0);
+        opacity: 0.25;
+    }
+}
+
+@keyframes ultraGentleFloat {
+    0%, 100% { 
+        transform: translate(0, 0) rotate(0deg) translateZ(0);
+        opacity: 0.6;
+    }
+    50% { 
+        transform: translate(5px, -3px) rotate(0.2deg) translateZ(0);
+        opacity: 0.8;
+    }
+}
+
+@keyframes ultraGentleDrift {
+    0% { 
+        transform: translate(0, 0) translateZ(0);
+    }
+    100% { 
+        transform: translate(-10px, -5px) translateZ(0);
+    }
+}
+
+@keyframes ultraGentleBreathe {
+    0%, 100% { 
+        transform: scale(1) translateZ(0);
+        opacity: 0.3;
+    }
+    50% { 
+        transform: scale(1.005) translateZ(0);
+        opacity: 0.4;
+    }
 }
 
 /* ===== CLEAN CENTERED LAYOUT ===== */
@@ -3847,12 +3925,18 @@ textarea:focus {
         transition-duration: 0.01ms !important;
     }
     
-    /* Disable matrix rain on reduced motion */
-    .matrix-bg,
+    /* Disable gentle animations on reduced motion */
+    .matrix-bg::before,
+    .matrix-bg::after,
     .matrix-layer-1,
     .matrix-layer-2,
     .matrix-layer-3 {
-        display: none !important;
+        animation: none !important;
+    }
+    
+    /* Keep static background for reduced motion users */
+    .matrix-bg {
+        opacity: 0.1 !important;
     }
     
     .tap-btn:active {
@@ -3936,15 +4020,21 @@ textarea:focus {
 /* ===== PERFORMANCE OPTIMIZATIONS ===== */
 /* Reduce complexity on mobile for better performance */
 @media (max-width: 768px) {
-    /* Reduce matrix layers on mobile */
+    /* Reduce gentle animation layers on mobile */
     .matrix-layer-2,
     .matrix-layer-3 {
         display: none;
     }
     
-    /* Simplify matrix animation */
+    /* Simplify gentle animations on mobile */
     .matrix-bg {
-        opacity: 0.25;
+        opacity: 0.2;
+    }
+    
+    .matrix-bg::before,
+    .matrix-bg::after,
+    .matrix-layer-1 {
+        animation-duration: 60s; /* Slower animations on mobile */
     }
     
     /* Reduce backdrop filter intensity */
