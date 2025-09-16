@@ -214,7 +214,7 @@ body::before {
     pointer-events: none;
 }
 
-/* Matrix rain animation - continuous seamless layers */
+/* Danger ambiance - static patterns with subtle pulse effects */
 .matrix-bg::before,
 .matrix-bg::after,
 .matrix-layer-1,
@@ -224,141 +224,235 @@ body::before {
     position: absolute;
     left: 0;
     width: 100%;
-    height: 200%;
+    height: 100%;
     background-repeat: repeat;
-    will-change: transform;
     transform: translateZ(0); /* Force GPU layer */
     backface-visibility: hidden; /* Prevent flickering */
 }
 
+/* Static danger grid pattern - layer 1 */
 .matrix-bg::before {
-    top: -100%;
+    top: 0;
     background-image: 
-        repeating-linear-gradient(180deg, 
+        repeating-linear-gradient(0deg,
             transparent 0px,
-            transparent 10px,
-            rgba(0, 255, 65, 0.2) 12px,
-            rgba(0, 255, 65, 0.3) 14px,
-            rgba(0, 255, 65, 0.2) 16px,
-            transparent 18px,
-            transparent 40px);
-    background-size: 50px 100%;
-    background-position: 0 0, 25px 0, 50px 0;
-    animation: matrixFall 12s linear infinite;
+            transparent 48px,
+            rgba(255, 20, 20, 0.08) 49px,
+            rgba(255, 20, 20, 0.12) 50px,
+            rgba(255, 20, 20, 0.08) 51px,
+            transparent 52px,
+            transparent 100px),
+        repeating-linear-gradient(90deg,
+            transparent 0px,
+            transparent 48px,
+            rgba(255, 20, 20, 0.08) 49px,
+            rgba(255, 20, 20, 0.12) 50px,
+            rgba(255, 20, 20, 0.08) 51px,
+            transparent 52px,
+            transparent 100px);
+    animation: dangerPulse 6s ease-in-out infinite;
 }
 
+/* Hexagonal danger pattern - layer 2 */
 .matrix-bg::after {
-    top: -100%;
+    top: 0;
     background-image: 
-        repeating-linear-gradient(180deg, 
-            transparent 0px,
-            transparent 15px,
-            rgba(0, 255, 65, 0.15) 17px,
-            rgba(0, 255, 65, 0.25) 19px,
-            rgba(0, 255, 65, 0.15) 21px,
-            transparent 23px,
-            transparent 50px);
-    background-size: 70px 100%;
-    background-position: 35px 0, 70px 0;
-    animation: matrixFall 14s linear infinite;
+        radial-gradient(circle at 25% 25%, rgba(255, 40, 40, 0.05) 1px, transparent 2px),
+        radial-gradient(circle at 75% 25%, rgba(255, 40, 40, 0.05) 1px, transparent 2px),
+        radial-gradient(circle at 25% 75%, rgba(255, 40, 40, 0.05) 1px, transparent 2px),
+        radial-gradient(circle at 75% 75%, rgba(255, 40, 40, 0.05) 1px, transparent 2px);
+    background-size: 80px 80px;
+    background-position: 0 0, 40px 0, 0 40px, 40px 40px;
+    animation: dangerPulse 8s ease-in-out infinite;
     animation-delay: -2s;
 }
 
+/* Warning stripes - layer 1 */
 .matrix-layer-1 {
-    top: -100%;
+    top: 0;
     background-image: 
-        repeating-linear-gradient(180deg, 
+        repeating-linear-gradient(45deg,
             transparent 0px,
-            transparent 20px,
-            rgba(0, 255, 65, 0.1) 22px,
-            rgba(0, 255, 65, 0.2) 24px,
-            rgba(0, 255, 65, 0.1) 26px,
-            transparent 28px,
-            transparent 60px);
-    background-size: 90px 100%;
-    background-position: 15px 0, 45px 0, 75px 0;
-    animation: matrixFall 16s linear infinite;
+            transparent 18px,
+            rgba(255, 60, 20, 0.06) 19px,
+            rgba(255, 60, 20, 0.08) 20px,
+            rgba(255, 60, 20, 0.06) 21px,
+            transparent 22px,
+            transparent 40px);
+    animation: dangerPulse 10s ease-in-out infinite;
     animation-delay: -4s;
 }
 
+/* Circuit danger pattern - layer 2 */
 .matrix-layer-2 {
-    top: -100%;
+    top: 0;
     background-image: 
-        repeating-linear-gradient(180deg, 
+        repeating-linear-gradient(0deg,
             transparent 0px,
-            transparent 25px,
-            rgba(0, 255, 65, 0.18) 27px,
-            rgba(0, 255, 65, 0.28) 29px,
-            rgba(0, 255, 65, 0.18) 31px,
-            transparent 33px,
-            transparent 70px);
-    background-size: 110px 100%;
-    background-position: 55px 0, 110px 0;
-    animation: matrixFall 18s linear infinite;
+            transparent 98px,
+            rgba(255, 80, 40, 0.04) 99px,
+            rgba(255, 80, 40, 0.06) 100px,
+            rgba(255, 80, 40, 0.04) 101px,
+            transparent 102px,
+            transparent 200px),
+        repeating-linear-gradient(90deg,
+            transparent 0px,
+            transparent 148px,
+            rgba(255, 80, 40, 0.04) 149px,
+            rgba(255, 80, 40, 0.06) 150px,
+            rgba(255, 80, 40, 0.04) 151px,
+            transparent 152px,
+            transparent 300px);
+    animation: dangerPulse 12s ease-in-out infinite;
     animation-delay: -6s;
 }
 
+/* Subtle danger dots - layer 3 */
 .matrix-layer-3 {
-    top: -100%;
+    top: 0;
     background-image: 
-        repeating-linear-gradient(180deg, 
-            transparent 0px,
-            transparent 30px,
-            rgba(0, 255, 65, 0.12) 32px,
-            rgba(0, 255, 65, 0.22) 34px,
-            rgba(0, 255, 65, 0.12) 36px,
-            transparent 38px,
-            transparent 80px);
-    background-size: 130px 100%;
-    background-position: 65px 0, 130px 0;
-    animation: matrixFall 20s linear infinite;
+        radial-gradient(circle at center, rgba(255, 100, 60, 0.03) 1px, transparent 2px);
+    background-size: 60px 60px;
+    background-position: 30px 30px;
+    animation: dangerPulse 14s ease-in-out infinite;
     animation-delay: -8s;
 }
 
-/* Matrix characters falling */
+/* Danger warning overlay - static text pattern */
 .matrix-bg-overlay::before {
-    content: '0101001010100101110010101001010111001010100101011100101010010101110010101001010111001010100101011100101010010101110010101001010111001010100101011100';
+    content: 'DANGER ALERT THREAT WARNING CAUTION RISK HAZARD DANGER ALERT THREAT WARNING CAUTION RISK HAZARD DANGER ALERT THREAT WARNING CAUTION RISK HAZARD DANGER ALERT THREAT WARNING CAUTION RISK HAZARD';
     position: absolute;
-    top: -100%;
+    top: 0;
     left: 0;
     width: 100%;
-    height: 200%;
+    height: 100%;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: rgba(0, 255, 65, 0.1);
+    font-size: 8px;
+    color: rgba(255, 40, 40, 0.04);
     word-wrap: break-word;
     white-space: pre-wrap;
-    line-height: 1.2;
-    animation: matrixText 30s linear infinite;
-    letter-spacing: 2px;
+    line-height: 3;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    animation: dangerPulse 16s ease-in-out infinite;
+    animation-delay: -10s;
 }
 
-/* Continuous seamless matrix fall animation - optimized */
-@keyframes matrixFall {
+/* Danger pulse animation - subtle breathing effect */
+@keyframes dangerPulse {
     0% { 
-        transform: translateY(0) translateZ(0);
+        opacity: 0.3;
+        filter: brightness(1);
+    }
+    25% { 
+        opacity: 0.4;
+        filter: brightness(1.1);
+    }
+    50% { 
+        opacity: 0.5;
+        filter: brightness(1.2);
+    }
+    75% { 
+        opacity: 0.4;
+        filter: brightness(1.1);
     }
     100% { 
-        transform: translateY(100%) translateZ(0);
+        opacity: 0.3;
+        filter: brightness(1);
     }
 }
 
-@keyframes matrixText {
-    0% { transform: translateY(-100%); opacity: 0; }
-    10% { opacity: 0.1; }
-    90% { opacity: 0.1; }
-    100% { transform: translateY(100%); opacity: 0; }
-}
-
-/* Enhanced matrix effect for special screens */
-.page.active .matrix-bg {
-    animation: matrixIntensify 2s ease-out;
-}
-
-@keyframes matrixIntensify {
-    0% { opacity: 0.05; }
-    50% { opacity: 0.3; }
+/* Alert flash animation for critical moments */
+@keyframes dangerFlash {
+    0% { opacity: 0.2; }
+    50% { opacity: 0.6; }
     100% { opacity: 0.2; }
+}
+
+/* Enhanced danger effect for special screens */
+.page.active .matrix-bg {
+    animation: dangerIntensify 2s ease-out;
+}
+
+@keyframes dangerIntensify {
+    0% { 
+        opacity: 0.1; 
+        filter: hue-rotate(0deg) brightness(1);
+    }
+    50% { 
+        opacity: 0.6; 
+        filter: hue-rotate(10deg) brightness(1.3);
+    }
+    100% { 
+        opacity: 0.4; 
+        filter: hue-rotate(0deg) brightness(1.1);
+    }
+}
+
+/* Critical danger states for urgent moments */
+.danger-critical .matrix-bg {
+    animation: dangerCritical 2s ease-in-out infinite !important;
+}
+
+.danger-warning .matrix-bg {
+    animation: dangerWarning 3s ease-in-out infinite !important;
+}
+
+.danger-alert .matrix-bg {
+    animation: dangerAlert 1.5s ease-in-out infinite !important;
+}
+
+@keyframes dangerCritical {
+    0% { 
+        opacity: 0.4; 
+        filter: hue-rotate(0deg) brightness(1) saturate(1);
+    }
+    50% { 
+        opacity: 0.8; 
+        filter: hue-rotate(15deg) brightness(1.4) saturate(1.5);
+    }
+    100% { 
+        opacity: 0.4; 
+        filter: hue-rotate(0deg) brightness(1) saturate(1);
+    }
+}
+
+@keyframes dangerWarning {
+    0% { 
+        opacity: 0.3; 
+        filter: hue-rotate(0deg) brightness(1) saturate(1);
+    }
+    33% { 
+        opacity: 0.5; 
+        filter: hue-rotate(5deg) brightness(1.2) saturate(1.2);
+    }
+    66% { 
+        opacity: 0.6; 
+        filter: hue-rotate(10deg) brightness(1.3) saturate(1.3);
+    }
+    100% { 
+        opacity: 0.3; 
+        filter: hue-rotate(0deg) brightness(1) saturate(1);
+    }
+}
+
+@keyframes dangerAlert {
+    0% { 
+        opacity: 0.5; 
+        filter: hue-rotate(0deg) brightness(1) saturate(1);
+    }
+    25% { 
+        opacity: 0.7; 
+        filter: hue-rotate(8deg) brightness(1.2) saturate(1.2);
+    }
+    75% { 
+        opacity: 0.6; 
+        filter: hue-rotate(5deg) brightness(1.1) saturate(1.1);
+    }
+    100% { 
+        opacity: 0.5; 
+        filter: hue-rotate(0deg) brightness(1) saturate(1);
+    }
 }
 
 /* ===== CLEAN CENTERED LAYOUT ===== */
@@ -3847,12 +3941,36 @@ textarea:focus {
         transition-duration: 0.01ms !important;
     }
     
-    /* Disable matrix rain on reduced motion */
+    /* Disable danger animations on reduced motion - keep static patterns */
     .matrix-bg,
+    .matrix-bg::before,
+    .matrix-bg::after,
     .matrix-layer-1,
     .matrix-layer-2,
-    .matrix-layer-3 {
-        display: none !important;
+    .matrix-layer-3,
+    .matrix-bg-overlay::before,
+    .danger-critical .matrix-bg,
+    .danger-warning .matrix-bg,
+    .danger-alert .matrix-bg {
+        animation: none !important;
+        opacity: 0.2 !important;
+        filter: none !important;
+    }
+    
+    /* Static danger indicators for reduced motion users */
+    .danger-critical .matrix-bg {
+        opacity: 0.4 !important;
+        filter: hue-rotate(15deg) brightness(1.2) saturate(1.2) !important;
+    }
+    
+    .danger-warning .matrix-bg {
+        opacity: 0.3 !important;
+        filter: hue-rotate(10deg) brightness(1.1) saturate(1.1) !important;
+    }
+    
+    .danger-alert .matrix-bg {
+        opacity: 0.35 !important;
+        filter: hue-rotate(8deg) brightness(1.15) saturate(1.15) !important;
     }
     
     .tap-btn:active {
