@@ -123,7 +123,7 @@ body::before {
     margin: 0 auto;
     padding: clamp(25px, 3vh, 60px);
     text-align: center;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(15px) saturate(1.3);
     -webkit-backdrop-filter: blur(15px) saturate(1.3);
     border: 3px solid var(--accent-cyan);
@@ -434,7 +434,7 @@ body::before {
 
 /* Main Content Area */
 .main-content {
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.5);
     border: 3px solid var(--accent-cyan);
     border-radius: 12px;
     backdrop-filter: blur(15px) saturate(1.3);
@@ -495,6 +495,10 @@ body::before {
     text-transform: uppercase;
     letter-spacing: 4px;
     line-height: 0.9;
+    text-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.9),
+        0 4px 8px rgba(0, 0, 0, 0.8),
+        0 0 20px rgba(0, 0, 0, 0.6);
 }
 
 .title-crack {
@@ -679,7 +683,7 @@ body::before {
     z-index: 2;
     max-width: clamp(400px, 70vw, 650px);
     width: 100%;
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(0, 0, 0, 0.5);
     padding: 25px;
     border-radius: 10px;
     backdrop-filter: blur(12px) saturate(1.2);
@@ -735,10 +739,11 @@ body::before {
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
     font-weight: 600;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 8px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .cyber-input {
@@ -797,7 +802,7 @@ body::before {
     align-items: center;
     justify-content: center;
     padding: clamp(12px, 1.5vh, 18px) clamp(24px, 3vw, 40px);
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(10px) saturate(1.5);
     -webkit-backdrop-filter: blur(10px) saturate(1.5);
     border: 2px solid var(--border-dim);
@@ -813,7 +818,7 @@ body::before {
     overflow: hidden;
     min-height: clamp(40px, 5vh, 50px);
     animation: buttonPulse 3s ease-in-out infinite;
-    text-shadow: 0 0 8px currentColor, 0 2px 4px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 0 8px currentColor, 0 2px 4px rgba(0, 0, 0, 0.9);
     box-shadow: 
         0 4px 20px rgba(0, 0, 0, 0.6),
         inset 0 0 20px rgba(0, 0, 0, 0.3);
@@ -1860,7 +1865,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .players-section {
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(15px) saturate(1.4);
     -webkit-backdrop-filter: blur(15px) saturate(1.4);
     padding: 24px;
@@ -2175,7 +2180,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     line-height: 1.7;
     font-size: 1.15em;
     padding: 24px;
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.5);
     border: 2px solid var(--border-secondary);
     border-left: 5px solid var(--accent-cyan);
     border-radius: 8px;
@@ -2192,7 +2197,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .challenge-description {
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(18px) saturate(1.4);
     -webkit-backdrop-filter: blur(18px) saturate(1.4);
     border: 2px solid var(--border-secondary);
@@ -4169,7 +4174,7 @@ body::before { z-index: -1; }
 }
 
 .popup-content {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 0.5);
     border: 2px solid var(--accent-cyan);
     border-radius: 12px;
     padding: 40px 30px;
@@ -4177,7 +4182,8 @@ body::before { z-index: -1; }
     width: 90%;
     text-align: center;
     animation: popupSlideIn 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px) saturate(1.3);
+    -webkit-backdrop-filter: blur(20px) saturate(1.3);
     box-shadow: 
         0 0 50px rgba(0, 245, 255, 0.3),
         var(--shadow-deep);
