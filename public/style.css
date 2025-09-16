@@ -75,9 +75,14 @@ body {
 .oracle-message, .riddle-question, .trivia-question-text, .answer-item,
 .player, .room-info, .players-section, .status-bar, .points-table-container,
 .final-score, .individual-result, .result-response, .custom-notification {
-    background: rgba(0, 0, 0, 0.9) !important;
-    backdrop-filter: blur(25px) saturate(2) !important;
-    -webkit-backdrop-filter: blur(25px) saturate(2) !important;
+    background: rgba(0, 0, 0, 0.92) !important;
+    backdrop-filter: blur(30px) saturate(2.2) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(2.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.8),
+        0 0 20px rgba(255, 255, 255, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Enhanced containers with better visual separation */
@@ -90,19 +95,114 @@ body {
         0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
-/* Enhanced text visibility for specific elements */
-h1, h2, h3, .title, .section-title, .game-title {
+/* Enhanced text visibility for all game content */
+h1, h2, h3, .title, .section-title, .game-title, .lobby-header h2, 
+.oracle-message, .riddle-text, .challenge-title, .results-title {
     text-shadow: 
-        0 0 15px rgba(0, 0, 0, 0.8),
-        0 2px 4px rgba(0, 0, 0, 1),
-        0 0 25px rgba(0, 0, 0, 0.6);
+        0 0 20px rgba(0, 0, 0, 1),
+        0 3px 6px rgba(0, 0, 0, 1),
+        0 0 30px rgba(0, 0, 0, 0.8),
+        0 1px 2px rgba(0, 0, 0, 1);
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-weight: 700 !important;
 }
 
-/* Button text enhancement */
+/* Button text enhancement with stage-specific prominence */
 button, .btn, .cyber-btn {
     text-shadow: 
-        0 0 10px rgba(0, 0, 0, 0.9),
-        0 2px 4px rgba(0, 0, 0, 1);
+        0 0 20px rgba(0, 0, 0, 1),
+        0 3px 8px rgba(0, 0, 0, 1),
+        0 0 30px rgba(0, 0, 0, 0.9),
+        0 1px 3px rgba(0, 0, 0, 1);
+    color: rgba(255, 255, 255, 0.98) !important;
+    font-weight: 800 !important;
+    border-width: 2px !important;
+    box-shadow: 
+        0 6px 25px rgba(0, 0, 0, 0.8),
+        0 0 30px rgba(255, 255, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Interactive elements in game stages */
+.trivia-option, .tap-button, #submit-riddle, #submit-challenge-response,
+.start-game-btn, .join-room-btn, .create-room-btn {
+    transform: translateZ(0) !important;
+    transition: all 0.2s ease !important;
+}
+
+.trivia-option:hover, .tap-button:hover, #submit-riddle:hover, 
+#submit-challenge-response:hover, .start-game-btn:hover,
+.join-room-btn:hover, .create-room-btn:hover {
+    transform: translateY(-3px) scale(1.02) !important;
+    box-shadow: 
+        0 10px 35px rgba(0, 0, 0, 0.9),
+        0 0 40px rgba(255, 255, 255, 0.15),
+        inset 0 2px 0 rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Game content text prominence */
+.player, .answer-item, .challenge-description, .trivia-question-text,
+.riddle-question, .oracle-message, .status-bar, .room-info,
+.challenge-result-item, .individual-result, .final-score {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.player *, .answer-item *, .challenge-description *, .trivia-question-text *,
+.riddle-question *, .oracle-message *, .status-bar *, .room-info *,
+.challenge-result-item *, .individual-result *, .final-score * {
+    text-shadow: 
+        0 0 15px rgba(0, 0, 0, 1),
+        0 2px 6px rgba(0, 0, 0, 1),
+        0 0 25px rgba(0, 0, 0, 0.8),
+        0 1px 3px rgba(0, 0, 0, 1);
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-weight: 600 !important;
+}
+
+/* Stage-specific prominence enhancements */
+/* Lobby Stage */
+.lobby-header, .room-info, .players-section, .player {
+    border: 2px solid rgba(0, 255, 255, 0.3) !important;
+    box-shadow: 
+        0 0 25px rgba(0, 255, 255, 0.2),
+        0 8px 32px rgba(0, 0, 0, 0.9),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Riddle Stage */
+.riddle-question, .oracle-message {
+    border: 2px solid rgba(255, 0, 68, 0.4) !important;
+    box-shadow: 
+        0 0 30px rgba(255, 0, 68, 0.3),
+        0 8px 32px rgba(0, 0, 0, 0.9),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Challenge Stage */
+.challenge-description, .challenge-result-item {
+    border: 2px solid rgba(255, 215, 0, 0.4) !important;
+    box-shadow: 
+        0 0 30px rgba(255, 215, 0, 0.3),
+        0 8px 32px rgba(0, 0, 0, 0.9),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Trivia Stage */
+.trivia-question-text, .trivia-option {
+    border: 2px solid rgba(0, 150, 255, 0.4) !important;
+    box-shadow: 
+        0 0 25px rgba(0, 150, 255, 0.3),
+        0 8px 32px rgba(0, 0, 0, 0.9),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Results Stage */
+.answer-item, .final-score, .individual-result {
+    border: 2px solid rgba(100, 255, 100, 0.4) !important;
+    box-shadow: 
+        0 0 25px rgba(100, 255, 100, 0.3),
+        0 8px 32px rgba(0, 0, 0, 0.9),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
 }
 
 /* ===== ANIMATED GAME BACKGROUND ===== */
@@ -1901,8 +2001,11 @@ input[type="text"], textarea {
         0 4px 20px rgba(0, 0, 0, 0.8),
         0 0 15px rgba(255, 255, 255, 0.05);
     text-shadow: 
-        0 0 10px rgba(0, 0, 0, 0.9),
-        0 2px 4px rgba(0, 0, 0, 1);
+        0 0 15px rgba(0, 0, 0, 1),
+        0 2px 6px rgba(0, 0, 0, 1),
+        0 0 25px rgba(0, 0, 0, 0.8);
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-weight: 600 !important;
 }
 
 
