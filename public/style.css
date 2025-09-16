@@ -123,7 +123,7 @@ body::before {
     margin: 0 auto;
     padding: clamp(25px, 3vh, 60px);
     text-align: center;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 1);
     backdrop-filter: blur(15px) saturate(1.3);
     -webkit-backdrop-filter: blur(15px) saturate(1.3);
     border: 3px solid var(--accent-cyan);
@@ -434,7 +434,7 @@ body::before {
 
 /* Main Content Area */
 .main-content {
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 1);
     border: 3px solid var(--accent-cyan);
     border-radius: 12px;
     backdrop-filter: blur(15px) saturate(1.3);
@@ -683,7 +683,7 @@ body::before {
     z-index: 2;
     max-width: clamp(400px, 70vw, 650px);
     width: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 1);
     padding: 25px;
     border-radius: 10px;
     backdrop-filter: blur(12px) saturate(1.2);
@@ -1865,7 +1865,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .players-section {
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 1);
     backdrop-filter: blur(15px) saturate(1.4);
     -webkit-backdrop-filter: blur(15px) saturate(1.4);
     padding: 24px;
@@ -2180,7 +2180,7 @@ input[type="text"]::placeholder, textarea::placeholder {
     line-height: 1.7;
     font-size: 1.15em;
     padding: 24px;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--border-secondary);
     border-left: 5px solid var(--accent-cyan);
     border-radius: 8px;
@@ -2197,7 +2197,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .challenge-description {
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 1);
     backdrop-filter: blur(18px) saturate(1.4);
     -webkit-backdrop-filter: blur(18px) saturate(1.4);
     border: 2px solid var(--border-secondary);
@@ -4174,7 +4174,7 @@ body::before { z-index: -1; }
 }
 
 .popup-content {
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--accent-cyan);
     border-radius: 12px;
     padding: 40px 30px;
@@ -4391,7 +4391,7 @@ body::before { z-index: -1; }
 }
 
 .modal-content {
-    background: var(--bg-secondary);
+    background: rgba(0, 0, 0, 1);
     border: 2px solid var(--accent-cyan);
     border-radius: 12px;
     max-width: 90%;
