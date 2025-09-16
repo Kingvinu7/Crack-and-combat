@@ -5,7 +5,25 @@ let isRoomOwner = false;
 let tapCount = 0;
 let tapperActive = false;
 
-// Removed complex matrix animation - keeping simple static background only
+// Replaced matrix animation with danger-themed visual effects that won't cause motion sickness
+
+// Danger state management for visual effects
+function setDangerState(level) {
+    const body = document.body;
+    // Remove all existing danger states
+    body.classList.remove('danger-critical', 'danger-warning', 'danger-alert');
+    
+    // Apply new danger state if specified
+    if (level && ['critical', 'warning', 'alert'].includes(level)) {
+        body.classList.add(`danger-${level}`);
+        console.log(`Applied danger state: ${level}`);
+    }
+}
+
+// Clear danger state
+function clearDangerState() {
+    document.body.classList.remove('danger-critical', 'danger-warning', 'danger-alert');
+}
 
 // DOM elements
 const pages = {
@@ -216,6 +234,12 @@ function showPage(pageName) {
     Object.values(pages).forEach(page => page.classList.remove('active'));
     if (pages[pageName]) {
         pages[pageName].classList.add('active');
+        
+        // Clear danger states when transitioning to safe pages
+        const safePages = ['home', 'lobby', 'gameOver', 'roundSummary'];
+        if (safePages.includes(pageName)) {
+            clearDangerState();
+        }
         
         // Simplified 3-track music system with smart switching
         if (window.audioManager) {
@@ -522,12 +546,18 @@ function startFastTapperTimer(duration) {
     const timer = setInterval(() => {
         document.getElementById('fast-tapper-timer').textContent = timeLeft;
         
-        if (timeLeft <= 3) {
+        if (timeLeft <= 2) {
             document.getElementById('fast-tapper-timer').classList.add('urgent');
             document.getElementById('fast-tapper-timer').classList.remove('danger');
+            setDangerState('critical'); // Critical danger for final seconds
+        } else if (timeLeft <= 3) {
+            document.getElementById('fast-tapper-timer').classList.add('urgent');
+            document.getElementById('fast-tapper-timer').classList.remove('danger');
+            setDangerState('alert'); // Alert danger for tapper
         } else if (timeLeft <= 5) {
             document.getElementById('fast-tapper-timer').classList.add('danger');
             document.getElementById('fast-tapper-timer').classList.remove('urgent');
+            setDangerState('warning'); // Warning danger for tapper
         }
         
         timeLeft--;
@@ -537,6 +567,7 @@ function startFastTapperTimer(duration) {
             tapperActive = false;
             document.getElementById('tap-button').disabled = true;
             document.getElementById('fast-tapper-timer').classList.remove('urgent', 'danger');
+            clearDangerState(); // Clear danger when tapper ends
             
             socket.emit('submit-tap-result', { roomCode: currentRoom, taps: tapCount });
             
@@ -678,14 +709,21 @@ function startTimer(elementId, seconds) {
     const timer = setInterval(() => {
         element.textContent = timeLeft;
         
-        if (timeLeft <= 10) {
+        if (timeLeft <= 5) {
             element.classList.add('urgent');
             element.classList.remove('danger');
+            setDangerState('critical'); // Critical danger visual state
+        } else if (timeLeft <= 10) {
+            element.classList.add('urgent');
+            element.classList.remove('danger');
+            setDangerState('alert'); // Alert danger visual state
         } else if (timeLeft <= 20) {
             element.classList.add('danger');
             element.classList.remove('urgent');
+            setDangerState('warning'); // Warning danger visual state
         } else {
             element.classList.remove('urgent', 'danger');
+            clearDangerState(); // Clear danger visual state
         }
         
         timeLeft--;
@@ -693,6 +731,7 @@ function startTimer(elementId, seconds) {
         if (timeLeft < 0) {
             clearInterval(timer);
             element.classList.remove('urgent', 'danger');
+            clearDangerState(); // Clear danger visual state when timer ends
         }
     }, 1000);
     
@@ -713,14 +752,21 @@ function startChallengeTimer(elementId, seconds) {
     window.challengeTimer = setInterval(() => {
         element.textContent = timeLeft;
         
-        if (timeLeft <= 10) {
+        if (timeLeft <= 5) {
             element.classList.add('urgent');
             element.classList.remove('danger');
+            setDangerState('critical'); // Critical danger for challenge timer
+        } else if (timeLeft <= 10) {
+            element.classList.add('urgent');
+            element.classList.remove('danger');
+            setDangerState('alert'); // Alert danger for challenge timer
         } else if (timeLeft <= 20) {
             element.classList.add('danger');
             element.classList.remove('urgent');
+            setDangerState('warning'); // Warning danger for challenge timer
         } else {
             element.classList.remove('urgent', 'danger');
+            clearDangerState(); // Clear danger visual state
         }
         
         timeLeft--;
@@ -729,6 +775,7 @@ function startChallengeTimer(elementId, seconds) {
             clearInterval(window.challengeTimer);
             window.challengeTimer = null;
             element.classList.remove('urgent', 'danger');
+            clearDangerState(); // Clear danger when challenge timer ends
             
             if (textarea && !textarea.disabled && !submitBtn.disabled) {
                 const currentText = textarea.value.trim();
