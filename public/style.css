@@ -227,7 +227,7 @@ body::before {
     pointer-events: none;
 }
 
-/* Static red to cyan gradient background - stronger colors */
+/* Static red to blue gradient background - stronger colors */
 .matrix-bg::before {
     content: '';
     position: absolute;
@@ -238,8 +238,8 @@ body::before {
     background: linear-gradient(135deg,
         rgba(255, 0, 68, 0.6) 0%,
         rgba(255, 0, 100, 0.5) 30%,
-        rgba(0, 255, 255, 0.5) 70%,
-        rgba(0, 255, 255, 0.6) 100%);
+        rgba(0, 100, 255, 0.5) 70%,
+        rgba(0, 150, 255, 0.6) 100%);
     transform: translate3d(0, 0, 0);
     backface-visibility: hidden;
 }
@@ -283,7 +283,7 @@ body::before {
     will-change: transform, opacity;
 }
 
-/* Second cyan orb moving in opposite direction - anti-flicker */
+/* Second blue orb moving in opposite direction - anti-flicker */
 .matrix-layer-2 {
     position: absolute;
     top: 60%;
@@ -291,12 +291,12 @@ body::before {
     width: 40px;
     height: 40px;
     background: radial-gradient(circle,
-        rgba(0, 255, 255, 0.8) 0%,
-        rgba(0, 255, 255, 0.4) 50%,
+        rgba(0, 100, 255, 0.8) 0%,
+        rgba(0, 150, 255, 0.4) 50%,
         transparent 100%);
     border-radius: 50%;
     animation: slowMoveLeft 25s linear infinite;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    box-shadow: 0 0 15px rgba(0, 120, 255, 0.5);
     transform: translate3d(0, 0, 0);
     backface-visibility: hidden;
     will-change: transform, opacity;
@@ -311,7 +311,7 @@ body::before {
     height: 60px;
     background: linear-gradient(45deg,
         rgba(255, 0, 68, 0.6) 0%,
-        rgba(0, 255, 255, 0.6) 100%);
+        rgba(0, 120, 255, 0.6) 100%);
     transform: rotate(45deg) translate3d(0, 0, 0);
     animation: slowFloat 30s ease-in-out infinite;
     box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
