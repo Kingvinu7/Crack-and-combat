@@ -195,7 +195,7 @@ body::before {
     height: 100%;
     overflow: hidden;
     z-index: 1;
-    opacity: 0.8;
+    opacity: 0.4;
     pointer-events: none;
     will-change: transform;
     transform: translateZ(0);
@@ -372,8 +372,8 @@ body::before {
 
 @keyframes gentleIntensify {
     0% { opacity: 0.2; }
-    50% { opacity: 0.8; }
-    100% { opacity: 0.6; }
+    50% { opacity: 0.6; }
+    100% { opacity: 0.4; }
 }
 
 
@@ -3937,7 +3937,7 @@ textarea:focus {
     
     /* Keep static background for reduced motion users */
     .matrix-bg {
-        opacity: 0.1 !important;
+        opacity: 0.4 !important;
     }
     
     .tap-btn:active {
@@ -4021,21 +4021,44 @@ textarea:focus {
 /* ===== PERFORMANCE OPTIMIZATIONS ===== */
 /* Reduce complexity on mobile for better performance */
 @media (max-width: 768px) {
-    /* Reduce gentle animation layers on mobile */
-    .matrix-layer-2,
-    .matrix-layer-3 {
-        display: none;
-    }
-    
-    /* Simplify gentle animations on mobile */
+    /* Keep all animations visible on mobile but optimize them */
     .matrix-bg {
-        opacity: 0.2;
+        opacity: 0.4; /* Keep same opacity as desktop */
     }
     
-    .matrix-bg::before,
-    .matrix-bg::after,
+    /* Slightly slower animations on mobile for better performance */
+    .matrix-bg::after {
+        animation-duration: 20s; /* Light beam: 15s -> 20s */
+    }
+    
     .matrix-layer-1 {
-        animation-duration: 60s; /* Slower animations on mobile */
+        animation-duration: 25s; /* Red orb: 20s -> 25s */
+    }
+    
+    .matrix-layer-2 {
+        animation-duration: 30s; /* Cyan orb: 25s -> 30s */
+    }
+    
+    .matrix-layer-3 {
+        animation-duration: 40s; /* Diamond: 30s -> 40s */
+        width: 40px; /* Smaller diamond on mobile */
+        height: 40px;
+    }
+    
+    /* Smaller orbs on mobile */
+    .matrix-layer-1 {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .matrix-layer-2 {
+        width: 30px;
+        height: 30px;
+    }
+    
+    /* Narrower light beam on mobile */
+    .matrix-bg::after {
+        width: 150px; /* Reduced from 200px */
     }
     
     /* Reduce backdrop filter intensity */
