@@ -208,7 +208,7 @@ body::before {
     height: 100%;
     overflow: hidden;
     z-index: 1;
-    opacity: 0.65;
+    opacity: 1.0;
     pointer-events: none;
     will-change: transform;
     transform: translateZ(0);
@@ -395,9 +395,9 @@ body::before {
 }
 
 @keyframes gentleIntensify {
-    0% { opacity: 0.3; }
-    50% { opacity: 0.8; }
-    100% { opacity: 0.65; }
+    0% { opacity: 0.8; }
+    50% { opacity: 1.0; }
+    100% { opacity: 1.0; }
 }
 
 
@@ -3961,7 +3961,7 @@ textarea:focus {
     
     /* Keep static background for reduced motion users */
     .matrix-bg {
-        opacity: 0.65 !important;
+        opacity: 1.0 !important;
     }
     
     .tap-btn:active {
@@ -4047,7 +4047,7 @@ textarea:focus {
 @media (max-width: 768px) {
     /* Keep all animations visible on mobile but optimize them */
     .matrix-bg {
-        opacity: 0.65; /* Keep same opacity as desktop */
+        opacity: 1.0; /* Keep same opacity as desktop */
     }
     
     /* Slightly slower animations on mobile for better performance */
