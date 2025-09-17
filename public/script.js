@@ -586,9 +586,11 @@ function updateStartButton() {
 function updatePlayers(players) {
     playersListEl.innerHTML = players.map((player, index) => {
         const isOwnerPlayer = index === 0;
+        const spectatorStatus = player.isSpectator ? ' (Spectator)' : '';
+        const spectatorClass = player.isSpectator ? ' spectator' : '';
         return `
-            <div class="player ${isOwnerPlayer ? 'owner-player' : ''}">
-                ${isOwnerPlayer ? 'OWNER ' : ''}${player.name}: ${player.score}pts
+            <div class="player ${isOwnerPlayer ? 'owner-player' : ''}${spectatorClass}">
+                ${isOwnerPlayer ? 'OWNER ' : ''}${player.name}: ${player.score}pts${spectatorStatus}
             </div>
         `;
     }).join('');
@@ -980,6 +982,16 @@ socket.on('join-success', (data) => {
     currentRoom = data.roomCode;
     isRoomOwner = data.isOwner;
     roomCodeDisplay.textContent = `Room: ${data.roomCode}`;
+    
+    // Handle spectator mode
+    if (data.isSpectator) {
+        showNotification(`Joined as spectator! You'll participate from round ${data.currentRound + 1}`, 'info');
+        
+        // Show current game state if game is in progress
+        if (data.gameState !== 'waiting') {
+            showNotification(`Game in progress - Round ${data.currentRound}/${data.maxRounds}`, 'info');
+        }
+    }
     
     updateLobbyOwnerDisplay();
     updateStartButton();
@@ -1377,6 +1389,55 @@ socket.on('game-over', (data) => {
 socket.on('error', (data) => {
     console.error('Socket error:', data.message);
     showNotification(data.message, 'error');
+});
+
+// Handle spectator activation
+socket.on('spectator-activated', (data) => {
+    showNotification(data.message, 'success');
+    if (window.audioManager) window.audioManager.playCorrectSound();
+});
+
+// Handle game state updates for mid-game joiners
+socket.on('game-state-update', (data) => {
+    console.log('Game state update received:', data);
+    showNotification(data.message, 'info');
+    
+    // Update UI based on current game state
+    switch (data.gameState) {
+        case 'riddle-phase':
+            showNotification('Riddle phase in progress - watch and wait for next round!', 'info');
+            break;
+        case 'challenge-phase':
+            showNotification('Challenge phase in progress - you\'ll join next round!', 'info');
+            break;
+        default:
+            showNotification('Game in progress - you\'ll participate soon!', 'info');
+    }
+});
+
+// Handle game ended due to insufficient players
+socket.on('game-ended', (data) => {
+    showNotification(data.message, 'warning');
+    
+    // Show game ended screen or return to lobby
+    const gameEndedMessage = document.createElement('div');
+    gameEndedMessage.className = 'game-ended-overlay';
+    gameEndedMessage.innerHTML = `
+        <div class="game-ended-content">
+            <h2>Game Ended</h2>
+            <p>${data.message}</p>
+            <p>Reason: ${data.reason}</p>
+            <button onclick="this.parentElement.parentElement.remove(); showPage('lobby');" class="btn primary">
+                Return to Lobby
+            </button>
+        </div>
+    `;
+    document.body.appendChild(gameEndedMessage);
+    
+    setTimeout(() => {
+        gameEndedMessage.remove();
+        showPage('lobby');
+    }, 5000);
 });
 
 // Mobile keyboard handling

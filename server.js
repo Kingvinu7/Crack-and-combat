@@ -605,7 +605,10 @@ async function startChallengePhase(roomCode) {
     const room = rooms[roomCode];
     if (!room) return;
 
-    const nonWinners = room.players.filter(p => p.name !== room.riddleWinner);
+    // Filter out spectators and riddle winner
+    const activePlayers = room.players.filter(p => !p.isSpectator);
+    const nonWinners = activePlayers.filter(p => p.name !== room.riddleWinner);
+    
     if (nonWinners.length === 0) {
         endRound(roomCode, []);
         return;
@@ -844,6 +847,24 @@ function startNewRound(roomCode) {
     
     room.currentRound++;
     room.gameState = 'riddle-phase';
+    
+    // Activate spectators at the start of new rounds
+    room.players.forEach(player => {
+        if (player.isSpectator && player.joinedAtRound < room.currentRound) {
+            console.log(`Activating spectator ${player.name} for round ${room.currentRound}`);
+            player.isSpectator = false;
+            
+            // Notify player they're now active
+            const socket = io.sockets.sockets.get(player.id);
+            if (socket) {
+                socket.emit('spectator-activated', {
+                    message: `You're now an active player starting from round ${room.currentRound}!`,
+                    round: room.currentRound
+                });
+            }
+        }
+    });
+    
     const { riddle, index } = getRandomRiddle(room.usedRiddleIndices);
     room.currentRiddle = riddle;
     room.usedRiddleIndices.push(index);
@@ -1036,30 +1057,90 @@ io.on('connection', (socket) => {
             socket.emit('error', { message: 'Room is full' });
             return;
         }
-        if (room.gameState !== 'waiting') {
-            socket.emit('error', { message: 'Game already in progress' });
-            return;
-        }
+        
+        // Check if player name already exists
         const existingPlayer = room.players.find(p => p.name === data.playerName);
         if (existingPlayer) {
             socket.emit('error', { message: 'Player name already taken' });
             return;
         }
         
-        room.players.push({ id: socket.id, name: data.playerName, score: 0 });
-        room.roundHistory = [];
+        // Allow joining games in progress - add as spectator initially
+        let isSpectator = false;
+        let playerScore = 0;
+        
+        if (room.gameState !== 'waiting') {
+            console.log(`Player ${data.playerName} joining game in progress in room ${data.roomCode}`);
+            isSpectator = true;
+            // They'll become active in the next round
+        }
+        
+        const newPlayer = { 
+            id: socket.id, 
+            name: data.playerName, 
+            score: playerScore,
+            isSpectator: isSpectator,
+            joinedAtRound: room.currentRound || 0
+        };
+        
+        room.players.push(newPlayer);
+        
+        // Initialize round history for new player if game is ongoing
+        if (room.gameState !== 'waiting' && room.roundHistory) {
+            // Add player to round history with losses for missed rounds
+            const newPlayerHistory = {
+                playerName: data.playerName,
+                playerId: socket.id,
+                rounds: []
+            };
+            
+            // Fill in losses for rounds they missed
+            for (let i = 0; i < room.currentRound; i++) {
+                newPlayerHistory.rounds.push('L');
+            }
+            
+            room.roundHistory.push(newPlayerHistory);
+            console.log(`Added ${data.playerName} to round history with ${room.currentRound} missed rounds`);
+        }
         
         socket.join(data.roomCode);
-        console.log('Player joined:', data.playerName, 'in room:', data.roomCode);
+        console.log('Player joined:', data.playerName, 'in room:', data.roomCode, 'as', isSpectator ? 'spectator' : 'active player');
         
         socket.emit('join-success', {
             roomCode: data.roomCode,
             playerName: data.playerName,
-            isOwner: false
+            isOwner: false,
+            isSpectator: isSpectator,
+            gameState: room.gameState,
+            currentRound: room.currentRound || 0,
+            maxRounds: room.maxRounds
         });
+        
+        // Send current game state to new player if game is in progress
+        if (room.gameState !== 'waiting') {
+            socket.emit('game-state-update', {
+                gameState: room.gameState,
+                currentRound: room.currentRound,
+                maxRounds: room.maxRounds,
+                players: room.players,
+                message: isSpectator ? 'You joined as a spectator. You\'ll participate from the next round.' : 'Game in progress'
+            });
+            
+            // If in riddle phase, send current riddle
+            if (room.gameState === 'riddle-phase' && room.currentRiddle) {
+                socket.emit('riddle-presented', {
+                    riddle: room.currentRiddle,
+                    round: room.currentRound,
+                    maxRounds: room.maxRounds,
+                    isSpectator: true
+                });
+            }
+        }
+        
         io.to(data.roomCode).emit('player-joined', {
             players: room.players,
-            newPlayer: data.playerName
+            newPlayer: data.playerName,
+            isSpectator: isSpectator
         });
     });
 
@@ -1092,30 +1173,34 @@ io.on('connection', (socket) => {
             const room = rooms[data.roomCode];
             if (!room || room.gameState !== 'riddle-phase') return;
             const player = room.players.find(p => p.id === socket.id);
-            if (!player) return;
-        if (!room.riddleAnswers[socket.id]) {
-            room.riddleAnswers[socket.id] = {
-                answer: data.answer.trim(),
-                timestamp: Date.now(),
-                playerName: player.name
-            };
-            io.to(data.roomCode).emit('answer-submitted', {
-                player: player.name,
-                totalSubmissions: Object.keys(room.riddleAnswers).length,
-                totalPlayers: room.players.length
-            });
+            if (!player || player.isSpectator) return; // Spectators can't submit answers
             
-            // Check if all players have answered
-            if (Object.keys(room.riddleAnswers).length === room.players.length) {
-                console.log('All players submitted riddle answer. Ending riddle phase early.');
-                // Clear the riddle timer if it's still running
-                if (room.riddleTimer) {
-                    clearInterval(room.riddleTimer);
-                    room.riddleTimer = null;
+            if (!room.riddleAnswers[socket.id]) {
+                room.riddleAnswers[socket.id] = {
+                    answer: data.answer.trim(),
+                    timestamp: Date.now(),
+                    playerName: player.name
+                };
+                
+                const activePlayers = room.players.filter(p => !p.isSpectator);
+                
+                io.to(data.roomCode).emit('answer-submitted', {
+                    player: player.name,
+                    totalSubmissions: Object.keys(room.riddleAnswers).length,
+                    totalPlayers: activePlayers.length
+                });
+                
+                // Check if all active players have answered
+                if (Object.keys(room.riddleAnswers).length === activePlayers.length) {
+                    console.log('All active players submitted riddle answer. Ending riddle phase early.');
+                    // Clear the riddle timer if it's still running
+                    if (room.riddleTimer) {
+                        clearInterval(room.riddleTimer);
+                        room.riddleTimer = null;
+                    }
+                    endRiddlePhase(data.roomCode);
                 }
-                endRiddlePhase(data.roomCode);
             }
-        }
         } catch (error) {
             console.error('Error in submit-riddle-answer:', error);
             socket.emit('error', { message: 'Failed to submit answer' });
@@ -1125,11 +1210,12 @@ io.on('connection', (socket) => {
         const room = rooms[data.roomCode];
         if (!room || room.gameState !== 'challenge-phase') return;
         const player = room.players.find(p => p.id === socket.id);
-        if (!player || player.name === room.riddleWinner) return;
+        if (!player || player.isSpectator || player.name === room.riddleWinner) return;
         
         room.challengeResponses[socket.id] = data.response.trim();
         
-        const expectedSubmissions = room.players.filter(p => p.name !== room.riddleWinner).length;
+        const activePlayers = room.players.filter(p => !p.isSpectator);
+        const expectedSubmissions = activePlayers.filter(p => p.name !== room.riddleWinner).length;
         const totalSubmissions = Object.keys(room.challengeResponses).length;
         
         io.to(data.roomCode).emit('challenge-response-submitted', {
@@ -1140,7 +1226,7 @@ io.on('connection', (socket) => {
         
         // Check if all players have responded - auto advance
         if (totalSubmissions === expectedSubmissions) {
-            console.log('All players submitted challenge response. Ending challenge phase early.');
+            console.log('All active non-winners submitted challenge response. Ending challenge phase early.');
             if (room.challengeTimer) {
                 clearTimeout(room.challengeTimer);
                 room.challengeTimer = null;
@@ -1152,15 +1238,17 @@ io.on('connection', (socket) => {
         const room = rooms[data.roomCode];
         if (!room || room.gameState !== 'challenge-phase') return;
         const player = room.players.find(p => p.id === socket.id);
-        if (!player || player.name === room.riddleWinner) return;
+        if (!player || player.isSpectator || player.name === room.riddleWinner) return;
         
         room.tapResults[socket.id] = data.taps;
+        
+        const activePlayers = room.players.filter(p => !p.isSpectator);
         
         io.to(data.roomCode).emit('tap-result-submitted', {
             player: player.name,
             taps: data.taps,
             totalSubmissions: Object.keys(room.tapResults).length,
-            expectedSubmissions: room.players.filter(p => p.name !== room.riddleWinner).length
+            expectedSubmissions: activePlayers.filter(p => p.name !== room.riddleWinner).length
         });
     });
 
@@ -1168,7 +1256,7 @@ io.on('connection', (socket) => {
         const room = rooms[data.roomCode];
         if (!room || room.gameState !== 'challenge-phase') return;
         const player = room.players.find(p => p.id === socket.id);
-        if (!player || player.name === room.riddleWinner) return;
+        if (!player || player.isSpectator || player.name === room.riddleWinner) return;
         
         if (!room.triviaAnswers[socket.id]) {
             room.triviaAnswers[socket.id] = {
@@ -1177,16 +1265,18 @@ io.on('connection', (socket) => {
                 playerName: player.name
             };
             
+            const activePlayers = room.players.filter(p => !p.isSpectator);
+            const expectedSubmissions = activePlayers.filter(p => p.name !== room.riddleWinner).length;
+            
             io.to(data.roomCode).emit('trivia-answer-submitted', {
                 player: player.name,
                 totalSubmissions: Object.keys(room.triviaAnswers).length,
-                expectedSubmissions: room.players.filter(p => p.name !== room.riddleWinner).length
+                expectedSubmissions: expectedSubmissions
             });
             
-            // Check if all players have answered
-            const expectedSubmissions = room.players.filter(p => p.name !== room.riddleWinner).length;
+            // Check if all active players have answered
             if (Object.keys(room.triviaAnswers).length === expectedSubmissions) {
-                console.log('All players submitted trivia answer. Ending trivia phase early.');
+                console.log('All active non-winners submitted trivia answer. Ending trivia phase early.');
                 if (room.challengeTimer) {
                     clearTimeout(room.challengeTimer);
                     room.challengeTimer = null;
@@ -1196,32 +1286,189 @@ io.on('connection', (socket) => {
         }
     });
     socket.on('disconnect', () => {
+        console.log('Player disconnected:', socket.id);
+        
         Object.keys(rooms).forEach(roomCode => {
             const room = rooms[roomCode];
-            const idx = room.players.findIndex(p => p.id === socket.id);
-            if (idx !== -1) {
-                const pname = room.players[idx].name;
-                room.players.splice(idx, 1);
+            const playerIndex = room.players.findIndex(p => p.id === socket.id);
+            
+            if (playerIndex !== -1) {
+                const disconnectedPlayer = room.players[playerIndex];
+                const playerName = disconnectedPlayer.name;
+                console.log(`Player ${playerName} disconnected from room ${roomCode} during ${room.gameState}`);
+                
+                // Handle disconnect based on game state
+                handlePlayerDisconnect(room, roomCode, socket.id, playerName);
+                
+                // Remove player from room
+                room.players.splice(playerIndex, 1);
+                
+                // Check if room should be deleted
                 if (room.players.length === 0) {
-                    // Properly clear all timers to prevent memory leaks
-                    if (room.riddleTimer) {
-                        clearInterval(room.riddleTimer);
-                        room.riddleTimer = null;
-                    }
-                    if (room.challengeTimer) {
-                        clearTimeout(room.challengeTimer);
-                        room.challengeTimer = null;
-                    }
+                    console.log(`Room ${roomCode} is empty, cleaning up`);
+                    cleanupRoom(room, roomCode);
                     delete rooms[roomCode];
                 } else {
+                    // Update ownership if owner left
+                    if (disconnectedPlayer.id === room.ownerId && room.players.length > 0) {
+                        room.ownerId = room.players[0].id;
+                        console.log(`Ownership transferred to ${room.players[0].name} in room ${roomCode}`);
+                    }
+                    
+                    // Notify remaining players
                     io.to(roomCode).emit('player-left', {
                         players: room.players,
-                        leftPlayer: pname
+                        leftPlayer: playerName,
+                        gameState: room.gameState
                     });
+                    
+                    // Check if game can continue
+                    checkGameContinuation(room, roomCode);
                 }
             }
         });
     });
+    
+    // Helper function to handle player disconnect based on game state
+    function handlePlayerDisconnect(room, roomCode, socketId, playerName) {
+        console.log(`Handling disconnect for ${playerName} in ${room.gameState} state`);
+        
+        switch (room.gameState) {
+            case 'riddle-phase':
+                // Auto-submit empty answer if they haven't answered
+                if (!room.riddleAnswers[socketId]) {
+                    room.riddleAnswers[socketId] = {
+                        answer: '[DISCONNECTED]',
+                        timestamp: Date.now(),
+                        playerName: playerName
+                    };
+                    console.log(`Auto-submitted disconnection for ${playerName} in riddle phase`);
+                }
+                break;
+                
+            case 'challenge-phase':
+                // Handle different challenge types
+                if (room.currentChallengeType === 'fastTapper') {
+                    if (!room.tapResults[socketId]) {
+                        room.tapResults[socketId] = 0; // 0 taps
+                        console.log(`Auto-submitted 0 taps for disconnected ${playerName}`);
+                    }
+                } else if (room.currentChallengeType === 'multipleChoiceTrivia') {
+                    if (!room.triviaAnswers[socketId]) {
+                        room.triviaAnswers[socketId] = {
+                            answer: -1, // Invalid answer
+                            timestamp: Date.now(),
+                            playerName: playerName
+                        };
+                        console.log(`Auto-submitted invalid trivia answer for disconnected ${playerName}`);
+                    }
+                } else {
+                    // Text-based challenge
+                    if (!room.challengeResponses[socketId]) {
+                        room.challengeResponses[socketId] = '[DISCONNECTED] Player left the game';
+                        console.log(`Auto-submitted disconnection response for ${playerName}`);
+                    }
+                }
+                break;
+        }
+        
+        // Remove from round history or mark as disconnected
+        if (room.roundHistory) {
+            const playerHistory = room.roundHistory.find(h => h.playerId === socketId || h.playerName === playerName);
+            if (playerHistory) {
+                console.log(`Player ${playerName} found in round history, keeping for final results`);
+                // Keep their history but mark them as disconnected
+                playerHistory.disconnected = true;
+            }
+        }
+    }
+    
+    // Helper function to clean up room resources
+    function cleanupRoom(room, roomCode) {
+        console.log(`Cleaning up room ${roomCode}`);
+        
+        // Clear all timers
+        if (room.riddleTimer) {
+            clearInterval(room.riddleTimer);
+            room.riddleTimer = null;
+        }
+        if (room.challengeTimer) {
+            clearTimeout(room.challengeTimer);
+            room.challengeTimer = null;
+        }
+        
+        // Clear any other timers or intervals that might exist
+        if (room.gameTimer) {
+            clearTimeout(room.gameTimer);
+            room.gameTimer = null;
+        }
+    }
+    
+    // Helper function to check if game can continue after player disconnect
+    function checkGameContinuation(room, roomCode) {
+        const activePlayers = room.players.filter(p => !p.isSpectator);
+        
+        if (activePlayers.length < 1) {
+            console.log(`Not enough active players in room ${roomCode}, ending game`);
+            // End game gracefully
+            io.to(roomCode).emit('game-ended', {
+                reason: 'Not enough players to continue',
+                message: 'Game ended due to insufficient players'
+            });
+            
+            // Reset room to waiting state
+            room.gameState = 'waiting';
+            room.currentRound = 0;
+            cleanupRoom(room, roomCode);
+            return;
+        }
+        
+        // Check if we need to advance phases due to all remaining players having submitted
+        switch (room.gameState) {
+            case 'riddle-phase':
+                const riddleSubmissions = Object.keys(room.riddleAnswers).length;
+                const activePlayerCount = activePlayers.length;
+                if (riddleSubmissions >= activePlayerCount) {
+                    console.log(`All remaining players submitted riddle answers, advancing phase`);
+                    if (room.riddleTimer) {
+                        clearInterval(room.riddleTimer);
+                        room.riddleTimer = null;
+                    }
+                    endRiddlePhase(roomCode);
+                }
+                break;
+                
+            case 'challenge-phase':
+                const nonWinners = activePlayers.filter(p => p.name !== room.riddleWinner);
+                let submissions = 0;
+                
+                if (room.currentChallengeType === 'fastTapper') {
+                    submissions = Object.keys(room.tapResults).length;
+                } else if (room.currentChallengeType === 'multipleChoiceTrivia') {
+                    submissions = Object.keys(room.triviaAnswers).length;
+                } else {
+                    submissions = Object.keys(room.challengeResponses).length;
+                }
+                
+                if (submissions >= nonWinners.length) {
+                    console.log(`All remaining non-winners submitted challenge responses, advancing phase`);
+                    if (room.challengeTimer) {
+                        clearTimeout(room.challengeTimer);
+                        room.challengeTimer = null;
+                    }
+                    
+                    // Evaluate results based on challenge type
+                    if (room.currentChallengeType === 'fastTapper') {
+                        evaluateFastTapperResults(roomCode);
+                    } else if (room.currentChallengeType === 'multipleChoiceTrivia') {
+                        evaluateTriviaResults(roomCode);
+                    } else {
+                        evaluateTextChallengeResults(roomCode);
+                    }
+                }
+                break;
+        }
+    }
 });
 
 const PORT = process.env.PORT || 3000;
