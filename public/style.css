@@ -55,6 +55,7 @@ body {
     background: rgba(0, 0, 0, 1);
     color: var(--text-primary);
     min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile */
     overflow-x: hidden;
     position: relative;
     background-image: 
@@ -67,6 +68,105 @@ body {
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     font-variant-ligatures: none;
+}
+
+/* Mobile-specific background fixes */
+@media (max-width: 768px) {
+    body {
+        background-attachment: scroll; /* Fixed attachment causes issues on mobile */
+        min-height: 100vh;
+        min-height: 100dvh; /* Use dynamic viewport height */
+        height: 100%;
+        position: relative;
+        overflow-x: hidden;
+        /* Prevent bounce scrolling on iOS */
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: none;
+    }
+    
+    html {
+        height: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        position: relative;
+        overflow-x: hidden;
+        /* Prevent bounce scrolling */
+        overscroll-behavior: none;
+    }
+    
+    /* Fix matrix background on mobile */
+    .matrix-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh; /* Dynamic viewport height */
+        min-height: 100vh;
+        min-height: 100dvh;
+        z-index: 1;
+        /* Prevent background from moving during scroll */
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        transform: translate3d(0, 0, 0);
+        will-change: auto; /* Reduce will-change on mobile for better performance */
+    }
+    
+    /* Ensure pages fill the entire viewport */
+    .page {
+        min-height: 100vh;
+        min-height: 100dvh;
+        width: 100vw;
+        position: relative;
+        overflow-x: hidden;
+    }
+    
+    /* Fix page content positioning */
+    .page-content, .clean-layout {
+        min-height: 100vh;
+        min-height: 100dvh;
+        width: 100%;
+        position: relative;
+        padding-bottom: env(safe-area-inset-bottom, 20px);
+    }
+    
+    /* Prevent black sections during scroll */
+    body::before, body::after {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        min-height: 100vh;
+        min-height: 100dvh;
+        transform: translate3d(0, 0, 0);
+        backface-visibility: hidden;
+    }
+    
+    /* Fix any scrolling containers */
+    .page, .page-content, .modal-content, .popup-content {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        scroll-behavior: smooth;
+    }
+    
+    /* Ensure full coverage on mobile browsers */
+    * {
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Fix viewport units for better mobile support */
+    .page {
+        height: 100vh;
+        height: 100dvh;
+        max-height: 100vh;
+        max-height: 100dvh;
+    }
 }
 
 /* Enhanced visibility for game content areas */
@@ -334,6 +434,8 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
+    min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile */
     overflow: hidden;
     z-index: 1;
     opacity: 0.65;
@@ -4190,6 +4292,7 @@ textarea:focus {
     /* Keep all animations visible on mobile but optimize them */
     .matrix-bg {
         opacity: 0.65; /* Keep same opacity as desktop */
+        /* Additional mobile fixes already applied above */
     }
     
     /* Slightly slower animations on mobile for better performance */
