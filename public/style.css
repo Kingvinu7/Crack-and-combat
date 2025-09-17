@@ -1085,10 +1085,11 @@ body::before {
 .status-display {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
+    font-size: 10px;
     color: var(--text-secondary);
+    opacity: 0.8;
 }
 
 .status-indicator {
@@ -3804,7 +3805,8 @@ input[type="text"]::placeholder, textarea::placeholder {
     }
 
     .status-display {
-        font-size: 10px;
+        font-size: 8px;
+        gap: 4px;
     }
     
     .cyber-label {
@@ -3979,7 +3981,9 @@ input[type="text"]::placeholder, textarea::placeholder {
     }
     
     .status-display {
-        font-size: 8px;
+        font-size: 7px;
+        gap: 3px;
+        opacity: 0.7;
     }
     
     .cyber-label {
