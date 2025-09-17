@@ -5,7 +5,7 @@ let isRoomOwner = false;
 let tapCount = 0;
 let tapperActive = false;
 
-// Removed complex matrix animation - keeping simple static background only
+// Replaced matrix rain with gentle, motion-sickness-free background animations
 
 // DOM elements
 const pages = {
