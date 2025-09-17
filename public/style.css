@@ -70,31 +70,22 @@ body {
     font-variant-ligatures: none;
 }
 
-/* Mobile-specific background fixes */
+/* Mobile-specific fixes - No scrolling needed */
 @media (max-width: 768px) {
-    body {
-        background-attachment: scroll; /* Fixed attachment causes issues on mobile */
-        min-height: 100vh;
-        min-height: 100dvh; /* Use dynamic viewport height */
-        height: 100%;
-        position: relative;
-        overflow-x: hidden;
-        /* Prevent bounce scrolling on iOS */
+    html, body {
+        height: 100vh;
+        height: 100dvh;
+        max-height: 100vh;
+        max-height: 100dvh;
+        overflow: hidden; /* Prevent all scrolling on mobile */
+        position: fixed;
+        width: 100%;
+        background-attachment: scroll;
+        overscroll-behavior: none;
         -webkit-overflow-scrolling: touch;
-        overscroll-behavior: none;
     }
     
-    html {
-        height: 100%;
-        min-height: 100vh;
-        min-height: 100dvh;
-        position: relative;
-        overflow-x: hidden;
-        /* Prevent bounce scrolling */
-        overscroll-behavior: none;
-    }
-    
-    /* Fix matrix background on mobile */
+    /* Fix matrix background to cover everything */
     .matrix-bg {
         position: fixed;
         top: 0;
@@ -103,69 +94,113 @@ body {
         bottom: 0;
         width: 100vw;
         height: 100vh;
-        height: 100dvh; /* Dynamic viewport height */
-        min-height: 100vh;
-        min-height: 100dvh;
-        z-index: 1;
-        /* Prevent background from moving during scroll */
-        backface-visibility: hidden;
-        -webkit-backface-visibility: hidden;
-        transform: translate3d(0, 0, 0);
-        will-change: auto; /* Reduce will-change on mobile for better performance */
-    }
-    
-    /* Ensure pages fill the entire viewport */
-    .page {
-        min-height: 100vh;
-        min-height: 100dvh;
-        width: 100vw;
-        position: relative;
-        overflow-x: hidden;
-    }
-    
-    /* Fix page content positioning */
-    .page-content, .clean-layout {
-        min-height: 100vh;
-        min-height: 100dvh;
-        width: 100%;
-        position: relative;
-        padding-bottom: env(safe-area-inset-bottom, 20px);
-    }
-    
-    /* Prevent black sections during scroll */
-    body::before, body::after {
-        position: fixed !important;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        width: 100vw;
-        height: 100vh;
         height: 100dvh;
-        min-height: 100vh;
-        min-height: 100dvh;
+        z-index: 1;
         transform: translate3d(0, 0, 0);
         backface-visibility: hidden;
     }
     
-    /* Fix any scrolling containers */
-    .page, .page-content, .modal-content, .popup-content {
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior: contain;
-        scroll-behavior: smooth;
-    }
-    
-    /* Ensure full coverage on mobile browsers */
-    * {
-        -webkit-tap-highlight-color: transparent;
-    }
-    
-    /* Fix viewport units for better mobile support */
+    /* Make all pages fit within viewport - no scrolling */
     .page {
         height: 100vh;
         height: 100dvh;
         max-height: 100vh;
         max-height: 100dvh;
+        width: 100vw;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+    
+    /* Compact page content to fit viewport */
+    .page-content, .clean-layout {
+        height: 100%;
+        max-height: 100vh;
+        max-height: 100dvh;
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+    
+    /* Make game containers more compact */
+    .game-container-outline {
+        max-height: 90vh;
+        max-height: 90dvh;
+        overflow: hidden;
+        padding: 15px !important;
+        margin: 5px !important;
+    }
+    
+    /* Compact spacing for mobile */
+    .lobby-header, .oracle-intro, .riddle-container, .challenge-container {
+        margin: 8px 0 !important;
+        padding: 15px !important;
+    }
+    
+    /* Reduce font sizes slightly for better fit */
+    h1 { font-size: clamp(1.8rem, 5vw, 2.2rem) !important; }
+    h2 { font-size: clamp(1.4rem, 4vw, 1.8rem) !important; }
+    h3 { font-size: clamp(1.2rem, 3.5vw, 1.5rem) !important; }
+    p, span, div { font-size: clamp(0.85rem, 2.5vw, 1rem) !important; }
+    
+    /* Compact buttons */
+    .btn, .cyber-btn {
+        padding: 8px 16px !important;
+        margin: 4px !important;
+        font-size: clamp(0.8rem, 2.2vw, 0.9rem) !important;
+        min-height: 40px !important;
+    }
+    
+    /* Compact inputs */
+    input[type="text"], textarea {
+        padding: 10px 15px !important;
+        margin: 5px 0 !important;
+        font-size: clamp(0.85rem, 2.5vw, 0.95rem) !important;
+        min-height: 40px !important;
+    }
+    
+    /* Scrollable content areas only where absolutely necessary */
+    .challenge-description, .riddle-question, .oracle-message {
+        max-height: 30vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+    
+    .challenge-description::-webkit-scrollbar,
+    .riddle-question::-webkit-scrollbar,
+    .oracle-message::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .challenge-description::-webkit-scrollbar-thumb,
+    .riddle-question::-webkit-scrollbar-thumb,
+    .oracle-message::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 2px;
+    }
+    
+    /* Compact player lists and results */
+    .players-section, .results-container {
+        max-height: 40vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Remove excessive margins and padding */
+    .page * {
+        margin-top: clamp(2px, 0.5vh, 8px) !important;
+        margin-bottom: clamp(2px, 0.5vh, 8px) !important;
     }
 }
 
