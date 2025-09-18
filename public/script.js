@@ -677,6 +677,13 @@ function startTimer(elementId, seconds) {
     const element = document.getElementById(elementId);
     let timeLeft = seconds;
     
+    // Clear any existing timer for this element type
+    if (elementId === 'riddle-timer' && window.riddleTimer) {
+        clearInterval(window.riddleTimer);
+    } else if (elementId === 'trivia-timer' && window.triviaTimer) {
+        clearInterval(window.triviaTimer);
+    }
+    
     const timer = setInterval(() => {
         element.textContent = timeLeft;
         
@@ -695,8 +702,22 @@ function startTimer(elementId, seconds) {
         if (timeLeft < 0) {
             clearInterval(timer);
             element.classList.remove('urgent', 'danger');
+            
+            // Clear the global reference
+            if (elementId === 'riddle-timer') {
+                window.riddleTimer = null;
+            } else if (elementId === 'trivia-timer') {
+                window.triviaTimer = null;
+            }
         }
     }, 1000);
+    
+    // Store timer reference globally for proper cleanup
+    if (elementId === 'riddle-timer') {
+        window.riddleTimer = timer;
+    } else if (elementId === 'trivia-timer') {
+        window.triviaTimer = timer;
+    }
     
     return timer;
 }
@@ -829,7 +850,7 @@ async function showIndividualResult(data) {
         if (overlay.style.display === 'flex') {
             hideIndividualResult();
         }
-    }, 8000);
+    }, 5000); // Reduced from 8000ms to 5000ms for faster flow
 }
 
 function hideIndividualResult() {
@@ -1041,6 +1062,12 @@ socket.on('answer-submitted', (data) => {
             </span>
         `;
         
+        // Clear any running riddle timer to prevent conflicts
+        if (window.riddleTimer) {
+            clearInterval(window.riddleTimer);
+            window.riddleTimer = null;
+        }
+        
         // Add visual feedback to timer
         const timer = document.getElementById('riddle-timer');
         if (timer) {
@@ -1206,6 +1233,12 @@ socket.on('challenge-response-submitted', (data) => {
             </span>
         `;
         
+        // Clear client timer and show advancing status
+        if (window.challengeTimer) {
+            clearInterval(window.challengeTimer);
+            window.challengeTimer = null;
+        }
+        
         // Add visual feedback to timer
         const timer = document.getElementById('text-challenge-timer');
         if (timer) {
@@ -1226,6 +1259,12 @@ socket.on('trivia-answer-submitted', (data) => {
                 ✓ All players answered! Auto-advancing...
             </span>
         `;
+        
+        // Clear any running timer to prevent early termination
+        if (window.triviaTimer) {
+            clearInterval(window.triviaTimer);
+            window.triviaTimer = null;
+        }
         
         // Add visual feedback to timer
         const timer = document.getElementById('trivia-timer');

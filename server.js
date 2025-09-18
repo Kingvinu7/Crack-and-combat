@@ -352,6 +352,20 @@ function updateRoundHistory(room, riddleWinner, challengeResults) {
             return;
         }
         
+        // Skip updating round history for spectators (players who joined mid-game)
+        if (player.isSpectator) {
+            console.log(`${player.name} is spectator, skipping round history update`);
+            return;
+        }
+        
+        // Only add round results for players who were active in this round
+        // Check if player joined before or at the start of current round
+        const joinedAtRound = player.joinedAtRound || 0;
+        if (joinedAtRound >= room.currentRound) {
+            console.log(`${player.name} joined at round ${joinedAtRound}, current is ${room.currentRound}, skipping history update`);
+            return;
+        }
+        
         let roundResult = 'L'; // Default to loss
         
         // Check if they won the riddle
@@ -416,8 +430,25 @@ async function generateChallengeContent(type, roundNumber) {
                 break;
         }
 
-        const result = await model.generateContent(prompt);
+        // Add timeout and retry logic for API calls
+        const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Gemini API timeout after 10 seconds')), 10000);
+        });
+
+        const result = await Promise.race([
+            model.generateContent(prompt),
+            timeoutPromise
+        ]);
+        
+        if (!result || !result.response) {
+            throw new Error('Invalid response from Gemini API');
+        }
+        
         const response = (await result.response).text();
+        
+        if (!response || response.trim().length === 0) {
+            throw new Error('Empty response from Gemini API');
+        }
         
         // Better text cleanup and validation
         let cleaned = response.trim()
@@ -454,14 +485,43 @@ async function generateChallengeContent(type, roundNumber) {
         
     } catch (e) {
         console.error('AI challenge generation error:', e.message);
-        // Creative fallbacks on error that encourage fun solutions
-        const mediumFallbacks = {
-            negotiator: "Convince your smart home AI to unlock the doors after it's decided you're 'not authorized' due to a software glitch that doesn't recognize your voice patterns.",
-            detective: "The research facility's experimental AI has gone missing from its secure server. Clues: Unauthorized network access at 2:47 AM, a coffee-stained USB drive, electromagnetic interference in Lab 7, and security footage showing a figure in a lab coat. Three researchers had late access: Dr. Chen (AI ethics specialist), Dr. Rodriguez (cybersecurity expert), and Dr. Kim (neural network architect). Who took the AI and why?",
-            trivia: "What is the theoretical maximum processing speed limit imposed by the laws of physics on any computer?",
-            danger: "You're in a mirrored room where your reflections move on their own. Spot the real you before the glass shatters. The mirrors seem to show different versions of yourself, each moving independently. How do you identify which one is real?"
+        console.error('Error details:', {
+            type: e.name,
+            message: e.message,
+            stack: e.stack ? e.stack.substring(0, 200) : 'No stack trace'
+        });
+        
+        // Enhanced fallbacks with more variety
+        const enhancedFallbacks = {
+            negotiator: [
+                "Convince your smart home AI to unlock the doors after it's decided you're 'not authorized' due to a software glitch.",
+                "Persuade your neighbor's overly protective guard dog to let you retrieve your ball from their yard.",
+                "Talk your way past a suspicious security guard who thinks you're up to something sneaky.",
+                "Convince a stubborn vending machine to give you your snack after it ate your money."
+            ],
+            detective: [
+                "The research facility's experimental AI has gone missing from its secure server. Clues: Unauthorized network access at 2:47 AM, a coffee-stained USB drive, electromagnetic interference in Lab 7, and security footage showing a figure in a lab coat. Three researchers had late access: Dr. Chen (AI ethics specialist), Dr. Rodriguez (cybersecurity expert), and Dr. Kim (neural network architect). Who took the AI and why?",
+                "Someone sabotaged the space station's life support. Evidence: Tool marks on the oxygen recycler, mysterious chemical residue, a missing access card, and power fluctuations at 3:15 AM. Suspects: Chief Engineer Martinez, Security Officer Kim, and Maintenance Tech Johnson. Who's the saboteur?",
+                "The museum's priceless diamond vanished during the gala. Clues: Disabled security camera, wine stain on the display case, a dropped earring, and the alarm was mysteriously delayed by 5 minutes. Three people were near the exhibit: Curator Sarah, Guest VIP Thompson, and Waiter Miguel. Who stole it?"
+            ],
+            trivia: [
+                "What is the theoretical maximum processing speed limit imposed by the laws of physics on any computer?",
+                "Which programming language was specifically designed to be impossible to learn or use effectively?",
+                "What phenomenon allows quantum computers to potentially solve certain problems exponentially faster than classical computers?"
+            ],
+            danger: [
+                "You're in a mirrored room where your reflections move on their own. Spot the real you before the glass shatters. The mirrors seem to show different versions of yourself, each moving independently. How do you identify which one is real?",
+                "You're trapped in a room where gravity keeps shifting directions every 30 seconds. The exit door is on the ceiling, but it's locked with a puzzle that requires steady hands. How do you solve it?",
+                "You're in a library where the books rewrite themselves when you're not looking directly at them. You need to find a specific piece of information, but every time you look away, the text changes. How do you get the answer?"
+            ]
         };
-        return mediumFallbacks[type] || "Face this challenging test!";
+        
+        // Select a random fallback for variety
+        const fallbackArray = enhancedFallbacks[type] || ["Face this challenging test!"];
+        const randomFallback = fallbackArray[Math.floor(Math.random() * fallbackArray.length)];
+        
+        console.log(`Using enhanced fallback for ${type}: ${randomFallback.substring(0, 50)}...`);
+        return randomFallback;
     }
 }
 
@@ -553,8 +613,26 @@ async function evaluatePlayerResponse(challengeContent, playerResponse, challeng
                 evaluationPrompt = `Evaluate this response:\n\nChallenge: ${challengeContent}\n\nResponse: ${cleanResponse}\n\nDoes this show genuine effort and creative thinking? PASS or FAIL with reason. Keep under 350 characters. ${isAutoSubmitted ? 'NOTE: Auto-submitted when time ran out.' : ''}`;
         }
 
-        const result = await model.generateContent(evaluationPrompt);
+        // Add timeout and retry logic for evaluation API calls
+        const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Gemini evaluation timeout after 8 seconds')), 8000);
+        });
+
+        const result = await Promise.race([
+            model.generateContent(evaluationPrompt),
+            timeoutPromise
+        ]);
+        
+        if (!result || !result.response) {
+            throw new Error('Invalid response from Gemini evaluation API');
+        }
+        
         const response = (await result.response).text();
+        
+        if (!response || response.trim().length === 0) {
+            throw new Error('Empty response from Gemini evaluation API');
+        }
+        
         const pass = /PASS/i.test(response);
         let feedback = response.replace(/PASS|FAIL/gi, '').trim();
         
@@ -593,9 +671,42 @@ async function evaluatePlayerResponse(challengeContent, playerResponse, challeng
         
     } catch (e) {
         console.error('AI evaluation error:', e.message);
+        console.error('Evaluation error details:', {
+            type: e.name,
+            message: e.message,
+            challengeType: challengeType,
+            responseLength: cleanResponse.length,
+            stack: e.stack ? e.stack.substring(0, 200) : 'No stack trace'
+        });
+        
+        // Improved fallback logic based on response quality
+        let fallbackPass = false;
+        let fallbackFeedback = "The Oracle's judgment is unclear at this time.";
+        
+        // Basic heuristics when AI fails
+        if (cleanResponse.length > 20) {
+            // Longer responses get benefit of doubt
+            fallbackPass = Math.random() > 0.3;
+            fallbackFeedback = "Detailed response shows effort. Oracle systems experiencing interference.";
+        } else if (cleanResponse.length > 5) {
+            // Short but not empty responses
+            fallbackPass = Math.random() > 0.5;
+            fallbackFeedback = "Brief but present response. Oracle evaluation systems disrupted.";
+        } else {
+            // Very short responses are likely poor
+            fallbackPass = Math.random() > 0.7;
+            fallbackFeedback = "Minimal response detected. Oracle judgment hindered by system errors.";
+        }
+        
+        // Add auto-submit indicator
+        if (isAutoSubmitted) {
+            fallbackFeedback = `⏰ ${fallbackFeedback}`;
+        }
+        
+        console.log(`Fallback evaluation result: ${fallbackPass ? 'PASS' : 'FAIL'} - "${fallbackFeedback}"`);
         return { 
-            pass: Math.random() > 0.45, 
-            feedback: isAutoSubmitted ? "⏰ Auto-submitted. Oracle judgment unclear." : "The Oracle's judgment is unclear at this time." 
+            pass: fallbackPass, 
+            feedback: fallbackFeedback
         };
     }
 }
@@ -832,12 +943,12 @@ async function evaluateTextChallengeResults(roomCode) {
             feedback: evaluation.feedback,
             response: response
         });
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await new Promise(resolve => setTimeout(resolve, 1500)); // Reduced from 3000ms to 1500ms for faster evaluation flow
     }
 
     setTimeout(() => {
         endRound(roomCode, evaluationResults);
-    }, 5000);
+    }, 2000); // Reduced from 5000ms to 2000ms to move faster to round summary
 }
 
 // Game Flow Functions
@@ -853,6 +964,15 @@ function startNewRound(roomCode) {
         if (player.isSpectator && player.joinedAtRound < room.currentRound) {
             console.log(`Activating spectator ${player.name} for round ${room.currentRound}`);
             player.isSpectator = false;
+            
+            // Clear their round history - they start fresh from this round
+            if (room.roundHistory) {
+                const playerHistory = room.roundHistory.find(h => h.playerId === player.id || h.playerName === player.name);
+                if (playerHistory) {
+                    console.log(`Clearing round history for newly activated player ${player.name}`);
+                    playerHistory.rounds = []; // Start fresh, no pre-filled losses
+                }
+            }
             
             // Notify player they're now active
             const socket = io.sockets.sockets.get(player.id);
@@ -943,7 +1063,7 @@ function endRiddlePhase(roomCode) {
     });
     setTimeout(() => {
         startChallengePhase(roomCode);
-    }, 1500);
+    }, 4000); // Increased from 1500ms to 4000ms (4 seconds) to give players time to read results
 }
 
 // FIXED: Enhanced endRound function with improved tie-breaking
