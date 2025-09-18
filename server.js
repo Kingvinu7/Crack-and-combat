@@ -801,7 +801,7 @@ room.challengeTimer = setTimeout(() => {
     evaluateTextChallengeResults(roomCode);
 }, timeLimit * 1000 + 8000);
     }
-  },500);
+  },1000); // Increased from 500ms to 1000ms to prevent page transition conflicts
 }
 // Evaluate Trivia Results
 async function evaluateTriviaResults(roomCode) {

@@ -213,6 +213,7 @@ function getMusicForPage(pageName) {
 
 // Utility functions
 function showPage(pageName) {
+    console.log('Switching to page:', pageName);
     Object.values(pages).forEach(page => page.classList.remove('active'));
     if (pages[pageName]) {
         pages[pageName].classList.add('active');
@@ -1030,8 +1031,25 @@ socket.on('player-left', (data) => {
 });
 
 socket.on('oracle-speaks', (data) => {
+    console.log('Oracle speaks event received:', data.type, '-', data.message);
     oracleIntroMessage.textContent = data.message;
-    showPage('oracleIntro');
+    
+    // Only show oracle intro page for round introductions, not for challenge intros or evaluations
+    if (data.type === 'introduction') {
+        console.log('Showing oracle intro page for round introduction');
+        showPage('oracleIntro');
+    } else if (data.type === 'challenge-intro') {
+        // For challenge intros, show a brief notification without changing pages
+        console.log('Oracle challenge intro - showing notification instead of changing pages');
+        showNotification(data.message, 'info');
+    } else if (data.type === 'evaluation') {
+        // For evaluation messages, don't change pages either
+        console.log('Oracle evaluation message - no page change');
+    } else {
+        // Fallback for any other oracle message types
+        console.log('Unknown oracle message type:', data.type, '- showing notification');
+        showNotification(data.message, 'info');
+    }
 });
 
 socket.on('riddle-presented', (data) => {
