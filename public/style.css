@@ -4740,24 +4740,26 @@ textarea:focus {
     
     /* Mobile home screen zoom-out optimization */
     #home-screen .clean-layout {
-        padding: 10px !important;
-        transform: scale(0.85) !important;
+        padding: 5% !important;
+        transform: scale(0.9) !important;
         transform-origin: center center !important;
-        min-height: 85vh !important;
+        min-height: 90vh !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
-        max-width: 100% !important;
-        width: 100% !important;
+        max-width: 90% !important;
+        width: 90% !important;
+        margin: 0 auto !important;
     }
     
     #home-screen .main-content {
-        padding: 15px !important;
-        margin: 5px 0 !important;
+        padding: 20px !important;
+        margin: 0 !important;
         max-width: 100% !important;
         width: 100% !important;
         transform: scale(1.0) !important;
+        box-sizing: border-box !important;
     }
     
     #home-screen .title-section {
@@ -4815,9 +4817,9 @@ textarea:focus {
     }
     
     #home-screen .action-section {
-        gap: 12px !important;
+        gap: 15px !important;
         width: 100% !important;
-        max-width: 320px !important;
+        max-width: 100% !important;
     }
     
     #home-screen .help-btn {
@@ -4829,15 +4831,18 @@ textarea:focus {
     #home-screen {
         overflow-y: auto !important;
         overflow-x: hidden !important;
+        padding: 5% !important;
     }
     
     #home-screen .page-content {
-        padding: 10px !important;
+        padding: 0 !important;
         margin: 0 !important;
-        min-height: 100vh !important;
+        min-height: 90vh !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
     
     /* Keep hardware acceleration only for interactive elements */
