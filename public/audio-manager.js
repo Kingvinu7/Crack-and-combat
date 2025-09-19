@@ -485,6 +485,16 @@ class AudioManager {
     playSound(soundName, volume = 1.0) {
         if (!this.isInitialized || this.isMuted) return;
         
+        // On mobile, only play essential sounds to prevent heating
+        if (this.mobileMode) {
+            const essentialSounds = ['correct', 'incorrect', 'submit', 'click'];
+            if (!essentialSounds.includes(soundName)) {
+                return; // Skip non-essential sounds on mobile
+            }
+            // Reduce volume on mobile to save battery
+            volume = volume * 0.6;
+        }
+        
         const sound = this.soundEffects[soundName];
         if (!sound) {
             console.warn(`Sound effect not found: ${soundName}`);
@@ -618,6 +628,38 @@ class AudioManager {
     playNotificationSound() { this.playSound('notification'); }
     playTransitionSound() { this.playSound('transition'); }
     playTapSound() { this.playSound('tap'); }
+    
+    // Mobile performance optimization
+    pauseAllAudio() {
+        if (this.currentMusic) {
+            this.currentMusic.pause();
+        }
+        // Suspend audio context to save mobile battery
+        if (this.audioContext && this.audioContext.state === 'running') {
+            this.audioContext.suspend().catch(console.error);
+        }
+    }
+    
+    // Mobile-specific audio optimization
+    optimizeForMobile() {
+        console.log('Optimizing audio for mobile performance');
+        
+        // Reduce audio quality on mobile to prevent heating
+        if (this.audioContext) {
+            // Lower sample rate if possible (browser dependent)
+            console.log('Current sample rate:', this.audioContext.sampleRate);
+        }
+        
+        // Disable sound effects on mobile to reduce processing
+        this.mobileMode = true;
+    }
+    
+    resumeAudio() {
+        // Resume audio context
+        if (this.audioContext && this.audioContext.state === 'suspended') {
+            this.audioContext.resume().catch(console.error);
+        }
+    }
 }
 
 // Create global audio manager instance

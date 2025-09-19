@@ -4,6 +4,7 @@ let playerName = null;
 let isRoomOwner = false;
 let tapCount = 0;
 let tapperActive = false;
+let gameEnded = false; // Track if game has ended to prevent stray overlays
 
 // Replaced matrix rain with gentle, motion-sickness-free background animations
 
@@ -213,17 +214,35 @@ function getMusicForPage(pageName) {
 
 // Utility functions
 function showPage(pageName) {
-    Object.values(pages).forEach(page => page.classList.remove('active'));
+    console.log('Switching to page:', pageName);
+    
+    // Mobile optimization: batch DOM updates
+    if (window.mobileOptimized) {
+        requestAnimationFrame(() => {
+            Object.values(pages).forEach(page => page.classList.remove('active'));
+            if (pages[pageName]) {
+                pages[pageName].classList.add('active');
+            }
+        });
+    } else {
+        Object.values(pages).forEach(page => page.classList.remove('active'));
+        if (pages[pageName]) {
+            pages[pageName].classList.add('active');
+        }
+    }
+    
     if (pages[pageName]) {
-        pages[pageName].classList.add('active');
         
         // Simplified 3-track music system with smart switching
         if (window.audioManager) {
             console.log(`Showing page: ${pageName}, Audio initialized: ${window.audioManager.isInitialized}`);
             
-            // Play transition sound only if initialized
+            // Play transition sound - mobile optimization handled in audio manager
             if (window.audioManager.isInitialized) {
-                window.audioManager.playTransitionSound();
+                // On mobile, only play transitions for important page changes
+                if (!window.mobileOptimized || ['gameOver', 'roundSummary'].includes(pageName)) {
+                    window.audioManager.playTransitionSound();
+                }
             }
             
             // Determine what music should play
@@ -675,9 +694,29 @@ function createPointsTable(roundHistory, tableId) {
 
 function startTimer(elementId, seconds) {
     const element = document.getElementById(elementId);
+    if (!element) {
+        console.warn('Timer element not found:', elementId);
+        return null;
+    }
+    
     let timeLeft = seconds;
     
+    // Clear any existing timer for this element type to prevent memory leaks
+    if (elementId === 'riddle-timer' && window.riddleTimer) {
+        clearInterval(window.riddleTimer);
+        window.riddleTimer = null;
+    } else if (elementId === 'trivia-timer' && window.triviaTimer) {
+        clearInterval(window.triviaTimer);
+        window.triviaTimer = null;
+    }
+    
     const timer = setInterval(() => {
+        // Check if element still exists (prevent errors if DOM changes)
+        if (!element.parentNode) {
+            clearInterval(timer);
+            return;
+        }
+        
         element.textContent = timeLeft;
         
         if (timeLeft <= 10) {
@@ -695,8 +734,22 @@ function startTimer(elementId, seconds) {
         if (timeLeft < 0) {
             clearInterval(timer);
             element.classList.remove('urgent', 'danger');
+            
+            // Clear the global reference
+            if (elementId === 'riddle-timer') {
+                window.riddleTimer = null;
+            } else if (elementId === 'trivia-timer') {
+                window.triviaTimer = null;
+            }
         }
     }, 1000);
+    
+    // Store timer reference globally for proper cleanup
+    if (elementId === 'riddle-timer') {
+        window.riddleTimer = timer;
+    } else if (elementId === 'trivia-timer') {
+        window.triviaTimer = timer;
+    }
     
     return timer;
 }
@@ -706,13 +759,26 @@ function startChallengeTimer(elementId, seconds) {
     const textarea = document.getElementById('challenge-response');
     const submitBtn = document.getElementById('submit-challenge-response');
     
-    // Clear any existing timer to prevent multiple timers running
+    if (!element) {
+        console.warn('Challenge timer element not found:', elementId);
+        return null;
+    }
+    
+    // Clear any existing timer to prevent multiple timers running and memory leaks
     if (window.challengeTimer) {
         clearInterval(window.challengeTimer);
+        window.challengeTimer = null;
     }
     
     let timeLeft = seconds;
     window.challengeTimer = setInterval(() => {
+        // Check if elements still exist (prevent errors if DOM changes)
+        if (!element.parentNode) {
+            clearInterval(window.challengeTimer);
+            window.challengeTimer = null;
+            return;
+        }
+        
         element.textContent = timeLeft;
         
         if (timeLeft <= 10) {
@@ -732,7 +798,7 @@ function startChallengeTimer(elementId, seconds) {
             window.challengeTimer = null;
             element.classList.remove('urgent', 'danger');
             
-            if (textarea && !textarea.disabled && !submitBtn.disabled) {
+            if (textarea && !textarea.disabled && submitBtn && !submitBtn.disabled) {
                 const currentText = textarea.value.trim();
                 if (currentText.length > 0) {
                     console.log('Auto-submitting response:', currentText.substring(0, 30) + '...');
@@ -757,6 +823,12 @@ function typeWriter(element, text, speed = 30) {
     return new Promise((resolve) => {
         element.textContent = '';
         element.scrollTop = 0;
+        
+        // On mobile, make typewriter effect much faster to reduce CPU usage
+        if (window.mobileOptimized) {
+            speed = speed / 3; // 3x faster on mobile
+        }
+        
         let i = 0;
         
         function typeNextChar() {
@@ -774,7 +846,12 @@ function typeWriter(element, text, speed = 30) {
                     delay = speed * 2;
                 }
                 
-                setTimeout(typeNextChar, delay);
+                // On mobile, use requestAnimationFrame for better performance
+                if (window.mobileOptimized && delay < 20) {
+                    requestAnimationFrame(typeNextChar);
+                } else {
+                    setTimeout(typeNextChar, delay);
+                }
             } else {
                 resolve();
             }
@@ -829,7 +906,7 @@ async function showIndividualResult(data) {
         if (overlay.style.display === 'flex') {
             hideIndividualResult();
         }
-    }, 8000);
+    }, 5000); // Reduced from 8000ms to 5000ms for faster flow
 }
 
 function hideIndividualResult() {
@@ -1009,11 +1086,29 @@ socket.on('player-left', (data) => {
 });
 
 socket.on('oracle-speaks', (data) => {
+    console.log('Oracle speaks event received:', data.type, '-', data.message);
     oracleIntroMessage.textContent = data.message;
-    showPage('oracleIntro');
+    
+    // Only show oracle intro page for round introductions, not for challenge intros or evaluations
+    if (data.type === 'introduction') {
+        console.log('Showing oracle intro page for round introduction');
+        showPage('oracleIntro');
+    } else if (data.type === 'challenge-intro') {
+        // For challenge intros, show a brief notification without changing pages
+        console.log('Oracle challenge intro - showing notification instead of changing pages');
+        showNotification(data.message, 'info');
+    } else if (data.type === 'evaluation') {
+        // For evaluation messages, don't change pages either
+        console.log('Oracle evaluation message - no page change');
+    } else {
+        // Fallback for any other oracle message types
+        console.log('Unknown oracle message type:', data.type, '- showing notification');
+        showNotification(data.message, 'info');
+    }
 });
 
 socket.on('riddle-presented', (data) => {
+    gameEnded = false; // Reset game state when new round starts
     document.getElementById('round-display').textContent = `Round ${data.round}/${data.maxRounds}`;
     riddleText.textContent = data.riddle.question;
     
@@ -1040,6 +1135,12 @@ socket.on('answer-submitted', (data) => {
                 ✓ All players answered! Auto-advancing...
             </span>
         `;
+        
+        // Clear any running riddle timer to prevent conflicts
+        if (window.riddleTimer) {
+            clearInterval(window.riddleTimer);
+            window.riddleTimer = null;
+        }
         
         // Add visual feedback to timer
         const timer = document.getElementById('riddle-timer');
@@ -1163,6 +1264,12 @@ socket.on('fast-tapper-start', (data) => {
 });
 
 socket.on('challenge-individual-result', (data) => {
+    // Prevent individual results from showing after game has ended
+    if (gameEnded) {
+        console.log('Game has ended, ignoring individual result overlay');
+        return;
+    }
+    
     // Challenge completed - go back to cyber-ambient
     if (window.audioManager) {
         console.log('Challenge completed - returning to cyber ambient');
@@ -1206,6 +1313,12 @@ socket.on('challenge-response-submitted', (data) => {
             </span>
         `;
         
+        // Clear client timer and show advancing status
+        if (window.challengeTimer) {
+            clearInterval(window.challengeTimer);
+            window.challengeTimer = null;
+        }
+        
         // Add visual feedback to timer
         const timer = document.getElementById('text-challenge-timer');
         if (timer) {
@@ -1226,6 +1339,12 @@ socket.on('trivia-answer-submitted', (data) => {
                 ✓ All players answered! Auto-advancing...
             </span>
         `;
+        
+        // Clear any running timer to prevent early termination
+        if (window.triviaTimer) {
+            clearInterval(window.triviaTimer);
+            window.triviaTimer = null;
+        }
         
         // Add visual feedback to timer
         const timer = document.getElementById('trivia-timer');
@@ -1320,6 +1439,7 @@ socket.on('round-summary', (data) => {
 
 // ENHANCED: Game over handler with debugging
 socket.on('game-over', (data) => {
+    gameEnded = true; // Mark game as ended to prevent stray overlays
     console.log('=== GAME OVER DEBUG START ===');
     console.log('Game over data received:', data);
     console.log('Winner:', data.winner);
@@ -1347,9 +1467,19 @@ socket.on('game-over', (data) => {
     }).join('');
     
     const bigWinnerEl = document.getElementById('big-winner-announcement');
-    if (bigWinnerEl) {
-        const tieText = data.tied ? 'It\'s a Tie!' : '';
-        bigWinnerEl.innerHTML = `CHAMPION: ${data.winner.name}<br>${data.winner.score} Points<br>${tieText}`;
+    if (bigWinnerEl && data.winner) {
+        let winnerDisplay = '';
+        if (data.tied) {
+            winnerDisplay = `🏆 TIE GAME! 🏆<br>Multiple Champions with ${data.winner.score} Points`;
+        } else if (data.winner.score === 0) {
+            winnerDisplay = `💀 NO WINNER 💀<br>Oracle Remains Victorious`;
+        } else {
+            winnerDisplay = `🏆 CHAMPION: ${data.winner.name} 🏆<br>${data.winner.score} Points`;
+        }
+        bigWinnerEl.innerHTML = winnerDisplay;
+    } else if (bigWinnerEl) {
+        // Fallback if no winner data
+        bigWinnerEl.innerHTML = `🤖 GAME COMPLETE 🤖<br>Results Processing...`;
     }
     
     const finalOracleEl = document.getElementById('final-oracle');
@@ -1440,10 +1570,24 @@ socket.on('game-ended', (data) => {
     }, 5000);
 });
 
-// Mobile keyboard handling
+// Mobile optimization and keyboard handling
 function handleMobileKeyboard() {
     const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (isMobile) {
+        // Aggressive mobile performance optimizations
+        console.log('Mobile device detected - applying performance optimizations');
+        
+        // Disable smooth scrolling to reduce CPU load
+        document.documentElement.style.scrollBehavior = 'auto';
+        
+        // Reduce DOM update frequency
+        window.mobileOptimized = true;
+        
+        // Optimize audio for mobile
+        if (window.audioManager) {
+            window.audioManager.optimizeForMobile();
+        }
+        
         // Prevent zoom when focusing inputs
         document.querySelectorAll('input, textarea').forEach(input => {
             input.addEventListener('focus', () => {
@@ -1560,8 +1704,8 @@ function checkAudioStatus() {
     }
 }
 
-// Check audio status periodically
-setInterval(checkAudioStatus, 1000);
+// Check audio status only when needed (removed continuous polling to save battery)
+// setInterval(checkAudioStatus, 1000); // Disabled for mobile performance
 
 // Add a global click handler to ensure audio starts on any click
 document.addEventListener('click', function(event) {
@@ -1582,6 +1726,54 @@ document.addEventListener('click', function(event) {
     }
 }, { once: false }); // Don't use once, so it can retry
 
+// Cleanup function to prevent memory leaks and battery drain
+function cleanupTimers() {
+    console.log('Cleaning up timers for mobile performance...');
+    
+    if (window.challengeTimer) {
+        clearInterval(window.challengeTimer);
+        window.challengeTimer = null;
+    }
+    
+    if (window.riddleTimer) {
+        clearInterval(window.riddleTimer);
+        window.riddleTimer = null;
+    }
+    
+    if (window.triviaTimer) {
+        clearInterval(window.triviaTimer);
+        window.triviaTimer = null;
+    }
+}
+
+// Clean up when page is hidden or user navigates away (saves mobile battery)
+document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+        console.log('Page hidden - cleaning up for mobile performance');
+        cleanupTimers();
+        
+        // Pause audio to save battery
+        if (window.audioManager) {
+            window.audioManager.pauseAllAudio();
+        }
+    } else {
+        console.log('Page visible - resuming audio if needed');
+        // Resume audio when page becomes visible again
+        if (window.audioManager && window.audioManager.isInitialized) {
+            window.audioManager.resumeAudio();
+            window.audioManager.playMusic('home');
+        }
+    }
+});
+
+// Clean up when user leaves the page
+window.addEventListener('beforeunload', function() {
+    cleanupTimers();
+    if (window.audioManager) {
+        window.audioManager.pauseAllAudio();
+    }
+});
+
 // Initialize
 addAudioControlsToAllPages();
 showPage('home');
@@ -1592,4 +1784,4 @@ checkAudioStatus(); // Initial check
 if (!/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     playerNameInput.focus();
 }
-console.log('Frontend loaded - Crack and Combat v4.8 (Enhanced Mobile + Auto-Advance)');
+console.log('Frontend loaded - Crack and Combat v4.8 (Enhanced Mobile Performance)');

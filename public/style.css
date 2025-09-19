@@ -4411,6 +4411,572 @@ textarea:focus {
     }
 }
 
+/* BALANCED MOBILE OPTIMIZATION - Keep essential animations, remove heavy ones */
+@media (max-width: 768px) {
+    /* Base body background with animated cyan colors */
+    body {
+        background: linear-gradient(45deg,
+            rgba(15, 35, 35, 1) 0%,
+            rgba(10, 40, 40, 1) 25%,
+            rgba(20, 45, 45, 1) 50%,
+            rgba(5, 50, 50, 1) 75%,
+            rgba(25, 40, 40, 1) 100%) !important;
+        background-size: 300% 300% !important;
+        animation: mobileGradientShift 15s ease-in-out infinite !important;
+        min-height: 100vh !important;
+    }
+    
+    /* Keep essential UI animations but make them faster and lighter */
+    .btn, .cyber-btn, .trivia-option, .tap-btn {
+        transition: transform 0.2s ease, background-color 0.2s ease !important;
+    }
+    
+    .btn:hover, .cyber-btn:hover, .trivia-option:hover, .tap-btn:hover {
+        transform: translateY(-2px) !important;
+    }
+    
+    /* Keep page transitions but make them faster */
+    .page {
+        transition: opacity 0.3s ease !important;
+        /* Enhanced full-screen animated gradient with cyan colors only */
+        background: linear-gradient(135deg, 
+            rgba(10, 45, 45, 0.9) 0%, 
+            rgba(15, 50, 50, 0.8) 15%, 
+            rgba(5, 55, 55, 0.7) 30%, 
+            rgba(20, 40, 40, 0.8) 45%, 
+            rgba(8, 60, 60, 0.9) 60%, 
+            rgba(25, 45, 45, 0.8) 75%, 
+            rgba(12, 65, 65, 0.7) 90%, 
+            rgba(18, 50, 50, 0.9) 100%) !important;
+        background-size: 600% 600% !important;
+        animation: mobileGradientShift 10s ease-in-out infinite !important;
+        min-height: 100vh !important;
+    }
+    
+    /* Keep notification animations - they're lightweight */
+    .custom-notification {
+        transition: opacity 0.3s ease, transform 0.3s ease !important;
+    }
+    
+    /* Keep modal animations but make them faster */
+    .modal-overlay, .popup-modal {
+        transition: opacity 0.2s ease !important;
+    }
+    
+    .modal-content, .popup-content {
+        transition: transform 0.2s ease !important;
+    }
+    
+    /* DISABLE HEAVY ANIMATIONS that cause heating */
+    
+    /* Remove matrix background completely - biggest heating source */
+    .matrix-bg,
+    .matrix-layer-1,
+    .matrix-layer-2,
+    .matrix-layer-3 {
+        display: none !important;
+    }
+    
+    /* Disable continuous/infinite animations that run constantly */
+    .hexagon-outer,
+    .hexagon-inner,
+    .ai-core .core-ring,
+    .cyber-title span,
+    .status-indicator,
+    .loading-dots span,
+    *[class*="glow"],
+    *[class*="pulse"],
+    *[class*="rotate"],
+    *[class*="float"] {
+        animation: none !important;
+    }
+    
+    /* Remove heavy visual effects that stress GPU */
+    .hexagon-outer,
+    .hexagon-inner,
+    .ai-core,
+    .core-ring {
+        box-shadow: none !important;
+        filter: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    
+    /* Keep simple box-shadows for depth but remove complex ones */
+    * {
+        filter: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    
+    /* Allow simple box-shadows for buttons and cards */
+    .btn, .cyber-btn, .modal-content, .popup-content, .custom-notification {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    /* Add subtle animated borders for visual interest */
+    .page-content {
+        border: 1px solid transparent !important;
+        background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                   linear-gradient(45deg, rgba(0, 255, 0, 0.2), rgba(255, 0, 0, 0.2), rgba(0, 255, 0, 0.2)) border-box !important;
+        animation: mobileBorderShift 6s ease-in-out infinite !important;
+    }
+    
+    /* Disable transform3d and hardware acceleration for non-essential elements */
+    .hexagon-outer,
+    .hexagon-inner,
+    .ai-core,
+    .core-ring,
+    .matrix-bg * {
+        transform: none !important;
+        will-change: auto !important;
+    }
+    
+    /* Add back subtle hover effects for interactive elements */
+    .ai-symbol-container:hover .hexagon-inner {
+        transform: scale(1.02) !important;
+        transition: transform 0.3s ease !important;
+    }
+    
+    /* Keep subtle glow for important elements */
+    .cyber-title {
+        text-shadow: 0 0 10px rgba(255, 0, 64, 0.3) !important;
+    }
+    
+    /* Enhanced floating elements for full-screen cyan coverage */
+    .page::before {
+        content: '';
+        position: absolute;
+        top: 5%;
+        left: 5%;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, rgba(0, 255, 255, 0.4) 0%, rgba(0, 200, 200, 0.3) 40%, transparent 80%);
+        border-radius: 50%;
+        animation: mobileFloatCyan 12s ease-in-out infinite;
+        pointer-events: none;
+        z-index: -1;
+    }
+    
+    .page::after {
+        content: '';
+        position: absolute;
+        bottom: 5%;
+        right: 5%;
+        width: 180px;
+        height: 180px;
+        background: radial-gradient(circle, rgba(0, 200, 255, 0.4) 0%, rgba(0, 150, 200, 0.3) 40%, transparent 80%);
+        border-radius: 50%;
+        animation: mobileFloatCyan 14s ease-in-out infinite reverse;
+        pointer-events: none;
+        z-index: -1;
+    }
+    
+    /* Enhanced page-specific themes with cyan-only color coverage */
+    #home-screen {
+        background: linear-gradient(135deg, 
+            rgba(10, 50, 50, 0.9) 0%, 
+            rgba(15, 60, 60, 0.8) 20%, 
+            rgba(5, 65, 65, 0.7) 40%, 
+            rgba(20, 55, 55, 0.8) 60%, 
+            rgba(8, 70, 70, 0.9) 80%, 
+            rgba(25, 50, 50, 0.8) 100%) !important;
+        background-size: 500% 500% !important;
+        animation: mobileGradientShift 12s ease-in-out infinite !important;
+    }
+    
+    #riddle-screen {
+        background: linear-gradient(135deg, 
+            rgba(5, 60, 60, 0.9) 0%, 
+            rgba(15, 55, 55, 0.8) 25%, 
+            rgba(0, 70, 70, 0.7) 50%, 
+            rgba(20, 50, 50, 0.8) 75%, 
+            rgba(10, 65, 65, 0.9) 100%) !important;
+        background-size: 400% 400% !important;
+        animation: mobileGradientShift 8s ease-in-out infinite !important;
+    }
+    
+    #text-challenge-screen, #trivia-challenge-screen, #fast-tapper-screen {
+        background: linear-gradient(135deg, 
+            rgba(8, 55, 55, 0.9) 0%, 
+            rgba(12, 60, 60, 0.8) 25%, 
+            rgba(3, 65, 65, 0.7) 50%, 
+            rgba(18, 50, 50, 0.8) 75%, 
+            rgba(6, 70, 70, 0.9) 100%) !important;
+        background-size: 400% 400% !important;
+        animation: mobileGradientShift 8s ease-in-out infinite !important;
+    }
+    
+    #game-over-screen {
+        background: linear-gradient(135deg, 
+            rgba(15, 60, 60, 0.9) 0%, 
+            rgba(10, 70, 70, 0.8) 20%, 
+            rgba(20, 55, 55, 0.7) 40%, 
+            rgba(5, 75, 75, 0.8) 60%, 
+            rgba(25, 50, 50, 0.9) 80%, 
+            rgba(12, 65, 65, 0.8) 100%) !important;
+        background-size: 500% 500% !important;
+        animation: mobileGradientShift 10s ease-in-out infinite !important;
+    }
+    
+    #lobby-screen {
+        background: linear-gradient(135deg, 
+            rgba(12, 45, 45, 0.9) 0%, 
+            rgba(18, 50, 50, 0.8) 30%, 
+            rgba(8, 55, 55, 0.7) 60%, 
+            rgba(22, 40, 40, 0.8) 100%) !important;
+        background-size: 400% 400% !important;
+        animation: mobileGradientShift 9s ease-in-out infinite !important;
+    }
+    
+    /* Enhanced particle system for full-screen cyan coverage */
+    #home-screen::before {
+        background: radial-gradient(circle, rgba(0, 255, 255, 0.5) 0%, rgba(0, 200, 200, 0.3) 50%, transparent 80%) !important;
+        width: 250px !important;
+        height: 250px !important;
+        top: 15% !important;
+        left: 70% !important;
+    }
+    
+    #home-screen::after {
+        background: radial-gradient(circle, rgba(0, 200, 255, 0.5) 0%, rgba(0, 150, 200, 0.3) 50%, transparent 80%) !important;
+        width: 220px !important;
+        height: 220px !important;
+        bottom: 15% !important;
+        right: 10% !important;
+    }
+    
+    #riddle-screen::before {
+        background: radial-gradient(circle, rgba(0, 255, 200, 0.5) 0%, rgba(0, 180, 180, 0.4) 50%, transparent 80%) !important;
+        width: 280px !important;
+        height: 280px !important;
+    }
+    
+    #riddle-screen::after {
+        background: radial-gradient(circle, rgba(0, 220, 255, 0.4) 0%, rgba(0, 160, 200, 0.3) 50%, transparent 80%) !important;
+        width: 200px !important;
+        height: 200px !important;
+    }
+    
+    #text-challenge-screen::before, #trivia-challenge-screen::before, #fast-tapper-screen::before {
+        background: radial-gradient(circle, rgba(0, 180, 255, 0.5) 0%, rgba(0, 140, 200, 0.4) 50%, transparent 80%) !important;
+        width: 300px !important;
+        height: 300px !important;
+    }
+    
+    #text-challenge-screen::after, #trivia-challenge-screen::after, #fast-tapper-screen::after {
+        background: radial-gradient(circle, rgba(0, 255, 220, 0.4) 0%, rgba(0, 200, 180, 0.3) 50%, transparent 80%) !important;
+        width: 220px !important;
+        height: 220px !important;
+    }
+    
+    /* Add more floating elements for full cyan coverage */
+    .page-content::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 20%;
+        width: 150px;
+        height: 150px;
+        background: radial-gradient(circle, rgba(0, 200, 200, 0.3) 0%, transparent 70%);
+        border-radius: 50%;
+        animation: mobileFloatCyan 15s ease-in-out infinite;
+        pointer-events: none;
+        z-index: -1;
+        transform: translateY(-50%);
+    }
+    
+    .page-content::after {
+        content: '';
+        position: absolute;
+        top: 30%;
+        right: 25%;
+        width: 120px;
+        height: 120px;
+        background: radial-gradient(circle, rgba(0, 255, 200, 0.3) 0%, transparent 70%);
+        border-radius: 50%;
+        animation: mobileFloatCyan 13s ease-in-out infinite reverse;
+        pointer-events: none;
+        z-index: -1;
+    }
+    
+    /* Add corner accent elements for full cyan coverage */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.4) 0%, transparent 100%);
+        pointer-events: none;
+        z-index: -2;
+        animation: mobileFloatCyan 20s ease-in-out infinite;
+    }
+    
+    body::after {
+        content: '';
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(315deg, rgba(0, 200, 255, 0.4) 0%, transparent 100%);
+        pointer-events: none;
+        z-index: -2;
+        animation: mobileFloatCyan 18s ease-in-out infinite reverse;
+    }
+    
+    /* Add side accent elements */
+    .page {
+        position: relative;
+        overflow: hidden !important;
+    }
+    
+    .page::before,
+    .page::after {
+        z-index: -1 !important;
+    }
+    
+    /* Mobile home screen full-background optimization */
+    #home-screen .clean-layout {
+        padding: 0 !important;
+        transform: none !important;
+        min-height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+        position: relative !important;
+    }
+    
+    #home-screen .main-content {
+        padding: 30px !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        transform: none !important;
+        box-sizing: border-box !important;
+        background: rgba(0, 0, 0, 0.5) !important;
+        border: 2px solid rgba(0, 255, 255, 0.4) !important;
+        border-radius: 15px !important;
+        position: relative !important;
+        z-index: 1 !important;
+    }
+    
+    #home-screen .title-section {
+        margin-bottom: 15px !important;
+        transform: scale(0.95) !important;
+    }
+    
+    #home-screen .ai-symbol-container {
+        margin: 10px 0 !important;
+        transform: scale(0.7) !important;
+    }
+    
+    #home-screen .hexagon-wrapper {
+        width: 120px !important;
+        height: 120px !important;
+    }
+    
+    #home-screen .hexagon-outer {
+        width: 100px !important;
+        height: 100px !important;
+    }
+    
+    #home-screen .hexagon-inner {
+        width: 80px !important;
+        height: 80px !important;
+    }
+    
+    #home-screen .game-controls {
+        margin-top: 15px !important;
+        transform: scale(0.9) !important;
+    }
+    
+    #home-screen .help-section {
+        margin-top: 10px !important;
+        transform: scale(0.85) !important;
+    }
+    
+    /* Adjust font sizes for better mobile proportions */
+    #home-screen .cyber-title {
+        font-size: 2.2rem !important;
+        line-height: 1.1 !important;
+        margin-bottom: 8px !important;
+    }
+    
+    #home-screen .cyber-subtitle {
+        font-size: 0.9rem !important;
+        margin-bottom: 15px !important;
+    }
+    
+    #home-screen .cyber-btn {
+        font-size: 0.9rem !important;
+        padding: 10px 18px !important;
+        margin: 6px 0 !important;
+        min-height: 45px !important;
+    }
+    
+    #home-screen .action-section {
+        gap: 15px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    #home-screen .help-btn {
+        font-size: 0.85rem !important;
+        padding: 8px 16px !important;
+    }
+    
+    /* Ensure home screen content fits well on mobile */
+    #home-screen {
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        padding: 0 !important;
+        position: relative !important;
+    }
+    
+    #home-screen .page-content {
+        padding: 20px !important;
+        margin: 0 !important;
+        min-height: 100vh !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        position: relative !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Keep hardware acceleration only for interactive elements */
+    .btn, .cyber-btn, .trivia-option, .tap-btn, .modal-content, .popup-content {
+        will-change: transform !important;
+    }
+    
+    /* Add back lightweight animations that enhance UX */
+    
+    /* Keep timer urgency animations - they're important for gameplay */
+    .timer.urgent {
+        animation: timerUrgent 1s ease-in-out infinite alternate !important;
+    }
+    
+    .timer.danger {
+        animation: timerDanger 0.8s ease-in-out infinite alternate !important;
+    }
+    
+    /* Keep winner announcement animations - they're momentary */
+    .winner-badge, .winner {
+        animation: winnerPulse 2s ease-in-out 3 !important;
+    }
+    
+    /* Keep loading dots for feedback - lightweight and helpful */
+    .loading-dots span {
+        animation: loadingDot 1.5s ease-in-out infinite !important;
+    }
+    .loading-dots span:nth-child(1) { animation-delay: -0.4s !important; }
+    .loading-dots span:nth-child(2) { animation-delay: -0.2s !important; }
+    .loading-dots span:nth-child(3) { animation-delay: 0s !important; }
+    
+    /* Keep button press feedback - essential for touch interfaces */
+    .btn:active, .cyber-btn:active, .trivia-option:active, .tap-btn:active {
+        transform: translateY(0px) scale(0.98) !important;
+        transition: transform 0.1s ease !important;
+    }
+    
+    /* Keep result reveal animations - they're short-lived */
+    .individual-result {
+        animation: resultSlideIn 0.4s ease-out !important;
+    }
+    
+    /* Keep notification slide-in - important for user feedback */
+    .custom-notification {
+        animation: notificationSlideIn 0.3s ease-out !important;
+    }
+}
+
+/* Define the lightweight animations for mobile */
+@keyframes timerUrgent {
+    from { color: var(--accent-red); }
+    to { color: #ff6b6b; }
+}
+
+@keyframes timerDanger {
+    from { color: var(--accent-yellow); }
+    to { color: #ffd93d; }
+}
+
+@keyframes winnerPulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.05); }
+}
+
+@keyframes loadingDot {
+    0%, 80%, 100% { opacity: 0.3; }
+    40% { opacity: 1; }
+}
+
+@keyframes resultSlideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes notificationSlideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Mobile-optimized gradient animation */
+@keyframes mobileGradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Enhanced floating animations for cyan coverage */
+@keyframes mobileFloatCyan {
+    0%, 100% { 
+        transform: translateY(0px) translateX(0px);
+        opacity: 0.4;
+    }
+    20% { 
+        transform: translateY(-40px) translateX(30px);
+        opacity: 0.6;
+    }
+    40% { 
+        transform: translateY(-20px) translateX(60px);
+        opacity: 0.5;
+    }
+    60% { 
+        transform: translateY(-50px) translateX(20px);
+        opacity: 0.7;
+    }
+    80% { 
+        transform: translateY(-30px) translateX(-10px);
+        opacity: 0.5;
+    }
+}
+
+/* Subtle border color animation */
+@keyframes mobileBorderShift {
+    0% { 
+        background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                   linear-gradient(45deg, rgba(0, 255, 0, 0.2), rgba(255, 0, 0, 0.1), rgba(0, 255, 0, 0.2)) border-box;
+    }
+    50% { 
+        background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                   linear-gradient(45deg, rgba(0, 255, 0, 0.1), rgba(255, 0, 0, 0.2), rgba(0, 255, 0, 0.1)) border-box;
+    }
+    100% { 
+        background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                   linear-gradient(45deg, rgba(0, 255, 0, 0.2), rgba(255, 0, 0, 0.1), rgba(0, 255, 0, 0.2)) border-box;
+    }
+}
+
 /* Firefox scrollbar */
 * {
     scrollbar-width: thin;
