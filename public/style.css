@@ -4738,6 +4738,105 @@ textarea:focus {
         z-index: -1 !important;
     }
     
+    /* Mobile home screen zoom-out optimization */
+    #home-screen .clean-layout {
+        padding: 8px !important;
+        transform: scale(0.8) !important;
+        transform-origin: center center !important;
+        min-height: 85vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+    
+    #home-screen .main-content {
+        padding: 12px !important;
+        margin: 5px 0 !important;
+        max-width: 95% !important;
+        transform: scale(0.9) !important;
+    }
+    
+    #home-screen .title-section {
+        margin-bottom: 15px !important;
+        transform: scale(0.95) !important;
+    }
+    
+    #home-screen .ai-symbol-container {
+        margin: 10px 0 !important;
+        transform: scale(0.7) !important;
+    }
+    
+    #home-screen .hexagon-wrapper {
+        width: 120px !important;
+        height: 120px !important;
+    }
+    
+    #home-screen .hexagon-outer {
+        width: 100px !important;
+        height: 100px !important;
+    }
+    
+    #home-screen .hexagon-inner {
+        width: 80px !important;
+        height: 80px !important;
+    }
+    
+    #home-screen .game-controls {
+        margin-top: 15px !important;
+        transform: scale(0.9) !important;
+    }
+    
+    #home-screen .help-section {
+        margin-top: 10px !important;
+        transform: scale(0.85) !important;
+    }
+    
+    /* Adjust font sizes for better mobile proportions */
+    #home-screen .cyber-title {
+        font-size: 2.2rem !important;
+        line-height: 1.1 !important;
+        margin-bottom: 8px !important;
+    }
+    
+    #home-screen .cyber-subtitle {
+        font-size: 0.9rem !important;
+        margin-bottom: 15px !important;
+    }
+    
+    #home-screen .cyber-btn {
+        font-size: 0.9rem !important;
+        padding: 10px 18px !important;
+        margin: 6px 0 !important;
+        min-height: 45px !important;
+    }
+    
+    #home-screen .action-section {
+        gap: 10px !important;
+        width: 100% !important;
+        max-width: 280px !important;
+    }
+    
+    #home-screen .help-btn {
+        font-size: 0.85rem !important;
+        padding: 8px 16px !important;
+    }
+    
+    /* Ensure home screen content fits well on mobile */
+    #home-screen {
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+    }
+    
+    #home-screen .page-content {
+        padding: 10px !important;
+        margin: 0 !important;
+        min-height: 100vh !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
     /* Keep hardware acceleration only for interactive elements */
     .btn, .cyber-btn, .trivia-option, .tap-btn, .modal-content, .popup-content {
         will-change: transform !important;
