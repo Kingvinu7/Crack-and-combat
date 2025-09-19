@@ -4426,8 +4426,15 @@ textarea:focus {
     .page {
         transition: opacity 0.3s ease !important;
         background: var(--bg-dark) !important;
-        /* Add subtle gradient instead of matrix background */
-        background: linear-gradient(135deg, var(--bg-dark) 0%, rgba(26, 26, 26, 0.95) 50%, var(--bg-dark) 100%) !important;
+        /* Add subtle animated gradient background with dark green and red */
+        background: linear-gradient(45deg, 
+            rgba(26, 26, 26, 1) 0%, 
+            rgba(16, 35, 16, 0.4) 25%, 
+            rgba(26, 26, 26, 1) 50%, 
+            rgba(35, 16, 16, 0.4) 75%, 
+            rgba(26, 26, 26, 1) 100%) !important;
+        background-size: 400% 400% !important;
+        animation: mobileGradientShift 8s ease-in-out infinite !important;
     }
     
     /* Keep notification animations - they're lightweight */
@@ -4491,6 +4498,14 @@ textarea:focus {
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
     }
     
+    /* Add subtle animated borders for visual interest */
+    .page-content {
+        border: 1px solid transparent !important;
+        background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                   linear-gradient(45deg, rgba(0, 255, 0, 0.2), rgba(255, 0, 0, 0.2), rgba(0, 255, 0, 0.2)) border-box !important;
+        animation: mobileBorderShift 6s ease-in-out infinite !important;
+    }
+    
     /* Disable transform3d and hardware acceleration for non-essential elements */
     .hexagon-outer,
     .hexagon-inner,
@@ -4510,6 +4525,80 @@ textarea:focus {
     /* Keep subtle glow for important elements */
     .cyber-title {
         text-shadow: 0 0 10px rgba(255, 0, 64, 0.3) !important;
+    }
+    
+    /* Add subtle floating elements for visual interest */
+    .page::before {
+        content: '';
+        position: absolute;
+        top: 10%;
+        left: 10%;
+        width: 100px;
+        height: 100px;
+        background: radial-gradient(circle, rgba(0, 255, 0, 0.1) 0%, transparent 70%);
+        border-radius: 50%;
+        animation: mobileFloatGreen 12s ease-in-out infinite;
+        pointer-events: none;
+        z-index: -1;
+    }
+    
+    .page::after {
+        content: '';
+        position: absolute;
+        bottom: 20%;
+        right: 15%;
+        width: 80px;
+        height: 80px;
+        background: radial-gradient(circle, rgba(255, 0, 0, 0.1) 0%, transparent 70%);
+        border-radius: 50%;
+        animation: mobileFloatRed 10s ease-in-out infinite reverse;
+        pointer-events: none;
+        z-index: -1;
+    }
+    
+    /* Different color themes for different pages */
+    #riddle-screen {
+        background: linear-gradient(45deg, 
+            rgba(26, 26, 26, 1) 0%, 
+            rgba(16, 35, 25, 0.5) 25%, 
+            rgba(26, 26, 26, 1) 50%, 
+            rgba(25, 35, 16, 0.5) 75%, 
+            rgba(26, 26, 26, 1) 100%) !important;
+    }
+    
+    #text-challenge-screen, #trivia-challenge-screen, #fast-tapper-screen {
+        background: linear-gradient(45deg, 
+            rgba(26, 26, 26, 1) 0%, 
+            rgba(35, 16, 16, 0.5) 25%, 
+            rgba(26, 26, 26, 1) 50%, 
+            rgba(35, 25, 16, 0.5) 75%, 
+            rgba(26, 26, 26, 1) 100%) !important;
+    }
+    
+    #game-over-screen {
+        background: linear-gradient(45deg, 
+            rgba(26, 26, 26, 1) 0%, 
+            rgba(35, 35, 16, 0.6) 25%, 
+            rgba(26, 26, 26, 1) 50%, 
+            rgba(16, 35, 35, 0.6) 75%, 
+            rgba(26, 26, 26, 1) 100%) !important;
+    }
+    
+    /* Add subtle particle-like dots for extra visual interest */
+    #home-screen::before {
+        background: radial-gradient(circle, rgba(0, 255, 0, 0.2) 0%, transparent 70%) !important;
+        width: 60px !important;
+        height: 60px !important;
+        top: 20% !important;
+        left: 80% !important;
+    }
+    
+    #riddle-screen::before {
+        background: radial-gradient(circle, rgba(0, 255, 100, 0.15) 0%, transparent 70%) !important;
+    }
+    
+    #text-challenge-screen::before, #trivia-challenge-screen::before, #fast-tapper-screen::before {
+        background: radial-gradient(circle, rgba(255, 100, 0, 0.15) 0%, transparent 70%) !important;
     }
     
     /* Keep hardware acceleration only for interactive elements */
@@ -4587,6 +4676,64 @@ textarea:focus {
 @keyframes notificationSlideIn {
     from { transform: translateX(100%); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
+}
+
+/* Mobile-optimized gradient animation */
+@keyframes mobileGradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Subtle floating animations for mobile */
+@keyframes mobileFloatGreen {
+    0%, 100% { 
+        transform: translateY(0px) translateX(0px);
+        opacity: 0.3;
+    }
+    25% { 
+        transform: translateY(-20px) translateX(10px);
+        opacity: 0.5;
+    }
+    50% { 
+        transform: translateY(-10px) translateX(20px);
+        opacity: 0.4;
+    }
+    75% { 
+        transform: translateY(-25px) translateX(5px);
+        opacity: 0.6;
+    }
+}
+
+@keyframes mobileFloatRed {
+    0%, 100% { 
+        transform: translateY(0px) translateX(0px);
+        opacity: 0.3;
+    }
+    33% { 
+        transform: translateY(15px) translateX(-10px);
+        opacity: 0.5;
+    }
+    66% { 
+        transform: translateY(25px) translateX(-20px);
+        opacity: 0.4;
+    }
+}
+
+/* Subtle border color animation */
+@keyframes mobileBorderShift {
+    0% { 
+        background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                   linear-gradient(45deg, rgba(0, 255, 0, 0.2), rgba(255, 0, 0, 0.1), rgba(0, 255, 0, 0.2)) border-box;
+    }
+    50% { 
+        background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                   linear-gradient(45deg, rgba(0, 255, 0, 0.1), rgba(255, 0, 0, 0.2), rgba(0, 255, 0, 0.1)) border-box;
+    }
+    100% { 
+        background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                   linear-gradient(45deg, rgba(0, 255, 0, 0.2), rgba(255, 0, 0, 0.1), rgba(0, 255, 0, 0.2)) border-box;
+    }
 }
 
 /* Firefox scrollbar */
