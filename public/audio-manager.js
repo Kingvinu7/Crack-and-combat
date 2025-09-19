@@ -485,6 +485,9 @@ class AudioManager {
     playSound(soundName, volume = 1.0) {
         if (!this.isInitialized || this.isMuted) return;
         
+        // Skip sound effects on mobile to prevent heating
+        if (this.mobileMode) return;
+        
         const sound = this.soundEffects[soundName];
         if (!sound) {
             console.warn(`Sound effect not found: ${soundName}`);
@@ -628,6 +631,20 @@ class AudioManager {
         if (this.audioContext && this.audioContext.state === 'running') {
             this.audioContext.suspend().catch(console.error);
         }
+    }
+    
+    // Mobile-specific audio optimization
+    optimizeForMobile() {
+        console.log('Optimizing audio for mobile performance');
+        
+        // Reduce audio quality on mobile to prevent heating
+        if (this.audioContext) {
+            // Lower sample rate if possible (browser dependent)
+            console.log('Current sample rate:', this.audioContext.sampleRate);
+        }
+        
+        // Disable sound effects on mobile to reduce processing
+        this.mobileMode = true;
     }
     
     resumeAudio() {

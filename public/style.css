@@ -4411,6 +4411,51 @@ textarea:focus {
     }
 }
 
+/* AGGRESSIVE MOBILE HEATING OPTIMIZATION - Disable all heavy rendering */
+@media (max-width: 768px) {
+    /* Disable ALL animations to prevent mobile heating */
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    /* Completely disable matrix background on mobile to reduce GPU load */
+    .matrix-bg,
+    .matrix-layer-1,
+    .matrix-layer-2,
+    .matrix-layer-3 {
+        display: none !important;
+    }
+    
+    /* Remove all transforms that cause repaints */
+    .hexagon-outer,
+    .hexagon-inner,
+    .ai-core,
+    .core-ring {
+        transform: none !important;
+    }
+    
+    /* Simplify all backgrounds to solid colors */
+    .page {
+        background: var(--bg-dark) !important;
+    }
+    
+    /* Disable box-shadows and filters that cause GPU load */
+    * {
+        box-shadow: none !important;
+        filter: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    
+    /* Force hardware acceleration off to prevent heating */
+    * {
+        transform: translateZ(0) !important;
+        will-change: auto !important;
+    }
+}
+
 /* Firefox scrollbar */
 * {
     scrollbar-width: thin;

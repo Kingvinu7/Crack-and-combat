@@ -215,15 +215,29 @@ function getMusicForPage(pageName) {
 // Utility functions
 function showPage(pageName) {
     console.log('Switching to page:', pageName);
-    Object.values(pages).forEach(page => page.classList.remove('active'));
+    
+    // Mobile optimization: batch DOM updates
+    if (window.mobileOptimized) {
+        requestAnimationFrame(() => {
+            Object.values(pages).forEach(page => page.classList.remove('active'));
+            if (pages[pageName]) {
+                pages[pageName].classList.add('active');
+            }
+        });
+    } else {
+        Object.values(pages).forEach(page => page.classList.remove('active'));
+        if (pages[pageName]) {
+            pages[pageName].classList.add('active');
+        }
+    }
+    
     if (pages[pageName]) {
-        pages[pageName].classList.add('active');
         
         // Simplified 3-track music system with smart switching
-        if (window.audioManager) {
+        if (window.audioManager && !window.mobileOptimized) {
             console.log(`Showing page: ${pageName}, Audio initialized: ${window.audioManager.isInitialized}`);
             
-            // Play transition sound only if initialized
+            // Play transition sound only if initialized and not on mobile (to save battery)
             if (window.audioManager.isInitialized) {
                 window.audioManager.playTransitionSound();
             }
@@ -1542,10 +1556,24 @@ socket.on('game-ended', (data) => {
     }, 5000);
 });
 
-// Mobile keyboard handling
+// Mobile optimization and keyboard handling
 function handleMobileKeyboard() {
     const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (isMobile) {
+        // Aggressive mobile performance optimizations
+        console.log('Mobile device detected - applying performance optimizations');
+        
+        // Disable smooth scrolling to reduce CPU load
+        document.documentElement.style.scrollBehavior = 'auto';
+        
+        // Reduce DOM update frequency
+        window.mobileOptimized = true;
+        
+        // Optimize audio for mobile
+        if (window.audioManager) {
+            window.audioManager.optimizeForMobile();
+        }
+        
         // Prevent zoom when focusing inputs
         document.querySelectorAll('input, textarea').forEach(input => {
             input.addEventListener('focus', () => {
