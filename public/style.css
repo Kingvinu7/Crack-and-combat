@@ -4411,16 +4411,42 @@ textarea:focus {
     }
 }
 
-/* AGGRESSIVE MOBILE HEATING OPTIMIZATION - Disable all heavy rendering */
+/* BALANCED MOBILE OPTIMIZATION - Keep essential animations, remove heavy ones */
 @media (max-width: 768px) {
-    /* Disable ALL animations to prevent mobile heating */
-    *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
+    /* Keep essential UI animations but make them faster and lighter */
+    .btn, .cyber-btn, .trivia-option, .tap-btn {
+        transition: transform 0.2s ease, background-color 0.2s ease !important;
     }
     
-    /* Completely disable matrix background on mobile to reduce GPU load */
+    .btn:hover, .cyber-btn:hover, .trivia-option:hover, .tap-btn:hover {
+        transform: translateY(-2px) !important;
+    }
+    
+    /* Keep page transitions but make them faster */
+    .page {
+        transition: opacity 0.3s ease !important;
+        background: var(--bg-dark) !important;
+        /* Add subtle gradient instead of matrix background */
+        background: linear-gradient(135deg, var(--bg-dark) 0%, rgba(26, 26, 26, 0.95) 50%, var(--bg-dark) 100%) !important;
+    }
+    
+    /* Keep notification animations - they're lightweight */
+    .custom-notification {
+        transition: opacity 0.3s ease, transform 0.3s ease !important;
+    }
+    
+    /* Keep modal animations but make them faster */
+    .modal-overlay, .popup-modal {
+        transition: opacity 0.2s ease !important;
+    }
+    
+    .modal-content, .popup-content {
+        transition: transform 0.2s ease !important;
+    }
+    
+    /* DISABLE HEAVY ANIMATIONS that cause heating */
+    
+    /* Remove matrix background completely - biggest heating source */
     .matrix-bg,
     .matrix-layer-1,
     .matrix-layer-2,
@@ -4428,32 +4454,139 @@ textarea:focus {
         display: none !important;
     }
     
-    /* Remove all transforms that cause repaints */
+    /* Disable continuous/infinite animations that run constantly */
+    .hexagon-outer,
+    .hexagon-inner,
+    .ai-core .core-ring,
+    .cyber-title span,
+    .status-indicator,
+    .loading-dots span,
+    *[class*="glow"],
+    *[class*="pulse"],
+    *[class*="rotate"],
+    *[class*="float"] {
+        animation: none !important;
+    }
+    
+    /* Remove heavy visual effects that stress GPU */
     .hexagon-outer,
     .hexagon-inner,
     .ai-core,
     .core-ring {
-        transform: none !important;
-    }
-    
-    /* Simplify all backgrounds to solid colors */
-    .page {
-        background: var(--bg-dark) !important;
-    }
-    
-    /* Disable box-shadows and filters that cause GPU load */
-    * {
         box-shadow: none !important;
         filter: none !important;
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
     }
     
-    /* Force hardware acceleration off to prevent heating */
+    /* Keep simple box-shadows for depth but remove complex ones */
     * {
-        transform: translateZ(0) !important;
+        filter: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    
+    /* Allow simple box-shadows for buttons and cards */
+    .btn, .cyber-btn, .modal-content, .popup-content, .custom-notification {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    /* Disable transform3d and hardware acceleration for non-essential elements */
+    .hexagon-outer,
+    .hexagon-inner,
+    .ai-core,
+    .core-ring,
+    .matrix-bg * {
+        transform: none !important;
         will-change: auto !important;
     }
+    
+    /* Add back subtle hover effects for interactive elements */
+    .ai-symbol-container:hover .hexagon-inner {
+        transform: scale(1.02) !important;
+        transition: transform 0.3s ease !important;
+    }
+    
+    /* Keep subtle glow for important elements */
+    .cyber-title {
+        text-shadow: 0 0 10px rgba(255, 0, 64, 0.3) !important;
+    }
+    
+    /* Keep hardware acceleration only for interactive elements */
+    .btn, .cyber-btn, .trivia-option, .tap-btn, .modal-content, .popup-content {
+        will-change: transform !important;
+    }
+    
+    /* Add back lightweight animations that enhance UX */
+    
+    /* Keep timer urgency animations - they're important for gameplay */
+    .timer.urgent {
+        animation: timerUrgent 1s ease-in-out infinite alternate !important;
+    }
+    
+    .timer.danger {
+        animation: timerDanger 0.8s ease-in-out infinite alternate !important;
+    }
+    
+    /* Keep winner announcement animations - they're momentary */
+    .winner-badge, .winner {
+        animation: winnerPulse 2s ease-in-out 3 !important;
+    }
+    
+    /* Keep loading dots for feedback - lightweight and helpful */
+    .loading-dots span {
+        animation: loadingDot 1.5s ease-in-out infinite !important;
+    }
+    .loading-dots span:nth-child(1) { animation-delay: -0.4s !important; }
+    .loading-dots span:nth-child(2) { animation-delay: -0.2s !important; }
+    .loading-dots span:nth-child(3) { animation-delay: 0s !important; }
+    
+    /* Keep button press feedback - essential for touch interfaces */
+    .btn:active, .cyber-btn:active, .trivia-option:active, .tap-btn:active {
+        transform: translateY(0px) scale(0.98) !important;
+        transition: transform 0.1s ease !important;
+    }
+    
+    /* Keep result reveal animations - they're short-lived */
+    .individual-result {
+        animation: resultSlideIn 0.4s ease-out !important;
+    }
+    
+    /* Keep notification slide-in - important for user feedback */
+    .custom-notification {
+        animation: notificationSlideIn 0.3s ease-out !important;
+    }
+}
+
+/* Define the lightweight animations for mobile */
+@keyframes timerUrgent {
+    from { color: var(--accent-red); }
+    to { color: #ff6b6b; }
+}
+
+@keyframes timerDanger {
+    from { color: var(--accent-yellow); }
+    to { color: #ffd93d; }
+}
+
+@keyframes winnerPulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.05); }
+}
+
+@keyframes loadingDot {
+    0%, 80%, 100% { opacity: 0.3; }
+    40% { opacity: 1; }
+}
+
+@keyframes resultSlideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes notificationSlideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
 }
 
 /* Firefox scrollbar */

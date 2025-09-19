@@ -485,8 +485,15 @@ class AudioManager {
     playSound(soundName, volume = 1.0) {
         if (!this.isInitialized || this.isMuted) return;
         
-        // Skip sound effects on mobile to prevent heating
-        if (this.mobileMode) return;
+        // On mobile, only play essential sounds to prevent heating
+        if (this.mobileMode) {
+            const essentialSounds = ['correct', 'incorrect', 'submit', 'click'];
+            if (!essentialSounds.includes(soundName)) {
+                return; // Skip non-essential sounds on mobile
+            }
+            // Reduce volume on mobile to save battery
+            volume = volume * 0.6;
+        }
         
         const sound = this.soundEffects[soundName];
         if (!sound) {

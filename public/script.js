@@ -234,12 +234,15 @@ function showPage(pageName) {
     if (pages[pageName]) {
         
         // Simplified 3-track music system with smart switching
-        if (window.audioManager && !window.mobileOptimized) {
+        if (window.audioManager) {
             console.log(`Showing page: ${pageName}, Audio initialized: ${window.audioManager.isInitialized}`);
             
-            // Play transition sound only if initialized and not on mobile (to save battery)
+            // Play transition sound - mobile optimization handled in audio manager
             if (window.audioManager.isInitialized) {
-                window.audioManager.playTransitionSound();
+                // On mobile, only play transitions for important page changes
+                if (!window.mobileOptimized || ['gameOver', 'roundSummary'].includes(pageName)) {
+                    window.audioManager.playTransitionSound();
+                }
             }
             
             // Determine what music should play
@@ -820,6 +823,12 @@ function typeWriter(element, text, speed = 30) {
     return new Promise((resolve) => {
         element.textContent = '';
         element.scrollTop = 0;
+        
+        // On mobile, make typewriter effect much faster to reduce CPU usage
+        if (window.mobileOptimized) {
+            speed = speed / 3; // 3x faster on mobile
+        }
+        
         let i = 0;
         
         function typeNextChar() {
@@ -837,7 +846,12 @@ function typeWriter(element, text, speed = 30) {
                     delay = speed * 2;
                 }
                 
-                setTimeout(typeNextChar, delay);
+                // On mobile, use requestAnimationFrame for better performance
+                if (window.mobileOptimized && delay < 20) {
+                    requestAnimationFrame(typeNextChar);
+                } else {
+                    setTimeout(typeNextChar, delay);
+                }
             } else {
                 resolve();
             }
