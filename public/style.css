@@ -4413,14 +4413,14 @@ textarea:focus {
 
 /* BALANCED MOBILE OPTIMIZATION - Keep essential animations, remove heavy ones */
 @media (max-width: 768px) {
-    /* Base body background with animated colors */
+    /* Base body background with animated cyan colors */
     body {
         background: linear-gradient(45deg,
-            rgba(15, 30, 15, 1) 0%,
-            rgba(30, 15, 15, 1) 25%,
-            rgba(10, 35, 10, 1) 50%,
-            rgba(35, 10, 10, 1) 75%,
-            rgba(20, 25, 20, 1) 100%) !important;
+            rgba(15, 35, 35, 1) 0%,
+            rgba(10, 40, 40, 1) 25%,
+            rgba(20, 45, 45, 1) 50%,
+            rgba(5, 50, 50, 1) 75%,
+            rgba(25, 40, 40, 1) 100%) !important;
         background-size: 300% 300% !important;
         animation: mobileGradientShift 15s ease-in-out infinite !important;
         min-height: 100vh !important;
@@ -4438,16 +4438,16 @@ textarea:focus {
     /* Keep page transitions but make them faster */
     .page {
         transition: opacity 0.3s ease !important;
-        /* Enhanced full-screen animated gradient with more prominent colors */
+        /* Enhanced full-screen animated gradient with cyan colors only */
         background: linear-gradient(135deg, 
-            rgba(20, 40, 20, 0.9) 0%, 
-            rgba(40, 20, 20, 0.8) 15%, 
-            rgba(15, 50, 15, 0.7) 30%, 
-            rgba(50, 15, 15, 0.8) 45%, 
-            rgba(25, 45, 25, 0.9) 60%, 
-            rgba(45, 25, 25, 0.8) 75%, 
-            rgba(20, 55, 20, 0.7) 90%, 
-            rgba(55, 20, 20, 0.9) 100%) !important;
+            rgba(10, 45, 45, 0.9) 0%, 
+            rgba(15, 50, 50, 0.8) 15%, 
+            rgba(5, 55, 55, 0.7) 30%, 
+            rgba(20, 40, 40, 0.8) 45%, 
+            rgba(8, 60, 60, 0.9) 60%, 
+            rgba(25, 45, 45, 0.8) 75%, 
+            rgba(12, 65, 65, 0.7) 90%, 
+            rgba(18, 50, 50, 0.9) 100%) !important;
         background-size: 600% 600% !important;
         animation: mobileGradientShift 10s ease-in-out infinite !important;
         min-height: 100vh !important;
@@ -4543,7 +4543,7 @@ textarea:focus {
         text-shadow: 0 0 10px rgba(255, 0, 64, 0.3) !important;
     }
     
-    /* Enhanced floating elements for full-screen color coverage */
+    /* Enhanced floating elements for full-screen cyan coverage */
     .page::before {
         content: '';
         position: absolute;
@@ -4551,9 +4551,9 @@ textarea:focus {
         left: 5%;
         width: 200px;
         height: 200px;
-        background: radial-gradient(circle, rgba(0, 255, 0, 0.3) 0%, rgba(0, 200, 0, 0.2) 40%, transparent 80%);
+        background: radial-gradient(circle, rgba(0, 255, 255, 0.4) 0%, rgba(0, 200, 200, 0.3) 40%, transparent 80%);
         border-radius: 50%;
-        animation: mobileFloatGreen 12s ease-in-out infinite;
+        animation: mobileFloatCyan 12s ease-in-out infinite;
         pointer-events: none;
         z-index: -1;
     }
@@ -4565,73 +4565,73 @@ textarea:focus {
         right: 5%;
         width: 180px;
         height: 180px;
-        background: radial-gradient(circle, rgba(255, 0, 0, 0.3) 0%, rgba(200, 0, 0, 0.2) 40%, transparent 80%);
+        background: radial-gradient(circle, rgba(0, 200, 255, 0.4) 0%, rgba(0, 150, 200, 0.3) 40%, transparent 80%);
         border-radius: 50%;
-        animation: mobileFloatRed 10s ease-in-out infinite reverse;
+        animation: mobileFloatCyan 14s ease-in-out infinite reverse;
         pointer-events: none;
         z-index: -1;
     }
     
-    /* Enhanced page-specific themes with full-screen color coverage */
+    /* Enhanced page-specific themes with cyan-only color coverage */
     #home-screen {
         background: linear-gradient(135deg, 
-            rgba(15, 45, 15, 0.9) 0%, 
-            rgba(45, 15, 15, 0.8) 20%, 
-            rgba(10, 60, 10, 0.7) 40%, 
-            rgba(60, 10, 10, 0.8) 60%, 
-            rgba(20, 50, 20, 0.9) 80%, 
-            rgba(50, 20, 20, 0.8) 100%) !important;
+            rgba(10, 50, 50, 0.9) 0%, 
+            rgba(15, 60, 60, 0.8) 20%, 
+            rgba(5, 65, 65, 0.7) 40%, 
+            rgba(20, 55, 55, 0.8) 60%, 
+            rgba(8, 70, 70, 0.9) 80%, 
+            rgba(25, 50, 50, 0.8) 100%) !important;
         background-size: 500% 500% !important;
         animation: mobileGradientShift 12s ease-in-out infinite !important;
     }
     
     #riddle-screen {
         background: linear-gradient(135deg, 
-            rgba(10, 60, 10, 0.9) 0%, 
-            rgba(25, 45, 25, 0.8) 25%, 
-            rgba(5, 70, 5, 0.7) 50%, 
-            rgba(30, 50, 30, 0.8) 75%, 
-            rgba(15, 65, 15, 0.9) 100%) !important;
+            rgba(5, 60, 60, 0.9) 0%, 
+            rgba(15, 55, 55, 0.8) 25%, 
+            rgba(0, 70, 70, 0.7) 50%, 
+            rgba(20, 50, 50, 0.8) 75%, 
+            rgba(10, 65, 65, 0.9) 100%) !important;
         background-size: 400% 400% !important;
         animation: mobileGradientShift 8s ease-in-out infinite !important;
     }
     
     #text-challenge-screen, #trivia-challenge-screen, #fast-tapper-screen {
         background: linear-gradient(135deg, 
-            rgba(60, 10, 10, 0.9) 0%, 
-            rgba(45, 25, 15, 0.8) 25%, 
-            rgba(70, 5, 5, 0.7) 50%, 
-            rgba(50, 30, 20, 0.8) 75%, 
-            rgba(65, 15, 15, 0.9) 100%) !important;
+            rgba(8, 55, 55, 0.9) 0%, 
+            rgba(12, 60, 60, 0.8) 25%, 
+            rgba(3, 65, 65, 0.7) 50%, 
+            rgba(18, 50, 50, 0.8) 75%, 
+            rgba(6, 70, 70, 0.9) 100%) !important;
         background-size: 400% 400% !important;
         animation: mobileGradientShift 8s ease-in-out infinite !important;
     }
     
     #game-over-screen {
         background: linear-gradient(135deg, 
-            rgba(40, 40, 10, 0.9) 0%, 
-            rgba(10, 60, 60, 0.8) 20%, 
-            rgba(50, 50, 5, 0.7) 40%, 
-            rgba(5, 70, 70, 0.8) 60%, 
-            rgba(45, 45, 15, 0.9) 80%, 
-            rgba(15, 65, 65, 0.8) 100%) !important;
+            rgba(15, 60, 60, 0.9) 0%, 
+            rgba(10, 70, 70, 0.8) 20%, 
+            rgba(20, 55, 55, 0.7) 40%, 
+            rgba(5, 75, 75, 0.8) 60%, 
+            rgba(25, 50, 50, 0.9) 80%, 
+            rgba(12, 65, 65, 0.8) 100%) !important;
         background-size: 500% 500% !important;
         animation: mobileGradientShift 10s ease-in-out infinite !important;
     }
     
     #lobby-screen {
         background: linear-gradient(135deg, 
-            rgba(25, 35, 25, 0.9) 0%, 
-            rgba(35, 25, 25, 0.8) 30%, 
-            rgba(20, 40, 20, 0.7) 60%, 
-            rgba(40, 20, 20, 0.8) 100%) !important;
+            rgba(12, 45, 45, 0.9) 0%, 
+            rgba(18, 50, 50, 0.8) 30%, 
+            rgba(8, 55, 55, 0.7) 60%, 
+            rgba(22, 40, 40, 0.8) 100%) !important;
         background-size: 400% 400% !important;
         animation: mobileGradientShift 9s ease-in-out infinite !important;
     }
     
-    /* Enhanced particle system for full-screen coverage */
+    /* Enhanced particle system for full-screen cyan coverage */
     #home-screen::before {
-        background: radial-gradient(circle, rgba(0, 255, 0, 0.4) 0%, rgba(0, 200, 0, 0.2) 50%, transparent 80%) !important;
+        background: radial-gradient(circle, rgba(0, 255, 255, 0.5) 0%, rgba(0, 200, 200, 0.3) 50%, transparent 80%) !important;
         width: 250px !important;
         height: 250px !important;
         top: 15% !important;
@@ -4639,7 +4639,7 @@ textarea:focus {
     }
     
     #home-screen::after {
-        background: radial-gradient(circle, rgba(255, 0, 0, 0.4) 0%, rgba(200, 0, 0, 0.2) 50%, transparent 80%) !important;
+        background: radial-gradient(circle, rgba(0, 200, 255, 0.5) 0%, rgba(0, 150, 200, 0.3) 50%, transparent 80%) !important;
         width: 220px !important;
         height: 220px !important;
         bottom: 15% !important;
@@ -4647,30 +4647,30 @@ textarea:focus {
     }
     
     #riddle-screen::before {
-        background: radial-gradient(circle, rgba(0, 255, 100, 0.4) 0%, rgba(0, 180, 80, 0.3) 50%, transparent 80%) !important;
+        background: radial-gradient(circle, rgba(0, 255, 200, 0.5) 0%, rgba(0, 180, 180, 0.4) 50%, transparent 80%) !important;
         width: 280px !important;
         height: 280px !important;
     }
     
     #riddle-screen::after {
-        background: radial-gradient(circle, rgba(100, 255, 0, 0.3) 0%, rgba(80, 180, 0, 0.2) 50%, transparent 80%) !important;
+        background: radial-gradient(circle, rgba(0, 220, 255, 0.4) 0%, rgba(0, 160, 200, 0.3) 50%, transparent 80%) !important;
         width: 200px !important;
         height: 200px !important;
     }
     
     #text-challenge-screen::before, #trivia-challenge-screen::before, #fast-tapper-screen::before {
-        background: radial-gradient(circle, rgba(255, 100, 0, 0.4) 0%, rgba(200, 80, 0, 0.3) 50%, transparent 80%) !important;
+        background: radial-gradient(circle, rgba(0, 180, 255, 0.5) 0%, rgba(0, 140, 200, 0.4) 50%, transparent 80%) !important;
         width: 300px !important;
         height: 300px !important;
     }
     
     #text-challenge-screen::after, #trivia-challenge-screen::after, #fast-tapper-screen::after {
-        background: radial-gradient(circle, rgba(255, 0, 100, 0.3) 0%, rgba(200, 0, 80, 0.2) 50%, transparent 80%) !important;
+        background: radial-gradient(circle, rgba(0, 255, 220, 0.4) 0%, rgba(0, 200, 180, 0.3) 50%, transparent 80%) !important;
         width: 220px !important;
         height: 220px !important;
     }
     
-    /* Add more floating elements for full coverage */
+    /* Add more floating elements for full cyan coverage */
     .page-content::before {
         content: '';
         position: absolute;
@@ -4678,9 +4678,9 @@ textarea:focus {
         left: 20%;
         width: 150px;
         height: 150px;
-        background: radial-gradient(circle, rgba(0, 150, 0, 0.2) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(0, 200, 200, 0.3) 0%, transparent 70%);
         border-radius: 50%;
-        animation: mobileFloatGreen 15s ease-in-out infinite;
+        animation: mobileFloatCyan 15s ease-in-out infinite;
         pointer-events: none;
         z-index: -1;
         transform: translateY(-50%);
@@ -4693,14 +4693,14 @@ textarea:focus {
         right: 25%;
         width: 120px;
         height: 120px;
-        background: radial-gradient(circle, rgba(150, 0, 0, 0.2) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(0, 255, 200, 0.3) 0%, transparent 70%);
         border-radius: 50%;
-        animation: mobileFloatRed 13s ease-in-out infinite reverse;
+        animation: mobileFloatCyan 13s ease-in-out infinite reverse;
         pointer-events: none;
         z-index: -1;
     }
     
-    /* Add corner accent elements for full coverage */
+    /* Add corner accent elements for full cyan coverage */
     body::before {
         content: '';
         position: fixed;
@@ -4708,10 +4708,10 @@ textarea:focus {
         left: 0;
         width: 100px;
         height: 100px;
-        background: linear-gradient(135deg, rgba(0, 255, 0, 0.3) 0%, transparent 100%);
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.4) 0%, transparent 100%);
         pointer-events: none;
         z-index: -2;
-        animation: mobileFloatGreen 20s ease-in-out infinite;
+        animation: mobileFloatCyan 20s ease-in-out infinite;
     }
     
     body::after {
@@ -4721,10 +4721,10 @@ textarea:focus {
         right: 0;
         width: 100px;
         height: 100px;
-        background: linear-gradient(315deg, rgba(255, 0, 0, 0.3) 0%, transparent 100%);
+        background: linear-gradient(315deg, rgba(0, 200, 255, 0.4) 0%, transparent 100%);
         pointer-events: none;
         z-index: -2;
-        animation: mobileFloatRed 18s ease-in-out infinite reverse;
+        animation: mobileFloatCyan 18s ease-in-out infinite reverse;
     }
     
     /* Add side accent elements */
@@ -4740,21 +4740,24 @@ textarea:focus {
     
     /* Mobile home screen zoom-out optimization */
     #home-screen .clean-layout {
-        padding: 8px !important;
-        transform: scale(0.8) !important;
+        padding: 10px !important;
+        transform: scale(0.85) !important;
         transform-origin: center center !important;
         min-height: 85vh !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
+        max-width: 100% !important;
+        width: 100% !important;
     }
     
     #home-screen .main-content {
-        padding: 12px !important;
+        padding: 15px !important;
         margin: 5px 0 !important;
-        max-width: 95% !important;
-        transform: scale(0.9) !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        transform: scale(1.0) !important;
     }
     
     #home-screen .title-section {
@@ -4812,9 +4815,9 @@ textarea:focus {
     }
     
     #home-screen .action-section {
-        gap: 10px !important;
+        gap: 12px !important;
         width: 100% !important;
-        max-width: 280px !important;
+        max-width: 320px !important;
     }
     
     #home-screen .help-btn {
@@ -4921,8 +4924,8 @@ textarea:focus {
     100% { background-position: 0% 50%; }
 }
 
-/* Enhanced floating animations for full-screen coverage */
-@keyframes mobileFloatGreen {
+/* Enhanced floating animations for cyan coverage */
+@keyframes mobileFloatCyan {
     0%, 100% { 
         transform: translateY(0px) translateX(0px);
         opacity: 0.4;
@@ -4942,25 +4945,6 @@ textarea:focus {
     80% { 
         transform: translateY(-30px) translateX(-10px);
         opacity: 0.5;
-    }
-}
-
-@keyframes mobileFloatRed {
-    0%, 100% { 
-        transform: translateY(0px) translateX(0px);
-        opacity: 0.4;
-    }
-    25% { 
-        transform: translateY(30px) translateX(-40px);
-        opacity: 0.6;
-    }
-    50% { 
-        transform: translateY(50px) translateX(-60px);
-        opacity: 0.5;
-    }
-    75% { 
-        transform: translateY(20px) translateX(-20px);
-        opacity: 0.7;
     }
 }
 
