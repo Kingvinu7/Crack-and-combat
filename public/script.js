@@ -4,6 +4,7 @@ let playerName = null;
 let isRoomOwner = false;
 let tapCount = 0;
 let tapperActive = false;
+let gameEnded = false; // Track if game has ended to prevent stray overlays
 
 // Replaced matrix rain with gentle, motion-sickness-free background animations
 
@@ -676,16 +677,29 @@ function createPointsTable(roundHistory, tableId) {
 
 function startTimer(elementId, seconds) {
     const element = document.getElementById(elementId);
+    if (!element) {
+        console.warn('Timer element not found:', elementId);
+        return null;
+    }
+    
     let timeLeft = seconds;
     
-    // Clear any existing timer for this element type
+    // Clear any existing timer for this element type to prevent memory leaks
     if (elementId === 'riddle-timer' && window.riddleTimer) {
         clearInterval(window.riddleTimer);
+        window.riddleTimer = null;
     } else if (elementId === 'trivia-timer' && window.triviaTimer) {
         clearInterval(window.triviaTimer);
+        window.triviaTimer = null;
     }
     
     const timer = setInterval(() => {
+        // Check if element still exists (prevent errors if DOM changes)
+        if (!element.parentNode) {
+            clearInterval(timer);
+            return;
+        }
+        
         element.textContent = timeLeft;
         
         if (timeLeft <= 10) {
@@ -728,13 +742,26 @@ function startChallengeTimer(elementId, seconds) {
     const textarea = document.getElementById('challenge-response');
     const submitBtn = document.getElementById('submit-challenge-response');
     
-    // Clear any existing timer to prevent multiple timers running
+    if (!element) {
+        console.warn('Challenge timer element not found:', elementId);
+        return null;
+    }
+    
+    // Clear any existing timer to prevent multiple timers running and memory leaks
     if (window.challengeTimer) {
         clearInterval(window.challengeTimer);
+        window.challengeTimer = null;
     }
     
     let timeLeft = seconds;
     window.challengeTimer = setInterval(() => {
+        // Check if elements still exist (prevent errors if DOM changes)
+        if (!element.parentNode) {
+            clearInterval(window.challengeTimer);
+            window.challengeTimer = null;
+            return;
+        }
+        
         element.textContent = timeLeft;
         
         if (timeLeft <= 10) {
@@ -754,7 +781,7 @@ function startChallengeTimer(elementId, seconds) {
             window.challengeTimer = null;
             element.classList.remove('urgent', 'danger');
             
-            if (textarea && !textarea.disabled && !submitBtn.disabled) {
+            if (textarea && !textarea.disabled && submitBtn && !submitBtn.disabled) {
                 const currentText = textarea.value.trim();
                 if (currentText.length > 0) {
                     console.log('Auto-submitting response:', currentText.substring(0, 30) + '...');
@@ -1053,6 +1080,7 @@ socket.on('oracle-speaks', (data) => {
 });
 
 socket.on('riddle-presented', (data) => {
+    gameEnded = false; // Reset game state when new round starts
     document.getElementById('round-display').textContent = `Round ${data.round}/${data.maxRounds}`;
     riddleText.textContent = data.riddle.question;
     
@@ -1208,6 +1236,12 @@ socket.on('fast-tapper-start', (data) => {
 });
 
 socket.on('challenge-individual-result', (data) => {
+    // Prevent individual results from showing after game has ended
+    if (gameEnded) {
+        console.log('Game has ended, ignoring individual result overlay');
+        return;
+    }
+    
     // Challenge completed - go back to cyber-ambient
     if (window.audioManager) {
         console.log('Challenge completed - returning to cyber ambient');
@@ -1377,6 +1411,7 @@ socket.on('round-summary', (data) => {
 
 // ENHANCED: Game over handler with debugging
 socket.on('game-over', (data) => {
+    gameEnded = true; // Mark game as ended to prevent stray overlays
     console.log('=== GAME OVER DEBUG START ===');
     console.log('Game over data received:', data);
     console.log('Winner:', data.winner);
@@ -1404,9 +1439,19 @@ socket.on('game-over', (data) => {
     }).join('');
     
     const bigWinnerEl = document.getElementById('big-winner-announcement');
-    if (bigWinnerEl) {
-        const tieText = data.tied ? 'It\'s a Tie!' : '';
-        bigWinnerEl.innerHTML = `CHAMPION: ${data.winner.name}<br>${data.winner.score} Points<br>${tieText}`;
+    if (bigWinnerEl && data.winner) {
+        let winnerDisplay = '';
+        if (data.tied) {
+            winnerDisplay = `🏆 TIE GAME! 🏆<br>Multiple Champions with ${data.winner.score} Points`;
+        } else if (data.winner.score === 0) {
+            winnerDisplay = `💀 NO WINNER 💀<br>Oracle Remains Victorious`;
+        } else {
+            winnerDisplay = `🏆 CHAMPION: ${data.winner.name} 🏆<br>${data.winner.score} Points`;
+        }
+        bigWinnerEl.innerHTML = winnerDisplay;
+    } else if (bigWinnerEl) {
+        // Fallback if no winner data
+        bigWinnerEl.innerHTML = `🤖 GAME COMPLETE 🤖<br>Results Processing...`;
     }
     
     const finalOracleEl = document.getElementById('final-oracle');
@@ -1617,8 +1662,8 @@ function checkAudioStatus() {
     }
 }
 
-// Check audio status periodically
-setInterval(checkAudioStatus, 1000);
+// Check audio status only when needed (removed continuous polling to save battery)
+// setInterval(checkAudioStatus, 1000); // Disabled for mobile performance
 
 // Add a global click handler to ensure audio starts on any click
 document.addEventListener('click', function(event) {
@@ -1639,6 +1684,54 @@ document.addEventListener('click', function(event) {
     }
 }, { once: false }); // Don't use once, so it can retry
 
+// Cleanup function to prevent memory leaks and battery drain
+function cleanupTimers() {
+    console.log('Cleaning up timers for mobile performance...');
+    
+    if (window.challengeTimer) {
+        clearInterval(window.challengeTimer);
+        window.challengeTimer = null;
+    }
+    
+    if (window.riddleTimer) {
+        clearInterval(window.riddleTimer);
+        window.riddleTimer = null;
+    }
+    
+    if (window.triviaTimer) {
+        clearInterval(window.triviaTimer);
+        window.triviaTimer = null;
+    }
+}
+
+// Clean up when page is hidden or user navigates away (saves mobile battery)
+document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+        console.log('Page hidden - cleaning up for mobile performance');
+        cleanupTimers();
+        
+        // Pause audio to save battery
+        if (window.audioManager) {
+            window.audioManager.pauseAllAudio();
+        }
+    } else {
+        console.log('Page visible - resuming audio if needed');
+        // Resume audio when page becomes visible again
+        if (window.audioManager && window.audioManager.isInitialized) {
+            window.audioManager.resumeAudio();
+            window.audioManager.playMusic('home');
+        }
+    }
+});
+
+// Clean up when user leaves the page
+window.addEventListener('beforeunload', function() {
+    cleanupTimers();
+    if (window.audioManager) {
+        window.audioManager.pauseAllAudio();
+    }
+});
+
 // Initialize
 addAudioControlsToAllPages();
 showPage('home');
@@ -1649,4 +1742,4 @@ checkAudioStatus(); // Initial check
 if (!/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     playerNameInput.focus();
 }
-console.log('Frontend loaded - Crack and Combat v4.8 (Enhanced Mobile + Auto-Advance)');
+console.log('Frontend loaded - Crack and Combat v4.8 (Enhanced Mobile Performance)');

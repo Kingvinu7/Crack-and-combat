@@ -618,6 +618,24 @@ class AudioManager {
     playNotificationSound() { this.playSound('notification'); }
     playTransitionSound() { this.playSound('transition'); }
     playTapSound() { this.playSound('tap'); }
+    
+    // Mobile performance optimization
+    pauseAllAudio() {
+        if (this.currentMusic) {
+            this.currentMusic.pause();
+        }
+        // Suspend audio context to save mobile battery
+        if (this.audioContext && this.audioContext.state === 'running') {
+            this.audioContext.suspend().catch(console.error);
+        }
+    }
+    
+    resumeAudio() {
+        // Resume audio context
+        if (this.audioContext && this.audioContext.state === 'suspended') {
+            this.audioContext.resume().catch(console.error);
+        }
+    }
 }
 
 // Create global audio manager instance

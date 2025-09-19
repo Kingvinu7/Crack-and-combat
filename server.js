@@ -1063,7 +1063,7 @@ function endRiddlePhase(roomCode) {
     });
     setTimeout(() => {
         startChallengePhase(roomCode);
-    }, 4000); // Increased from 1500ms to 4000ms (4 seconds) to give players time to read results
+    }, 2500); // Reduced to 2500ms (2.5 seconds) for better pacing
 }
 
 // FIXED: Enhanced endRound function with improved tie-breaking
@@ -1098,7 +1098,20 @@ function endRound(roomCode, challengeResults) {
     if (room.currentRound >= room.maxRounds) {
         setTimeout(() => {
             // FIXED: Enhanced winner selection for the final game-over
-            const finalScores = Object.values(rooms[roomCode].players).sort((a, b) => b.score - a.score);
+            if (!rooms[roomCode]) {
+                console.error('Room not found during game over');
+                return;
+            }
+            
+            const finalScores = rooms[roomCode].players
+                .filter(player => player && typeof player.score === 'number') // Filter out invalid players
+                .sort((a, b) => b.score - a.score);
+                
+            if (finalScores.length === 0) {
+                console.error('No valid players found for final scoring');
+                return;
+            }
+            
             const winner = finalScores[0];
             
             // Check for ties
@@ -1110,6 +1123,13 @@ function endRound(roomCode, challengeResults) {
             } else if (winner.score === 0) {
                 winnerMessage = `No one pleased the Oracle. Humanity is doomed.`;
             }
+            
+            console.log('Final game results:', {
+                winner: winner.name,
+                score: winner.score,
+                tied: tiedPlayers.length > 1,
+                totalPlayers: finalScores.length
+            });
 
             io.to(roomCode).emit('game-over', {
                 winner: winner,
