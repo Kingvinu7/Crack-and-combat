@@ -5850,6 +5850,7 @@ body::before { z-index: -1; }
     #falling-fury-screen .page-content {
         padding: 5px;
         justify-content: center;
+        position: relative;
     }
     
     .falling-fury-section {
@@ -5861,13 +5862,43 @@ body::before { z-index: -1; }
         max-height: 95vh;
         padding: 5px;
         gap: 5px;
+        position: relative;
+    }
+    
+    .falling-fury-section h2 {
+        font-size: 1.3em;
+        margin: 5px 0;
+        line-height: 1.2;
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+    }
+    
+    .falling-fury-section .challenge-description {
+        font-size: 0.75em;
+        margin: 0;
+        padding: 3px 8px;
+        position: absolute;
+        top: 35px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 5px;
+        border: 1px solid var(--border-cyan);
+        z-index: 10;
+        max-width: 90%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     .falling-arena {
-        height: 45vh;
-        max-height: 400px;
+        height: 50vh;
+        max-height: 450px;
         max-width: 95vw;
-        margin: 5px auto;
+        margin: 0 auto;
     }
     
     .falling-object {
@@ -5882,12 +5913,6 @@ body::before { z-index: -1; }
     .score-display-text {
         font-size: 2.5em;
         line-height: 1;
-    }
-    
-    .falling-fury-section h2 {
-        font-size: 1.3em;
-        margin: 5px 0;
-        line-height: 1.2;
     }
     
     .score-display {
@@ -5906,11 +5931,6 @@ body::before { z-index: -1; }
     #falling-fury-timer {
         font-size: 2em;
     }
-    
-    .challenge-description {
-        font-size: 0.9em;
-        margin: 5px 0;
-    }
 }
 
 @media (max-width: 480px) {
@@ -5919,10 +5939,24 @@ body::before { z-index: -1; }
         gap: 3px;
     }
     
+    .falling-fury-section h2 {
+        font-size: 1.1em;
+        margin: 3px 0;
+        top: 0;
+        position: absolute;
+    }
+    
+    .falling-fury-section .challenge-description {
+        font-size: 0.7em;
+        padding: 2px 6px;
+        top: 28px;
+        position: absolute;
+    }
+    
     .falling-arena {
-        height: 40vh;
-        max-height: 350px;
-        margin: 5px auto;
+        height: 45vh;
+        max-height: 400px;
+        margin: 0 auto;
     }
     
     .falling-object {
@@ -5937,22 +5971,12 @@ body::before { z-index: -1; }
         line-height: 1;
     }
     
-    .falling-fury-section h2 {
-        font-size: 1.1em;
-        margin: 3px 0;
-    }
-    
     .score-display {
         margin: 3px 0;
     }
     
     #falling-fury-timer {
         font-size: 1.8em;
-    }
-    
-    .challenge-description {
-        font-size: 0.85em;
-        margin: 3px 0;
     }
 }
 
