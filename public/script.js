@@ -583,6 +583,23 @@ function startFallingFuryGame(duration) {
     const arena = document.getElementById('falling-arena');
     arena.innerHTML = '';
     
+    // Set up event delegation for better performance (one listener instead of many)
+    const handleArenaClick = (e) => {
+        if (!fallingFuryActive) return;
+        const target = e.target;
+        if (target.classList.contains('falling-object') && !target.classList.contains('clicked')) {
+            e.preventDefault();
+            e.stopPropagation();
+            handleFallingObjectClick(target);
+        }
+    };
+    
+    arena.addEventListener('touchstart', handleArenaClick, { passive: false });
+    arena.addEventListener('click', handleArenaClick);
+    
+    // Store for cleanup
+    arena.dataset.clickHandler = 'attached';
+    
     // Start timer
     fallingFuryTimer = setInterval(() => {
         document.getElementById('falling-fury-timer').textContent = timeLeft;
@@ -603,8 +620,10 @@ function startFallingFuryGame(duration) {
             fallingFuryActive = false;
             document.getElementById('falling-fury-timer').classList.remove('urgent', 'danger');
             
-            // Clean up any remaining objects
+            // Clean up event listeners
             if (arena) {
+                arena.removeEventListener('touchstart', handleArenaClick);
+                arena.removeEventListener('click', handleArenaClick);
                 arena.innerHTML = '';
             }
             
@@ -620,17 +639,12 @@ function startFallingFuryGame(duration) {
         }
     }, 1000);
     
-    // Start spawning objects every 1 second (reduced from 0.6s for better performance)
+    // Spawn objects every 0.4 seconds = ~2-3 objects per second, 40-50 total in 20s
     fallingFurySpawnInterval = setInterval(() => {
         if (fallingFuryActive) {
-            const arena = document.getElementById('falling-arena');
-            // Limit max objects on screen to 8 for performance
-            const currentObjects = arena ? arena.children.length : 0;
-            if (currentObjects < 8) {
-                spawnFallingObject();
-            }
+            spawnFallingObject();
         }
-    }, 1000);
+    }, 400);
 }
 
 function spawnFallingObject() {
@@ -651,35 +665,14 @@ function spawnFallingObject() {
     const maxLeft = arenaWidth - objectSize;
     object.style.left = Math.random() * maxLeft + 'px';
     
-    // Click handler - instant response for both touch and mouse
-    const handleClick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!fallingFuryActive) return;
-        handleFallingObjectClick(object);
-        // Remove event listeners after click to prevent memory leaks
-        object.removeEventListener('touchstart', handleClick);
-        object.removeEventListener('click', handleClick);
-    };
-    
-    // Use touchstart for instant mobile response, click as fallback
-    object.addEventListener('touchstart', handleClick, { passive: false });
-    object.addEventListener('click', handleClick);
-    
     arena.appendChild(object);
     
-    // Remove after animation completes (3 seconds) with cleanup
-    const cleanupTimeout = setTimeout(() => {
+    // Remove after animation completes (3 seconds) - no individual listeners needed!
+    setTimeout(() => {
         if (object && object.parentNode === arena) {
-            // Remove event listeners before removing element
-            object.removeEventListener('touchstart', handleClick);
-            object.removeEventListener('click', handleClick);
             arena.removeChild(object);
         }
     }, 3000);
-    
-    // Store timeout for cleanup if needed
-    object.dataset.cleanupTimeout = cleanupTimeout;
 }
 
 function handleFallingObjectClick(object) {
@@ -688,11 +681,6 @@ function handleFallingObjectClick(object) {
     // Prevent multiple clicks
     if (object.classList.contains('clicked')) return;
     object.classList.add('clicked');
-    
-    // Clear the cleanup timeout since we're handling removal
-    if (object.dataset.cleanupTimeout) {
-        clearTimeout(parseInt(object.dataset.cleanupTimeout));
-    }
     
     if (type === 'gun') {
         // +1 point for guns
@@ -704,12 +692,12 @@ function handleFallingObjectClick(object) {
         document.getElementById('falling-fury-score').textContent = fallingFuryScore;
     }
     
-    // Remove after explosion animation with cleanup
+    // Remove after explosion animation
     setTimeout(() => {
         if (object && object.parentNode) {
             object.parentNode.removeChild(object);
         }
-    }, 300);
+    }, 200);
 }
 
 function updateLobbyOwnerDisplay() {
