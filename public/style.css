@@ -5653,11 +5653,24 @@ body::before { z-index: -1; }
 }
 
 /* ===== FALLING FURY CHALLENGE STYLES ===== */
+#falling-fury-screen .page-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    overflow: hidden;
+}
+
 .falling-fury-section {
     width: 100%;
     max-width: 800px;
     margin: 0 auto;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .falling-fury-section h2 {
@@ -5700,6 +5713,10 @@ body::before { z-index: -1; }
     border-radius: 10px;
     overflow: hidden;
     box-shadow: var(--glow-cyan);
+    /* Prevent accidental zoom/scroll on touch */
+    touch-action: pan-y;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .falling-object {
@@ -5707,9 +5724,14 @@ body::before { z-index: -1; }
     font-size: 3em;
     cursor: pointer;
     user-select: none;
+    -webkit-user-select: none;
     transition: transform 0.1s ease;
     filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
     animation: fall-down 3s linear forwards;
+    /* Instant click response */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
+    -webkit-touch-callout: none;
 }
 
 .falling-object:hover {
@@ -5717,7 +5739,8 @@ body::before { z-index: -1; }
 }
 
 .falling-object:active {
-    transform: scale(0.9);
+    transform: scale(0.8);
+    filter: brightness(1.5) drop-shadow(0 0 15px rgba(255, 255, 255, 0.8));
 }
 
 @keyframes fall-down {
@@ -5824,35 +5847,112 @@ body::before { z-index: -1; }
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+    #falling-fury-screen .page-content {
+        padding: 5px;
+        justify-content: center;
+    }
+    
+    .falling-fury-section {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        max-height: 95vh;
+        padding: 5px;
+        gap: 5px;
+    }
+    
     .falling-arena {
-        height: 300px;
-        max-width: 100%;
+        height: 45vh;
+        max-height: 400px;
+        max-width: 95vw;
+        margin: 5px auto;
     }
     
     .falling-object {
         font-size: 2.5em;
+        /* Instant click response on mobile */
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: rgba(255, 255, 255, 0.3);
+        user-select: none;
+        -webkit-user-select: none;
     }
     
     .score-display-text {
-        font-size: 3em;
+        font-size: 2.5em;
+        line-height: 1;
     }
     
     .falling-fury-section h2 {
-        font-size: 1.5em;
+        font-size: 1.3em;
+        margin: 5px 0;
+        line-height: 1.2;
+    }
+    
+    .score-display {
+        margin: 5px 0;
+    }
+    
+    .score-display p {
+        margin: 2px 0;
+        font-size: 0.9em;
+    }
+    
+    .timer-section {
+        margin-bottom: 5px;
+    }
+    
+    #falling-fury-timer {
+        font-size: 2em;
+    }
+    
+    .challenge-description {
+        font-size: 0.9em;
+        margin: 5px 0;
     }
 }
 
 @media (max-width: 480px) {
+    .falling-fury-section {
+        padding: 3px;
+        gap: 3px;
+    }
+    
     .falling-arena {
-        height: 250px;
+        height: 40vh;
+        max-height: 350px;
+        margin: 5px auto;
     }
     
     .falling-object {
         font-size: 2em;
+        /* Instant click response on mobile */
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: rgba(255, 255, 255, 0.3);
     }
     
     .score-display-text {
-        font-size: 2.5em;
+        font-size: 2em;
+        line-height: 1;
+    }
+    
+    .falling-fury-section h2 {
+        font-size: 1.1em;
+        margin: 3px 0;
+    }
+    
+    .score-display {
+        margin: 3px 0;
+    }
+    
+    #falling-fury-timer {
+        font-size: 1.8em;
+    }
+    
+    .challenge-description {
+        font-size: 0.85em;
+        margin: 3px 0;
     }
 }
 

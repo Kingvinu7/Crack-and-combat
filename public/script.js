@@ -641,12 +641,17 @@ function spawnFallingObject() {
     const maxLeft = arenaWidth - objectSize;
     object.style.left = Math.random() * maxLeft + 'px';
     
-    // Click handler
-    object.addEventListener('click', () => {
+    // Click handler - instant response for both touch and mouse
+    const handleClick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         if (!fallingFuryActive) return;
-        
         handleFallingObjectClick(object);
-    });
+    };
+    
+    // Use touchstart for instant mobile response, click as fallback
+    object.addEventListener('touchstart', handleClick, { passive: false });
+    object.addEventListener('click', handleClick);
     
     arena.appendChild(object);
     
