@@ -18,7 +18,7 @@ if (process.env.GEMINI_API_KEY) {
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Challenge Types (will be shuffled for each game session)
-const BASE_CHALLENGE_TYPES = ['negotiator', 'detective', 'multipleChoiceTrivia', 'fastTapper', 'danger'];
+const BASE_CHALLENGE_TYPES = ['fallingFury', 'detective', 'multipleChoiceTrivia', 'fastTapper', 'danger'];
 
 // Shuffle array function
 function shuffleArray(array) {
@@ -334,10 +334,10 @@ const gameData = {
     ],
     oraclePersonality: {
         introductions: [
-            "🤖 I AM THE ORACLE! Your inferior minds will face my complex challenges!",
-            "💀 Mortals... prepare for tests that will strain your thinking!",
-            "⚡ I am the AI overlord! My challenges grow more cunning each round!",
-            "🔥 Welcome to intellectual warfare! Can your minds handle the complexity?"
+            "?? I AM THE ORACLE! Your inferior minds will face my complex challenges!",
+            "?? Mortals... prepare for tests that will strain your thinking!",
+            "? I am the AI overlord! My challenges grow more cunning each round!",
+            "?? Welcome to intellectual warfare! Can your minds handle the complexity?"
         ]
     }
 };
@@ -619,7 +619,7 @@ async function generateChallengeContent(type, roundNumber, room = null) {
                 "You're in a mirrored room where your reflections move on their own. Spot the real you before the glass shatters. The mirrors seem to show different versions of yourself, each moving independently. How do you identify which one is real?",
                 "You're trapped in a room where gravity keeps shifting directions every 30 seconds. The exit door is on the ceiling, but it's locked with a puzzle that requires steady hands. How do you solve it?",
                 "You're in a library where the books rewrite themselves when you're not looking directly at them. You need to find a specific piece of information, but every time you look away, the text changes. How do you get the answer?",
-                "You're stuck in an elevator that's moving between floors that don't exist. The buttons show numbers like 2.5, π, and ∞. Which floor do you press to escape?",
+                "You're stuck in an elevator that's moving between floors that don't exist. The buttons show numbers like 2.5, ?, and ?. Which floor do you press to escape?",
                 "You're in a maze where the walls move when you're not looking at them. Your phone's flashlight is dying, and you hear footsteps that match yours exactly. How do you find the exit?",
                 "You're trapped in a room full of identical doors. Each time you open one, it leads back to the same room, but with one small detail changed. How do you break the loop?",
                 "You're in a time loop where you have exactly 60 seconds before everything resets, but you retain your memory. The exit requires a 10-digit code. How do you escape?",
@@ -806,7 +806,7 @@ async function evaluatePlayerResponse(challengeContent, playerResponse, challeng
         
         // Add auto-submit indicator
         if (isAutoSubmitted) {
-            feedback = `⏰ ${feedback}`;
+            feedback = `? ${feedback}`;
         }
         
         const evaluationType = hasLazyShortcut && !hasCleverIndicators ? 'LAZY SHORTCUT' : 
@@ -845,7 +845,7 @@ async function evaluatePlayerResponse(challengeContent, playerResponse, challeng
         
         // Add auto-submit indicator
         if (isAutoSubmitted) {
-            fallbackFeedback = `⏰ ${fallbackFeedback}`;
+            fallbackFeedback = `? ${fallbackFeedback}`;
         }
         
         console.log(`Fallback evaluation result: ${fallbackPass ? 'PASS' : 'FAIL'} - "${fallbackFeedback}"`);
@@ -913,6 +913,18 @@ async function startChallengePhase(roomCode) {
             room.challengeTimer = setTimeout(() => {
                 evaluateTriviaResults(roomCode);
             }, 48000);
+            
+        } else if (challengeType === 'fallingFury') {
+            // Falling Fury Challenge
+            room.fallingFuryResults = {};
+            io.to(roomCode).emit('falling-fury-start', {
+                participants: nonWinners.map(p => p.name),
+                duration: 30
+            });
+            
+            room.challengeTimer = setTimeout(() => {
+                evaluateFallingFuryResults(roomCode);
+            }, 32000);
             
         } else {
             // Text-based challenges with 40 seconds
@@ -1047,6 +1059,53 @@ async function evaluateFastTapperResults(roomCode) {
     }, 6000);
 }
 
+// Evaluate Falling Fury Results
+async function evaluateFallingFuryResults(roomCode) {
+    const room = rooms[roomCode];
+    if (!room) return;
+
+    const furyEntries = Object.entries(room.fallingFuryResults);
+    if (furyEntries.length === 0) {
+        endRound(roomCode, []);
+        return;
+    }
+
+    let maxScore = -Infinity;
+    let winners = [];
+    furyEntries.forEach(([playerId, score]) => {
+        if (score > maxScore) {
+            maxScore = score;
+            winners = [playerId];
+        } else if (score === maxScore) {
+            winners.push(playerId);
+        }
+    });
+    
+    // Award points to winners
+    winners.forEach(playerId => {
+        const player = room.players.find(p => p.id === playerId);
+        if (player) player.score += 1;
+    });
+    
+    const results = furyEntries.map(([playerId, score]) => {
+        const player = room.players.find(p => p.id === playerId);
+        return {
+            playerName: player?.name || 'Unknown',
+            score: score,
+            won: winners.includes(playerId)
+        };
+    }).sort((a, b) => b.score - a.score);
+    
+    io.to(roomCode).emit('falling-fury-results', {
+        results: results,
+        maxScore: maxScore
+    });
+    
+    setTimeout(() => {
+        endRound(roomCode, results);
+    }, 6000);
+}
+
 // Evaluate Text Challenge Results
 async function evaluateTextChallengeResults(roomCode) {
     const room = rooms[roomCode];
@@ -1138,6 +1197,7 @@ function startNewRound(roomCode) {
     room.riddleAnswers = {};
     room.challengeResponses = {};
     room.tapResults = {};
+    room.fallingFuryResults = {};
     
     // Initialize round history on first round OR if it's missing
     if (room.currentRound === 1 || !room.roundHistory || room.roundHistory.length === 0) {
@@ -1307,6 +1367,7 @@ io.on('connection', (socket) => {
             challengeResponses: {},
             tapResults: {},
             triviaAnswers: {},
+            fallingFuryResults: {},
             currentChallengeType: null,
             currentChallengeContent: null,
             currentTriviaQuestion: null,
@@ -1576,6 +1637,24 @@ io.on('connection', (socket) => {
             }
         }
     });
+
+    socket.on('submit-falling-result', (data) => {
+        const room = rooms[data.roomCode];
+        if (!room || room.gameState !== 'challenge-phase') return;
+        const player = room.players.find(p => p.id === socket.id);
+        if (!player || player.isSpectator || player.name === room.riddleWinner) return;
+        
+        room.fallingFuryResults[socket.id] = data.score;
+        
+        const activePlayers = room.players.filter(p => !p.isSpectator);
+        
+        io.to(data.roomCode).emit('falling-fury-result-submitted', {
+            player: player.name,
+            score: data.score,
+            totalSubmissions: Object.keys(room.fallingFuryResults).length,
+            expectedSubmissions: activePlayers.filter(p => p.name !== room.riddleWinner).length
+        });
+    });
     socket.on('disconnect', () => {
         console.log('Player disconnected:', socket.id);
         
@@ -1652,6 +1731,11 @@ io.on('connection', (socket) => {
                             playerName: playerName
                         };
                         console.log(`Auto-submitted invalid trivia answer for disconnected ${playerName}`);
+                    }
+                } else if (room.currentChallengeType === 'fallingFury') {
+                    if (!room.fallingFuryResults[socketId]) {
+                        room.fallingFuryResults[socketId] = 0; // 0 score
+                        console.log(`Auto-submitted 0 score for disconnected ${playerName} in falling fury`);
                     }
                 } else {
                     // Text-based challenge
@@ -1737,6 +1821,8 @@ io.on('connection', (socket) => {
                     submissions = Object.keys(room.tapResults).length;
                 } else if (room.currentChallengeType === 'multipleChoiceTrivia') {
                     submissions = Object.keys(room.triviaAnswers).length;
+                } else if (room.currentChallengeType === 'fallingFury') {
+                    submissions = Object.keys(room.fallingFuryResults).length;
                 } else {
                     submissions = Object.keys(room.challengeResponses).length;
                 }
@@ -1753,6 +1839,8 @@ io.on('connection', (socket) => {
                         evaluateFastTapperResults(roomCode);
                     } else if (room.currentChallengeType === 'multipleChoiceTrivia') {
                         evaluateTriviaResults(roomCode);
+                    } else if (room.currentChallengeType === 'fallingFury') {
+                        evaluateFallingFuryResults(roomCode);
                     } else {
                         evaluateTextChallengeResults(roomCode);
                     }
@@ -1764,15 +1852,16 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
-    console.log(`🤖 Crack and Combat server running on port ${PORT}`);
-    console.log('🎯 ENHANCED: Smart AI judging with creative rewards and brutal shortcuts punishment!');
-    console.log('⏱️ Challenge Timer: 40 seconds with auto-submit');
-    console.log('🎲 Total Riddles Available:', gameData.riddles.length);
-    console.log('📋 Challenge Types (shuffled per game):', BASE_CHALLENGE_TYPES.join(', '));
-    console.log('🧠 Smart Judging: Rewards creativity, punishes lazy shortcuts');
+    console.log(`?? Crack and Combat server running on port ${PORT}`);
+    console.log('?? ENHANCED: Smart AI judging with creative rewards and brutal shortcuts punishment!');
+    console.log('?? Challenge Timer: 40 seconds with auto-submit');
+    console.log('?? Total Riddles Available:', gameData.riddles.length);
+    console.log('?? Challenge Types (shuffled per game):', BASE_CHALLENGE_TYPES.join(', '));
+    console.log('?? NEW: Falling Fury challenge - Test your hand-eye coordination!');
+    console.log('?? Smart Judging: Rewards creativity, punishes lazy shortcuts');
     if (genAI) {
-        console.log('🔑 Gemini 2.5 Flash: AI-powered challenges with smart evaluation!');
+        console.log('?? Gemini 2.5 Flash: AI-powered challenges with smart evaluation!');
     } else {
-        console.log('⚠️ No Gemini API key: Using fallback challenges.');
+        console.log('?? No Gemini API key: Using fallback challenges.');
     }
 });

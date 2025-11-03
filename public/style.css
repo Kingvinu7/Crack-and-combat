@@ -2623,7 +2623,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .challenge-description::before {
-    content: '⚠ AI CHALLENGE';
+    content: '? AI CHALLENGE';
     position: absolute;
     top: -12px;
     left: 20px;
@@ -2844,7 +2844,7 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .trivia-question-text::before {
-    content: '🧠 QUESTION';
+    content: '?? QUESTION';
     position: absolute;
     top: -12px;
     left: 20px;
@@ -5562,7 +5562,7 @@ body::before { z-index: -1; }
 }
 
 .rule-section li::before {
-    content: '▸';
+    content: '?';
     position: absolute;
     left: 0;
     color: var(--accent-red);
@@ -5649,6 +5649,210 @@ body::before { z-index: -1; }
     
     .rule-section p {
         font-size: 1.1em;
+    }
+}
+
+/* ===== FALLING FURY CHALLENGE STYLES ===== */
+.falling-fury-section {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.falling-fury-section h2 {
+    color: var(--accent-cyan);
+    font-size: 2em;
+    text-shadow: var(--glow-cyan);
+    margin-bottom: 10px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+}
+
+.score-display {
+    margin: 20px 0;
+}
+
+.score-display-text {
+    font-size: 4em;
+    font-weight: 800;
+    color: var(--accent-yellow);
+    text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+    display: block;
+    line-height: 1;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+.score-display p {
+    color: var(--text-secondary);
+    font-size: 1em;
+    margin-top: 5px;
+}
+
+.falling-arena {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    height: 400px;
+    margin: 20px auto;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid var(--border-cyan);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--glow-cyan);
+}
+
+.falling-object {
+    position: absolute;
+    font-size: 3em;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.1s ease;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+    animation: fall-down 3s linear forwards;
+}
+
+.falling-object:hover {
+    transform: scale(1.2);
+}
+
+.falling-object:active {
+    transform: scale(0.9);
+}
+
+@keyframes fall-down {
+    from {
+        top: -100px;
+        opacity: 1;
+    }
+    to {
+        top: 100%;
+        opacity: 1;
+    }
+}
+
+.falling-object.clicked {
+    animation: explode 0.3s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes explode {
+    0% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.5) rotate(180deg);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(2) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Falling Fury Results */
+.falling-fury-results-section {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.falling-fury-results-section h3 {
+    color: var(--accent-cyan);
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    text-shadow: var(--glow-cyan);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+}
+
+#falling-fury-scores-list {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-cyan);
+    border-radius: 8px;
+    padding: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.falling-fury-score-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+    border: 1px solid var(--border-dim);
+    transition: all 0.3s ease;
+}
+
+.falling-fury-score-item:hover {
+    border-color: var(--accent-cyan);
+    box-shadow: var(--glow-cyan);
+    transform: translateX(5px);
+}
+
+.falling-fury-score-item.winner {
+    border: 2px solid var(--accent-yellow);
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 140, 0, 0.05));
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.falling-fury-score-item .player-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1.2em;
+}
+
+.falling-fury-score-item.winner .player-name::before {
+    content: '?? ';
+}
+
+.falling-fury-score-item .player-score {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    font-family: 'Rajdhani', sans-serif;
+}
+
+.falling-fury-score-item.winner .player-score {
+    color: var(--accent-yellow);
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .falling-arena {
+        height: 300px;
+        max-width: 100%;
+    }
+    
+    .falling-object {
+        font-size: 2.5em;
+    }
+    
+    .score-display-text {
+        font-size: 3em;
+    }
+    
+    .falling-fury-section h2 {
+        font-size: 1.5em;
+    }
+}
+
+@media (max-width: 480px) {
+    .falling-arena {
+        height: 250px;
+    }
+    
+    .falling-object {
+        font-size: 2em;
+    }
+    
+    .score-display-text {
+        font-size: 2.5em;
     }
 }
 

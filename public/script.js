@@ -6,6 +6,12 @@ let tapCount = 0;
 let tapperActive = false;
 let gameEnded = false; // Track if game has ended to prevent stray overlays
 
+// Falling Fury variables
+let fallingFuryScore = 0;
+let fallingFuryActive = false;
+let fallingFurySpawnInterval = null;
+let fallingFuryTimer = null;
+
 // Replaced matrix rain with gentle, motion-sickness-free background animations
 
 // DOM elements
@@ -19,6 +25,8 @@ const pages = {
     triviaChallenge: document.getElementById('trivia-challenge-screen'),
     triviaResults: document.getElementById('trivia-results-screen'),
     fastTapper: document.getElementById('fast-tapper-screen'),
+    fallingFury: document.getElementById('falling-fury-screen'),
+    fallingFuryResults: document.getElementById('falling-fury-results-screen'),
     challengeResults: document.getElementById('challenge-results-screen'),
     waiting: document.getElementById('waiting-screen'),
     roundSummary: document.getElementById('round-summary-screen'),
@@ -564,6 +572,115 @@ function startFastTapperTimer(duration) {
             }, 500);
         }
     }, 1000);
+}
+
+function startFallingFuryGame(duration) {
+    fallingFuryActive = true;
+    fallingFuryScore = 0;
+    let timeLeft = duration;
+    
+    // Clear arena
+    const arena = document.getElementById('falling-arena');
+    arena.innerHTML = '';
+    
+    // Start timer
+    fallingFuryTimer = setInterval(() => {
+        document.getElementById('falling-fury-timer').textContent = timeLeft;
+        
+        if (timeLeft <= 3) {
+            document.getElementById('falling-fury-timer').classList.add('urgent');
+            document.getElementById('falling-fury-timer').classList.remove('danger');
+        } else if (timeLeft <= 5) {
+            document.getElementById('falling-fury-timer').classList.add('danger');
+            document.getElementById('falling-fury-timer').classList.remove('urgent');
+        }
+        
+        timeLeft--;
+        
+        if (timeLeft < 0) {
+            clearInterval(fallingFuryTimer);
+            clearInterval(fallingFurySpawnInterval);
+            fallingFuryActive = false;
+            document.getElementById('falling-fury-timer').classList.remove('urgent', 'danger');
+            
+            // Submit score
+            socket.emit('submit-falling-result', { 
+                roomCode: currentRoom, 
+                score: fallingFuryScore 
+            });
+            
+            setTimeout(() => {
+                showNotification(`Time's up! Final score: ${fallingFuryScore}`, 'success');
+            }, 500);
+        }
+    }, 1000);
+    
+    // Start spawning objects every 0.6 seconds
+    fallingFurySpawnInterval = setInterval(() => {
+        if (fallingFuryActive) {
+            spawnFallingObject();
+        }
+    }, 600);
+}
+
+function spawnFallingObject() {
+    const arena = document.getElementById('falling-arena');
+    if (!arena) return;
+    
+    const object = document.createElement('div');
+    object.className = 'falling-object';
+    
+    // 70% guns, 30% bombs
+    const isGun = Math.random() < 0.7;
+    object.textContent = isGun ? '🔫' : '💣';
+    object.dataset.type = isGun ? 'gun' : 'bomb';
+    
+    // Random horizontal position
+    const arenaWidth = arena.offsetWidth;
+    const objectSize = 60; // approximate size in pixels
+    const maxLeft = arenaWidth - objectSize;
+    object.style.left = Math.random() * maxLeft + 'px';
+    
+    // Click handler
+    object.addEventListener('click', () => {
+        if (!fallingFuryActive) return;
+        
+        handleFallingObjectClick(object);
+    });
+    
+    arena.appendChild(object);
+    
+    // Remove after animation completes (3 seconds)
+    setTimeout(() => {
+        if (object.parentNode === arena) {
+            arena.removeChild(object);
+        }
+    }, 3000);
+}
+
+function handleFallingObjectClick(object) {
+    const type = object.dataset.type;
+    
+    // Prevent multiple clicks
+    if (object.classList.contains('clicked')) return;
+    object.classList.add('clicked');
+    
+    if (type === 'gun') {
+        // +1 point for guns
+        fallingFuryScore += 1;
+        document.getElementById('falling-fury-score').textContent = fallingFuryScore;
+    } else if (type === 'bomb') {
+        // -50% current score for bombs
+        fallingFuryScore = Math.floor(fallingFuryScore * 0.5);
+        document.getElementById('falling-fury-score').textContent = fallingFuryScore;
+    }
+    
+    // Remove after explosion animation
+    setTimeout(() => {
+        if (object.parentNode) {
+            object.parentNode.removeChild(object);
+        }
+    }, 300);
 }
 
 function updateLobbyOwnerDisplay() {
@@ -1261,6 +1378,48 @@ socket.on('fast-tapper-start', (data) => {
         document.getElementById('waiting-message').textContent = 'Others are tapping as fast as they can!';
         showPage('waiting');
     }
+});
+
+socket.on('falling-fury-start', (data) => {
+    const isParticipant = data.participants.includes(playerName);
+    
+    if (isParticipant) {
+        fallingFuryScore = 0;
+        document.getElementById('falling-fury-score').textContent = '0';
+        
+        showPage('fallingFury');
+        startFallingFuryGame(data.duration || 30);
+    } else {
+        document.getElementById('waiting-title').textContent = 'Falling Fury Challenge!';
+        document.getElementById('waiting-message').textContent = 'Others are dodging bombs and catching guns!';
+        showPage('waiting');
+    }
+});
+
+socket.on('falling-fury-results', (data) => {
+    document.getElementById('falling-fury-results-message').textContent = 
+        `Top score: ${data.maxScore} points!`;
+    
+    const resultsHtml = data.results.map(result => `
+        <div class="falling-fury-score-item ${result.won ? 'winner' : ''}">
+            <span class="player-name">${result.playerName}</span>
+            <span class="player-score">${result.score}</span>
+        </div>
+    `).join('');
+    
+    document.getElementById('falling-fury-scores-list').innerHTML = resultsHtml;
+    
+    // Falling fury completed - go back to cyber-ambient
+    if (window.audioManager) {
+        console.log('Falling fury completed - returning to cyber ambient');
+        window.audioManager.playMusic('home');
+    }
+    
+    showPage('fallingFuryResults');
+});
+
+socket.on('falling-fury-result-submitted', (data) => {
+    console.log(`${data.player} scored ${data.score} points`);
 });
 
 socket.on('challenge-individual-result', (data) => {
