@@ -978,7 +978,7 @@ room.challengeTimer = setTimeout(() => {
 // Generate Memory Challenge
 function generateMemoryChallenge(roundNumber) {
     const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan'];
-    const balloonCount = 5 + Math.min(roundNumber, 3); // 5-8 balloons depending on round
+    const balloonCount = 7 + Math.floor(Math.random() * 3); // 7-9 balloons randomly
     
     const balloons = [];
     const usedNumbers = [];

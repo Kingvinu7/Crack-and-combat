@@ -6041,6 +6041,35 @@ body::before { z-index: -1; }
     overflow-y: auto;
 }
 
+/* Answer item styles for memory challenge */
+.answer-item.correct {
+    border-color: #00ff88;
+    background: rgba(0, 255, 136, 0.1);
+}
+
+.answer-item.incorrect {
+    border-color: #ff0044;
+    background: rgba(255, 0, 68, 0.1);
+}
+
+.answer-item.correct .answer-status {
+    color: #00ff88;
+    font-weight: bold;
+}
+
+.answer-item.incorrect .answer-status {
+    color: #ff0044;
+    font-weight: bold;
+}
+
+.answer-item.correct .answer-text {
+    color: #00ff88;
+}
+
+.answer-item.incorrect .answer-text {
+    color: #ff0044;
+}
+
 /* Mobile responsive for memory challenge */
 @media (max-width: 768px) {
     .balloon {
