@@ -17,17 +17,23 @@ if (process.env.GEMINI_API_KEY) {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Challenge Types (will be shuffled for each game session)
-const BASE_CHALLENGE_TYPES = ['fallingFury', 'detective', 'multipleChoiceTrivia', 'fastTapper', 'danger'];
+// Challenge Types - Fixed order with fallingFury always as 2nd challenge
+const BASE_CHALLENGE_TYPES = ['detective', 'fallingFury', 'multipleChoiceTrivia', 'fastTapper', 'danger'];
 
-// Shuffle array function
+// Shuffle array function (keeping other challenges except fallingFury at position 1)
 function shuffleArray(array) {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
+    // Keep fallingFury at index 1 (2nd position), shuffle the rest
+    const fixed = [...array];
+    const toShuffle = [fixed[0], ...fixed.slice(2)]; // Get all except fallingFury
+    
+    // Shuffle the rest
+    for (let i = toShuffle.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        [toShuffle[i], toShuffle[j]] = [toShuffle[j], toShuffle[i]];
     }
-    return shuffled;
+    
+    // Rebuild array with fallingFury always at index 1
+    return [toShuffle[0], 'fallingFury', ...toShuffle.slice(1)];
 }
 
 // Game Data with 50+ riddles and trivia questions
@@ -915,16 +921,16 @@ async function startChallengePhase(roomCode) {
             }, 48000);
             
         } else if (challengeType === 'fallingFury') {
-            // Falling Fury Challenge
+            // Falling Fury Challenge - 20 seconds
             room.fallingFuryResults = {};
             io.to(roomCode).emit('falling-fury-start', {
                 participants: nonWinners.map(p => p.name),
-                duration: 30
+                duration: 20
             });
             
             room.challengeTimer = setTimeout(() => {
                 evaluateFallingFuryResults(roomCode);
-            }, 32000);
+            }, 22000);
             
         } else {
             // Text-based challenges with 40 seconds
