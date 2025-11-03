@@ -1441,8 +1441,8 @@ socket.on('fast-tapper-results', (data) => {
         `Fastest fingers: ${data.maxTaps} taps!`;
     
     const resultsHtml = data.results.map(result => `
-        <div class="tap-result-item ${result.won ? 'winner' : ''}">
-            <span class="tap-result-name">${result.won ? 'WINNER ' : ''}${result.playerName}</span>
+        <div class="tap-result-item ${result.won ? 'winner correct' : 'incorrect'}">
+            <span class="tap-result-name">${result.won ? '🏆 ' : ''}${result.playerName}</span>
             <span class="tap-result-count">${result.taps} taps</span>
         </div>
     `).join('');

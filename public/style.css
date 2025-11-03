@@ -3091,14 +3091,14 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 .challenge-result-item.passed {
     border-color: #00ff88;
-    background: rgba(0, 0, 0, 0.9);
-    box-shadow: 0 0 25px rgba(0, 255, 136, 0.3);
+    background: rgba(0, 255, 136, 0.1);
+    box-shadow: 0 0 25px rgba(0, 255, 136, 0.4);
 }
 
 .challenge-result-item.failed {
-    border-color: var(--accent-red);
-    background: rgba(0, 0, 0, 0.9);
-    box-shadow: 0 0 25px rgba(255, 8, 68, 0.3);
+    border-color: #ff0044;
+    background: rgba(255, 0, 68, 0.1);
+    box-shadow: 0 0 25px rgba(255, 0, 68, 0.4);
 }
 
 .challenge-result-header {
@@ -3182,9 +3182,21 @@ input[type="text"]::placeholder, textarea::placeholder {
     font-weight: 600;
 }
 
+.tap-result-item.correct {
+    border-color: #00ff88;
+    background: rgba(0, 255, 136, 0.1);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+.tap-result-item.incorrect {
+    border-color: #ff0044;
+    background: rgba(255, 0, 68, 0.1);
+    box-shadow: 0 0 20px rgba(255, 0, 68, 0.3);
+}
+
 .tap-result-item.winner {
     border-color: var(--accent-yellow);
-    background: rgba(0, 0, 0, 1);
+    background: rgba(255, 215, 0, 0.1);
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
     animation: winnerGlow 2s ease-in-out infinite alternate;
 }
@@ -3215,6 +3227,14 @@ input[type="text"]::placeholder, textarea::placeholder {
 .tap-result-item.winner .tap-result-count {
     color: var(--accent-yellow);
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.tap-result-item.correct .tap-result-count {
+    color: #00ff88;
+}
+
+.tap-result-item.incorrect .tap-result-count {
+    color: #ff0044;
 }
 
 /* ===== INDIVIDUAL RESULT OVERLAY ===== */
@@ -3280,14 +3300,14 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 .individual-result.passed {
     border-color: #00ff88;
-    background: rgba(0, 0, 0, 1);
-    box-shadow: 0 0 40px rgba(0, 255, 136, 0.3);
+    background: rgba(0, 255, 136, 0.1);
+    box-shadow: 0 0 40px rgba(0, 255, 136, 0.4);
 }
 
 .individual-result.failed {
-    border-color: var(--accent-red);
-    background: rgba(0, 0, 0, 1);
-    box-shadow: 0 0 40px rgba(255, 8, 68, 0.3);
+    border-color: #ff0044;
+    background: rgba(255, 0, 68, 0.1);
+    box-shadow: 0 0 40px rgba(255, 0, 68, 0.4);
 }
 
 .individual-result h3 {
@@ -3305,8 +3325,8 @@ input[type="text"]::placeholder, textarea::placeholder {
 }
 
 .individual-result.failed h3 {
-    color: var(--accent-red);
-    text-shadow: 0 0 20px rgba(255, 8, 68, 0.5);
+    color: #ff0044;
+    text-shadow: 0 0 20px rgba(255, 0, 68, 0.5);
 }
 
 .auto-submit-indicator {
