@@ -334,8 +334,8 @@
         </div>
     </div>
 
-    <!-- Falling Fury Screen -->
-    <div id="falling-fury-screen" class="page">
+    <!-- Memory Challenge Screen -->
+    <div id="memory-challenge-screen" class="page">
         <!-- Matrix Background Effect with multiple layers -->
         <div class="matrix-bg">
             <div class="matrix-layer-1"></div>
@@ -343,24 +343,30 @@
             <div class="matrix-layer-3"></div>
         </div>
         <div class="page-content">
-            <div class="timer-section">
-                <div id="falling-fury-timer" class="timer danger">20</div>
-                <p>seconds remaining</p>
-            </div>
-            <div class="falling-fury-section">
-                <h2>🔫 FALLING FURY CHALLENGE</h2>
-                <p class="challenge-description">Click 🔫 guns (+1 point) and avoid 💣 bombs (-50% score)!</p>
-                <div class="score-display">
-                    <span id="falling-fury-score" class="score-display-text">0</span>
-                    <p>points</p>
+            <div class="memory-challenge-section">
+                <h2>🎈 MEMORY CHALLENGE</h2>
+                <p id="memory-instruction" class="memory-instruction">Memorize the balloons and their numbers!</p>
+                <div id="memory-display" class="memory-display">
+                    <div id="balloons-container" class="balloons-container"></div>
                 </div>
-                <div id="falling-arena" class="falling-arena"></div>
+                <div id="memory-question-section" class="memory-question-section" style="display: none;">
+                    <div class="timer-section">
+                        <div id="memory-timer" class="timer danger">20</div>
+                        <p>seconds remaining</p>
+                    </div>
+                    <p id="memory-question" class="memory-question"></p>
+                    <input type="text" id="memory-answer-input" class="memory-answer-input" placeholder="Type your answer...">
+                    <button id="submit-memory-answer" class="btn primary large">Submit Answer</button>
+                    <div class="submission-status">
+                        <p id="memory-submission-count">0/0 players answered</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Falling Fury Results Screen -->
-    <div id="falling-fury-results-screen" class="page">
+    <!-- Memory Challenge Results Screen -->
+    <div id="memory-results-screen" class="page">
         <!-- Matrix Background Effect with multiple layers -->
         <div class="matrix-bg">
             <div class="matrix-layer-1"></div>
@@ -369,12 +375,18 @@
         </div>
         <div class="page-content">
             <div class="results-header">
-                <h2>🎯 FALLING FURY RESULTS</h2>
-                <p id="falling-fury-results-message">Analyzing your performance...</p>
+                <h2>🎯 MEMORY CHALLENGE RESULTS</h2>
+                <p id="memory-results-message">Analyzing your answers...</p>
             </div>
-            <div class="falling-fury-results-section">
-                <h3>Final Scores</h3>
-                <div id="falling-fury-scores-list"></div>
+            <div class="memory-results-section">
+                <div class="correct-answer-display">
+                    <h3>Correct Answer</h3>
+                    <p id="memory-correct-answer-text">Loading...</p>
+                </div>
+                <div class="all-memory-answers-section">
+                    <h3>All Answers</h3>
+                    <div id="all-memory-answers-list"></div>
+                </div>
             </div>
         </div>
     </div>

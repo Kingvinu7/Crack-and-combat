@@ -5652,28 +5652,16 @@ body::before { z-index: -1; }
     }
 }
 
-/* ===== FALLING FURY CHALLENGE STYLES ===== */
-#falling-fury-screen .page-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    overflow: hidden;
-}
-
-.falling-fury-section {
+/* ===== MEMORY CHALLENGE STYLES ===== */
+.memory-challenge-section {
     width: 100%;
     max-width: 800px;
     margin: 0 auto;
     text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    padding: 20px;
 }
 
-.falling-fury-section h2 {
+.memory-challenge-section h2 {
     color: var(--accent-cyan);
     font-size: 2em;
     text-shadow: var(--glow-cyan);
@@ -5682,24 +5670,44 @@ body::before { z-index: -1; }
     font-weight: 700;
 }
 
-.score-display {
+.memory-instruction {
+    color: var(--accent-yellow);
+    font-size: 1.2em;
+    margin: 15px 0;
+    font-weight: 600;
+}
+
+.memory-display {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin: 20px 0;
 }
 
-.score-display-text {
-    font-size: 4em;
-    font-weight: 800;
-    color: var(--accent-yellow);
-    text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
-    display: block;
-    line-height: 1;
-    font-family: 'Rajdhani', sans-serif;
+.balloons-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    max-width: 600px;
 }
 
-.score-display p {
-    color: var(--text-secondary);
-    font-size: 1em;
-    margin-top: 5px;
+.balloon {
+    width: 80px;
+    height: 100px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    box-shadow: inset -10px -10px 20px rgba(0, 0, 0, 0.2),
+                0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .falling-arena {
@@ -5962,3 +5970,111 @@ body::before { z-index: -1; }
 }
 
 
+
+/* Memory Question and Answer Styles */
+.balloon.red { background: linear-gradient(135deg, #ff4444, #cc0000); }
+.balloon.blue { background: linear-gradient(135deg, #4444ff, #0000cc); }
+.balloon.green { background: linear-gradient(135deg, #44ff44, #00cc00); }
+.balloon.yellow { background: linear-gradient(135deg, #ffff44, #cccc00); }
+.balloon.purple { background: linear-gradient(135deg, #ff44ff, #cc00cc); }
+.balloon.orange { background: linear-gradient(135deg, #ffaa44, #cc7700); }
+.balloon.pink { background: linear-gradient(135deg, #ff88ff, #ff44ff); }
+.balloon.cyan { background: linear-gradient(135deg, #44ffff, #00cccc); }
+
+.memory-question-section {
+    margin-top: 20px;
+}
+
+.memory-question {
+    font-size: 1.5em;
+    color: var(--accent-cyan);
+    margin: 20px 0;
+    font-weight: 600;
+}
+
+.memory-answer-input {
+    width: 100%;
+    max-width: 400px;
+    padding: 15px;
+    font-size: 1.2em;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-cyan);
+    border-radius: 8px;
+    color: var(--text-primary);
+    text-align: center;
+    margin: 15px auto;
+    display: block;
+}
+
+.memory-answer-input:focus {
+    outline: none;
+    border-color: var(--accent-cyan);
+    box-shadow: var(--glow-cyan);
+}
+
+/* Memory Results */
+.memory-results-section {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.memory-results-section h3 {
+    color: var(--accent-cyan);
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    text-shadow: var(--glow-cyan);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+}
+
+.all-memory-answers-section {
+    margin-top: 30px;
+}
+
+#all-memory-answers-list {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-cyan);
+    border-radius: 8px;
+    padding: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Mobile responsive for memory challenge */
+@media (max-width: 768px) {
+    .balloon {
+        width: 60px;
+        height: 75px;
+        font-size: 1.5em;
+    }
+    
+    .balloons-container {
+        gap: 15px;
+    }
+    
+    .memory-question {
+        font-size: 1.2em;
+    }
+    
+    .memory-answer-input {
+        font-size: 1em;
+        padding: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .balloon {
+        width: 50px;
+        height: 65px;
+        font-size: 1.3em;
+    }
+    
+    .balloons-container {
+        gap: 10px;
+    }
+    
+    .memory-instruction {
+        font-size: 1em;
+    }
+}

@@ -17,14 +17,14 @@ if (process.env.GEMINI_API_KEY) {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Challenge Types - Fixed order with fallingFury always as 2nd challenge
-const BASE_CHALLENGE_TYPES = ['detective', 'fallingFury', 'multipleChoiceTrivia', 'fastTapper', 'danger'];
+// Challenge Types - Fixed order with memoryChallenge always as 2nd challenge
+const BASE_CHALLENGE_TYPES = ['detective', 'memoryChallenge', 'multipleChoiceTrivia', 'fastTapper', 'danger'];
 
-// Shuffle array function (keeping other challenges except fallingFury at position 1)
+// Shuffle array function (keeping other challenges except memoryChallenge at position 1)
 function shuffleArray(array) {
-    // Keep fallingFury at index 1 (2nd position), shuffle the rest
+    // Keep memoryChallenge at index 1 (2nd position), shuffle the rest
     const fixed = [...array];
-    const toShuffle = [fixed[0], ...fixed.slice(2)]; // Get all except fallingFury
+    const toShuffle = [fixed[0], ...fixed.slice(2)]; // Get all except memoryChallenge
     
     // Shuffle the rest
     for (let i = toShuffle.length - 1; i > 0; i--) {
@@ -32,8 +32,8 @@ function shuffleArray(array) {
         [toShuffle[i], toShuffle[j]] = [toShuffle[j], toShuffle[i]];
     }
     
-    // Rebuild array with fallingFury always at index 1
-    return [toShuffle[0], 'fallingFury', ...toShuffle.slice(1)];
+    // Rebuild array with memoryChallenge always at index 1
+    return [toShuffle[0], 'memoryChallenge', ...toShuffle.slice(1)];
 }
 
 // Game Data with 50+ riddles and trivia questions
@@ -920,17 +920,26 @@ async function startChallengePhase(roomCode) {
                 evaluateTriviaResults(roomCode);
             }, 48000);
             
-        } else if (challengeType === 'fallingFury') {
-            // Falling Fury Challenge - 20 seconds
-            room.fallingFuryResults = {};
-            io.to(roomCode).emit('falling-fury-start', {
+        } else if (challengeType === 'memoryChallenge') {
+            // Memory Challenge - 20 seconds to answer after 2 second display
+            room.memoryResults = {};
+            
+            // Generate memory challenge data
+            const memoryData = generateMemoryChallenge(room.currentRound);
+            room.currentMemoryChallenge = memoryData;
+            
+            io.to(roomCode).emit('memory-challenge-start', {
                 participants: nonWinners.map(p => p.name),
-                duration: 20
+                balloons: memoryData.balloons,
+                question: memoryData.question.text,
+                displayTime: 2,
+                answerTime: 20
             });
             
+            // Timer for answer phase (2s display + 20s answer + 2s buffer)
             room.challengeTimer = setTimeout(() => {
-                evaluateFallingFuryResults(roomCode);
-            }, 22000);
+                evaluateMemoryResults(roomCode);
+            }, 24000);
             
         } else {
             // Text-based challenges with 40 seconds
@@ -966,6 +975,110 @@ room.challengeTimer = setTimeout(() => {
     }
   },1000); // Increased from 500ms to 1000ms to prevent page transition conflicts
 }
+// Generate Memory Challenge
+function generateMemoryChallenge(roundNumber) {
+    const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan'];
+    const balloonCount = 5 + Math.min(roundNumber, 3); // 5-8 balloons depending on round
+    
+    const balloons = [];
+    const usedNumbers = [];
+    
+    for (let i = 0; i < balloonCount; i++) {
+        let number;
+        do {
+            number = Math.floor(Math.random() * 20) + 1; // Numbers 1-20
+        } while (usedNumbers.includes(number));
+        usedNumbers.push(number);
+        
+        balloons.push({
+            number: number,
+            color: colors[Math.floor(Math.random() * colors.length)]
+        });
+    }
+    
+    // Generate random question
+    const questionTypes = [
+        { type: 'color', text: `What was the color of balloon number ${balloons[Math.floor(Math.random() * balloons.length)].number}?` },
+        { type: 'count', text: 'How many balloons were there?' },
+        { type: 'number', text: `Was there a balloon with the number ${Math.random() > 0.5 ? balloons[0].number : (balloonCount + 5)}?` },
+        { type: 'colorCount', text: `How many ${balloons[0].color} balloons were there?` }
+    ];
+    
+    const selectedQuestion = questionTypes[Math.floor(Math.random() * questionTypes.length)];
+    
+    return {
+        balloons: balloons,
+        question: selectedQuestion,
+        correctAnswer: getCorrectAnswer(balloons, selectedQuestion)
+    };
+}
+
+function getCorrectAnswer(balloons, question) {
+    switch (question.type) {
+        case 'color':
+            const targetNumber = parseInt(question.text.match(/number (\d+)/)[1]);
+            const balloon = balloons.find(b => b.number === targetNumber);
+            return balloon ? balloon.color : 'none';
+        case 'count':
+            return balloons.length.toString();
+        case 'number':
+            const checkNumber = parseInt(question.text.match(/number (\d+)/)[1]);
+            return balloons.some(b => b.number === checkNumber) ? 'yes' : 'no';
+        case 'colorCount':
+            const targetColor = question.text.match(/many (\w+) balloons/)[1];
+            return balloons.filter(b => b.color === targetColor).length.toString();
+        default:
+            return '';
+    }
+}
+
+// Evaluate Memory Results
+async function evaluateMemoryResults(roomCode) {
+    const room = rooms[roomCode];
+    if (!room) return;
+
+    const memoryEntries = Object.entries(room.memoryResults);
+    if (memoryEntries.length === 0) {
+        endRound(roomCode, []);
+        return;
+    }
+
+    const correctAnswer = room.currentMemoryChallenge.correctAnswer.toLowerCase();
+    let winners = [];
+
+    memoryEntries.forEach(([playerId, answer]) => {
+        if (answer.toLowerCase().trim() === correctAnswer) {
+            winners.push(playerId);
+        }
+    });
+
+    // Award points to winners
+    winners.forEach(playerId => {
+        const player = room.players.find(p => p.id === playerId);
+        if (player) player.score += 1;
+    });
+
+    const results = memoryEntries.map(([playerId, answer]) => {
+        const player = room.players.find(p => p.id === playerId);
+        return {
+            playerName: player?.name || 'Unknown',
+            answer: answer,
+            correct: answer.toLowerCase().trim() === correctAnswer,
+            won: winners.includes(playerId)
+        };
+    });
+
+    io.to(roomCode).emit('memory-challenge-results', {
+        results: results,
+        correctAnswer: room.currentMemoryChallenge.correctAnswer,
+        question: room.currentMemoryChallenge.question.text
+    });
+
+    setTimeout(() => {
+        endRound(roomCode, results);
+    }, 6000);
+}
+
 // Evaluate Trivia Results
 async function evaluateTriviaResults(roomCode) {
     const room = rooms[roomCode];
@@ -1203,7 +1316,7 @@ function startNewRound(roomCode) {
     room.riddleAnswers = {};
     room.challengeResponses = {};
     room.tapResults = {};
-    room.fallingFuryResults = {};
+    room.memoryResults = {};
     
     // Initialize round history on first round OR if it's missing
     if (room.currentRound === 1 || !room.roundHistory || room.roundHistory.length === 0) {
@@ -1373,7 +1486,8 @@ io.on('connection', (socket) => {
             challengeResponses: {},
             tapResults: {},
             triviaAnswers: {},
-            fallingFuryResults: {},
+            memoryResults: {},
+            currentMemoryChallenge: null,
             currentChallengeType: null,
             currentChallengeContent: null,
             currentTriviaQuestion: null,
@@ -1644,22 +1758,34 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('submit-falling-result', (data) => {
+    socket.on('submit-memory-answer', (data) => {
         const room = rooms[data.roomCode];
         if (!room || room.gameState !== 'challenge-phase') return;
         const player = room.players.find(p => p.id === socket.id);
         if (!player || player.isSpectator || player.name === room.riddleWinner) return;
         
-        room.fallingFuryResults[socket.id] = data.score;
-        
-        const activePlayers = room.players.filter(p => !p.isSpectator);
-        
-        io.to(data.roomCode).emit('falling-fury-result-submitted', {
-            player: player.name,
-            score: data.score,
-            totalSubmissions: Object.keys(room.fallingFuryResults).length,
-            expectedSubmissions: activePlayers.filter(p => p.name !== room.riddleWinner).length
-        });
+        if (!room.memoryResults[socket.id]) {
+            room.memoryResults[socket.id] = data.answer;
+            
+            const activePlayers = room.players.filter(p => !p.isSpectator);
+            const expectedSubmissions = activePlayers.filter(p => p.name !== room.riddleWinner).length;
+            
+            io.to(data.roomCode).emit('memory-answer-submitted', {
+                player: player.name,
+                totalSubmissions: Object.keys(room.memoryResults).length,
+                expectedSubmissions: expectedSubmissions
+            });
+            
+            // Check if all active players have answered
+            if (Object.keys(room.memoryResults).length === expectedSubmissions) {
+                console.log('All active non-winners submitted memory answer. Ending memory phase early.');
+                if (room.challengeTimer) {
+                    clearTimeout(room.challengeTimer);
+                    room.challengeTimer = null;
+                }
+                evaluateMemoryResults(data.roomCode);
+            }
+        }
     });
     socket.on('disconnect', () => {
         console.log('Player disconnected:', socket.id);
@@ -1738,10 +1864,10 @@ io.on('connection', (socket) => {
                         };
                         console.log(`Auto-submitted invalid trivia answer for disconnected ${playerName}`);
                     }
-                } else if (room.currentChallengeType === 'fallingFury') {
-                    if (!room.fallingFuryResults[socketId]) {
-                        room.fallingFuryResults[socketId] = 0; // 0 score
-                        console.log(`Auto-submitted 0 score for disconnected ${playerName} in falling fury`);
+                } else if (room.currentChallengeType === 'memoryChallenge') {
+                    if (!room.memoryResults[socketId]) {
+                        room.memoryResults[socketId] = '[DISCONNECTED]';
+                        console.log(`Auto-submitted disconnection for ${playerName} in memory challenge`);
                     }
                 } else {
                     // Text-based challenge
@@ -1827,8 +1953,8 @@ io.on('connection', (socket) => {
                     submissions = Object.keys(room.tapResults).length;
                 } else if (room.currentChallengeType === 'multipleChoiceTrivia') {
                     submissions = Object.keys(room.triviaAnswers).length;
-                } else if (room.currentChallengeType === 'fallingFury') {
-                    submissions = Object.keys(room.fallingFuryResults).length;
+                } else if (room.currentChallengeType === 'memoryChallenge') {
+                    submissions = Object.keys(room.memoryResults).length;
                 } else {
                     submissions = Object.keys(room.challengeResponses).length;
                 }
@@ -1845,8 +1971,8 @@ io.on('connection', (socket) => {
                         evaluateFastTapperResults(roomCode);
                     } else if (room.currentChallengeType === 'multipleChoiceTrivia') {
                         evaluateTriviaResults(roomCode);
-                    } else if (room.currentChallengeType === 'fallingFury') {
-                        evaluateFallingFuryResults(roomCode);
+                    } else if (room.currentChallengeType === 'memoryChallenge') {
+                        evaluateMemoryResults(roomCode);
                     } else {
                         evaluateTextChallengeResults(roomCode);
                     }

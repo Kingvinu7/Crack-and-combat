@@ -6,11 +6,9 @@ let tapCount = 0;
 let tapperActive = false;
 let gameEnded = false; // Track if game has ended to prevent stray overlays
 
-// Falling Fury variables
-let fallingFuryScore = 0;
-let fallingFuryActive = false;
-let fallingFurySpawnInterval = null;
-let fallingFuryTimer = null;
+// Memory Challenge variables
+let memoryTimer = null;
+let memoryBalloons = [];
 
 // Replaced matrix rain with gentle, motion-sickness-free background animations
 
@@ -25,8 +23,8 @@ const pages = {
     triviaChallenge: document.getElementById('trivia-challenge-screen'),
     triviaResults: document.getElementById('trivia-results-screen'),
     fastTapper: document.getElementById('fast-tapper-screen'),
-    fallingFury: document.getElementById('falling-fury-screen'),
-    fallingFuryResults: document.getElementById('falling-fury-results-screen'),
+    memoryChallenge: document.getElementById('memory-challenge-screen'),
+    memoryResults: document.getElementById('memory-results-screen'),
     challengeResults: document.getElementById('challenge-results-screen'),
     waiting: document.getElementById('waiting-screen'),
     roundSummary: document.getElementById('round-summary-screen'),
@@ -574,131 +572,88 @@ function startFastTapperTimer(duration) {
     }, 1000);
 }
 
-function startFallingFuryGame(duration) {
-    fallingFuryActive = true;
-    fallingFuryScore = 0;
-    let timeLeft = duration;
+function startMemoryChallenge(balloons, question, displayTime, answerTime) {
+    // Show balloons
+    displayBalloons(balloons);
+    document.getElementById('memory-instruction').textContent = 'Memorize the balloons and their numbers!';
+    document.getElementById('memory-display').style.display = 'flex';
+    document.getElementById('memory-question-section').style.display = 'none';
     
-    // Clear arena
-    const arena = document.getElementById('falling-arena');
-    arena.innerHTML = '';
-    
-    // Set up event delegation for better performance (one listener instead of many)
-    const handleArenaClick = (e) => {
-        if (!fallingFuryActive) return;
-        const target = e.target;
-        if (target.classList.contains('falling-object') && !target.classList.contains('clicked')) {
-            e.preventDefault();
-            e.stopPropagation();
-            handleFallingObjectClick(target);
-        }
-    };
-    
-    arena.addEventListener('touchstart', handleArenaClick, { passive: false });
-    arena.addEventListener('click', handleArenaClick);
-    
-    // Store for cleanup
-    arena.dataset.clickHandler = 'attached';
-    
-    // Start timer
-    fallingFuryTimer = setInterval(() => {
-        document.getElementById('falling-fury-timer').textContent = timeLeft;
+    // After display time, hide balloons and show question
+    setTimeout(() => {
+        // Hide balloons
+        document.getElementById('balloons-container').innerHTML = '';
+        document.getElementById('memory-display').style.display = 'none';
+        document.getElementById('memory-instruction').style.display = 'none';
         
-        if (timeLeft <= 3) {
-            document.getElementById('falling-fury-timer').classList.add('urgent');
-            document.getElementById('falling-fury-timer').classList.remove('danger');
-        } else if (timeLeft <= 5) {
-            document.getElementById('falling-fury-timer').classList.add('danger');
-            document.getElementById('falling-fury-timer').classList.remove('urgent');
-        }
+        // Show question section
+        document.getElementById('memory-question-section').style.display = 'block';
+        document.getElementById('memory-question').textContent = question;
         
-        timeLeft--;
+        // Reset and enable input
+        const answerInput = document.getElementById('memory-answer-input');
+        answerInput.value = '';
+        answerInput.disabled = false;
+        document.getElementById('submit-memory-answer').disabled = false;
         
-        if (timeLeft < 0) {
-            clearInterval(fallingFuryTimer);
-            clearInterval(fallingFurySpawnInterval);
-            fallingFuryActive = false;
-            document.getElementById('falling-fury-timer').classList.remove('urgent', 'danger');
+        // Start answer timer
+        let timeLeft = answerTime;
+        document.getElementById('memory-timer').textContent = timeLeft;
+        
+        memoryTimer = setInterval(() => {
+            timeLeft--;
+            document.getElementById('memory-timer').textContent = timeLeft;
             
-            // Clean up event listeners
-            if (arena) {
-                arena.removeEventListener('touchstart', handleArenaClick);
-                arena.removeEventListener('click', handleArenaClick);
-                arena.innerHTML = '';
+            if (timeLeft <= 3) {
+                document.getElementById('memory-timer').classList.add('urgent');
+                document.getElementById('memory-timer').classList.remove('danger');
+            } else if (timeLeft <= 5) {
+                document.getElementById('memory-timer').classList.add('danger');
+                document.getElementById('memory-timer').classList.remove('urgent');
             }
             
-            // Submit score
-            socket.emit('submit-falling-result', { 
-                roomCode: currentRoom, 
-                score: fallingFuryScore 
-            });
-            
-            setTimeout(() => {
-                showNotification(`Time's up! Final score: ${fallingFuryScore}`, 'success');
-            }, 500);
-        }
-    }, 1000);
-    
-    // Spawn objects every 0.4 seconds = ~2-3 objects per second, 40-50 total in 20s
-    fallingFurySpawnInterval = setInterval(() => {
-        if (fallingFuryActive) {
-            spawnFallingObject();
-        }
-    }, 400);
+            if (timeLeft <= 0) {
+                clearInterval(memoryTimer);
+                submitMemoryAnswer();
+            }
+        }, 1000);
+        
+    }, displayTime * 1000);
 }
 
-function spawnFallingObject() {
-    const arena = document.getElementById('falling-arena');
-    if (!arena || !fallingFuryActive) return;
+function displayBalloons(balloons) {
+    const container = document.getElementById('balloons-container');
+    container.innerHTML = '';
     
-    const object = document.createElement('div');
-    object.className = 'falling-object';
-    
-    // 70% guns, 30% bombs
-    const isGun = Math.random() < 0.7;
-    object.textContent = isGun ? '🔫' : '💣';
-    object.dataset.type = isGun ? 'gun' : 'bomb';
-    
-    // Random horizontal position
-    const arenaWidth = arena.offsetWidth;
-    const objectSize = 60; // approximate size in pixels
-    const maxLeft = arenaWidth - objectSize;
-    object.style.left = Math.random() * maxLeft + 'px';
-    
-    arena.appendChild(object);
-    
-    // Remove after animation completes (3 seconds) - no individual listeners needed!
-    setTimeout(() => {
-        if (object && object.parentNode === arena) {
-            arena.removeChild(object);
-        }
-    }, 3000);
+    balloons.forEach(balloon => {
+        const balloonEl = document.createElement('div');
+        balloonEl.className = `balloon ${balloon.color}`;
+        balloonEl.textContent = balloon.number;
+        container.appendChild(balloonEl);
+    });
 }
 
-function handleFallingObjectClick(object) {
-    const type = object.dataset.type;
+function submitMemoryAnswer() {
+    const answerInput = document.getElementById('memory-answer-input');
+    const answer = answerInput.value.trim() || '[No answer]';
     
-    // Prevent multiple clicks
-    if (object.classList.contains('clicked')) return;
-    object.classList.add('clicked');
+    socket.emit('submit-memory-answer', {
+        roomCode: currentRoom,
+        answer: answer
+    });
     
-    if (type === 'gun') {
-        // +1 point for guns
-        fallingFuryScore += 1;
-        document.getElementById('falling-fury-score').textContent = fallingFuryScore;
-    } else if (type === 'bomb') {
-        // -50% current score for bombs
-        fallingFuryScore = Math.floor(fallingFuryScore * 0.5);
-        document.getElementById('falling-fury-score').textContent = fallingFuryScore;
-    }
+    // Disable input and button
+    answerInput.disabled = true;
+    document.getElementById('submit-memory-answer').disabled = true;
     
-    // Remove after explosion animation
-    setTimeout(() => {
-        if (object && object.parentNode) {
-            object.parentNode.removeChild(object);
-        }
-    }, 200);
+    showNotification('Answer submitted!', 'success');
 }
+
+// Add event listener for submit button
+document.getElementById('submit-memory-answer').addEventListener('click', submitMemoryAnswer);
+document.getElementById('memory-answer-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') submitMemoryAnswer();
+});
 
 function updateLobbyOwnerDisplay() {
     const lobbyHeader = document.querySelector('.lobby-header');
@@ -1397,46 +1352,72 @@ socket.on('fast-tapper-start', (data) => {
     }
 });
 
-socket.on('falling-fury-start', (data) => {
+socket.on('memory-challenge-start', (data) => {
     const isParticipant = data.participants.includes(playerName);
     
     if (isParticipant) {
-        fallingFuryScore = 0;
-        document.getElementById('falling-fury-score').textContent = '0';
-        
-        showPage('fallingFury');
-        startFallingFuryGame(data.duration || 30);
+        memoryBalloons = data.balloons;
+        showPage('memoryChallenge');
+        startMemoryChallenge(data.balloons, data.question, data.displayTime || 2, data.answerTime || 20);
     } else {
-        document.getElementById('waiting-title').textContent = 'Falling Fury Challenge!';
-        document.getElementById('waiting-message').textContent = 'Others are dodging bombs and catching guns!';
+        document.getElementById('waiting-title').textContent = 'Memory Challenge!';
+        document.getElementById('waiting-message').textContent = 'Others are testing their memory!';
         showPage('waiting');
     }
 });
 
-socket.on('falling-fury-results', (data) => {
-    document.getElementById('falling-fury-results-message').textContent = 
-        `Top score: ${data.maxScore} points!`;
+socket.on('memory-challenge-results', (data) => {
+    document.getElementById('memory-results-message').textContent = 
+        `Question: ${data.question}`;
     
-    const resultsHtml = data.results.map(result => `
-        <div class="falling-fury-score-item ${result.won ? 'winner' : ''}">
-            <span class="player-name">${result.playerName}</span>
-            <span class="player-score">${result.score}</span>
-        </div>
-    `).join('');
+    document.getElementById('memory-correct-answer-text').textContent = data.correctAnswer;
     
-    document.getElementById('falling-fury-scores-list').innerHTML = resultsHtml;
+    const answersListEl = document.getElementById('all-memory-answers-list');
+    let answersHtml = '';
     
-    // Falling fury completed - go back to cyber-ambient
-    if (window.audioManager) {
-        console.log('Falling fury completed - returning to cyber ambient');
-        window.audioManager.playMusic('home');
-    }
+    data.results.forEach((result, index) => {
+        answersHtml += `
+            <div class="answer-item ${result.correct ? 'correct' : 'incorrect'} ${result.won ? 'winner' : ''}">
+                <div class="answer-header">
+                    <span class="player-name">${result.playerName}</span>
+                    ${result.won ? '<span class="winner-badge">WINNER</span>' : ''}
+                </div>
+                <div class="answer-text">"${result.answer}"</div>
+                <div class="answer-status">
+                    ${result.correct ? 'Correct' : 'Incorrect'}
+                </div>
+            </div>
+        `;
+    });
     
-    showPage('fallingFuryResults');
+    answersListEl.innerHTML = answersHtml;
+    showPage('memoryResults');
 });
 
-socket.on('falling-fury-result-submitted', (data) => {
-    console.log(`${data.player} scored ${data.score} points`);
+socket.on('memory-answer-submitted', (data) => {
+    const submissionCount = document.getElementById('memory-submission-count');
+    submissionCount.textContent = `${data.totalSubmissions}/${data.expectedSubmissions} players answered`;
+    
+    // Show auto-advance indicator when all players have answered
+    if (data.totalSubmissions === data.expectedSubmissions) {
+        submissionCount.innerHTML = `
+            <span style="color: var(--accent-green); font-weight: bold;">
+                ✓ All players answered! Auto-advancing...
+            </span>
+        `;
+        
+        // Clear timer
+        if (memoryTimer) {
+            clearInterval(memoryTimer);
+            memoryTimer = null;
+        }
+        
+        const timer = document.getElementById('memory-timer');
+        if (timer) {
+            timer.textContent = 'ADVANCING...';
+            timer.classList.add('auto-submit');
+        }
+    }
 });
 
 socket.on('challenge-individual-result', (data) => {
