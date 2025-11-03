@@ -97,126 +97,6 @@ const gameData = {
     ],
     triviaQuestions: [
         {
-            question: "Which artificial intelligence technique mimics the structure of the human brain?",
-            options: ["Neural Networks", "Decision Trees", "Linear Regression", "K-Means Clustering"],
-            correctAnswer: 0,
-            difficulty: "medium"
-        },
-        {
-            question: "What is the primary component of Earth's atmosphere that AI systems might struggle to process without proper sensors?",
-            options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Argon"],
-            correctAnswer: 2,
-            difficulty: "medium"
-        },
-        {
-            question: "In quantum computing, what phenomenon allows qubits to exist in multiple states simultaneously?",
-            options: ["Entanglement", "Superposition", "Decoherence", "Tunneling"],
-            correctAnswer: 1,
-            difficulty: "above-medium"
-        },
-        {
-            question: "Which programming paradigm treats computation as the evaluation of mathematical functions?",
-            options: ["Object-Oriented", "Procedural", "Functional", "Assembly"],
-            correctAnswer: 2,
-            difficulty: "medium"
-        },
-        {
-            question: "What is the term for AI systems that can perform any intellectual task that humans can do?",
-            options: ["Narrow AI", "General AI", "Super AI", "Weak AI"],
-            correctAnswer: 1,
-            difficulty: "medium"
-        },
-        {
-            question: "Which cryptographic algorithm is considered quantum-resistant?",
-            options: ["RSA", "ECC", "Lattice-based", "SHA-256"],
-            correctAnswer: 2,
-            difficulty: "above-medium"
-        },
-        {
-            question: "In machine learning, what technique prevents overfitting by randomly setting some neurons to zero during training?",
-            options: ["Batch Normalization", "Dropout", "Regularization", "Cross-validation"],
-            correctAnswer: 1,
-            difficulty: "above-medium"
-        },
-        {
-            question: "What is the maximum theoretical efficiency of a Carnot heat engine operating between 300K and 600K?",
-            options: ["25%", "50%", "75%", "100%"],
-            correctAnswer: 1,
-            difficulty: "above-medium"
-        },
-        {
-            question: "Which data structure provides O(1) average time complexity for insertions, deletions, and lookups?",
-            options: ["Binary Tree", "Hash Table", "Linked List", "Array"],
-            correctAnswer: 1,
-            difficulty: "medium"
-        },
-        {
-            question: "In cybersecurity, what attack vector exploits the time difference in cryptographic operations?",
-            options: ["SQL Injection", "Timing Attack", "Buffer Overflow", "Man-in-the-Middle"],
-            correctAnswer: 1,
-            difficulty: "above-medium"
-        },
-        {
-            question: "What is the primary challenge in achieving artificial general intelligence?",
-            options: ["Processing Power", "Data Storage", "Transfer Learning", "Energy Consumption"],
-            correctAnswer: 2,
-            difficulty: "above-medium"
-        },
-        {
-            question: "Which mathematical concept is fundamental to understanding neural network backpropagation?",
-            options: ["Linear Algebra", "Chain Rule", "Fourier Transform", "Bayes' Theorem"],
-            correctAnswer: 1,
-            difficulty: "medium"
-        },
-        {
-            question: "In distributed systems, what problem does the Byzantine Generals Problem address?",
-            options: ["Load Balancing", "Consensus", "Data Replication", "Network Partitioning"],
-            correctAnswer: 1,
-            difficulty: "above-medium"
-        },
-        {
-            question: "What is the fundamental unit of information in quantum computing?",
-            options: ["Bit", "Byte", "Qubit", "Photon"],
-            correctAnswer: 2,
-            difficulty: "medium"
-        },
-        {
-            question: "Which AI ethics principle focuses on ensuring AI systems can explain their decision-making process?",
-            options: ["Fairness", "Transparency", "Accountability", "Privacy"],
-            correctAnswer: 1,
-            difficulty: "medium"
-        },
-        {
-            question: "In complexity theory, what class of problems can be solved in polynomial time by a non-deterministic Turing machine?",
-            options: ["P", "NP", "NP-Complete", "PSPACE"],
-            correctAnswer: 1,
-            difficulty: "above-medium"
-        },
-        {
-            question: "What is the primary advantage of using transformer architecture in large language models?",
-            options: ["Lower Memory Usage", "Parallel Processing", "Smaller Model Size", "Faster Training"],
-            correctAnswer: 1,
-            difficulty: "above-medium"
-        },
-        {
-            question: "Which phenomenon in physics could potentially be exploited for faster-than-light communication if properly harnessed?",
-            options: ["Quantum Tunneling", "Quantum Entanglement", "Wormholes", "Time Dilation"],
-            correctAnswer: 1,
-            difficulty: "above-medium"
-        },
-        {
-            question: "In game theory, what strategy always chooses the option that minimizes the maximum possible loss?",
-            options: ["Nash Equilibrium", "Minimax", "Dominant Strategy", "Pareto Optimal"],
-            correctAnswer: 1,
-            difficulty: "medium"
-        },
-        {
-            question: "What is the primary bottleneck in current AI systems when processing real-world data?",
-            options: ["Computational Speed", "Memory Bandwidth", "Context Understanding", "Power Consumption"],
-            correctAnswer: 2,
-            difficulty: "above-medium"
-        },
-        {
             question: "What is Bungee.exchange primarily used for?",
             options: ["NFT trading", "Cross-chain token swapping", "Staking rewards", "Mining pools"],
             correctAnswer: 1,
@@ -276,64 +156,123 @@ const gameData = {
             correctAnswer: 1,
             difficulty: "above-medium"
         },
-        // Additional fallback trivia questions for variety
         {
-            question: "What is the primary purpose of a hash function in computer science?",
-            options: ["Data encryption", "Data compression", "Data integrity verification", "Data sorting"],
-            correctAnswer: 2,
+            question: "What is Bungee's Socket API used for?",
+            options: ["Real-time chat", "Cross-chain route quotes and transactions", "Game development", "Video streaming"],
+            correctAnswer: 1,
             difficulty: "medium"
         },
         {
-            question: "Which of these is NOT a fundamental principle of object-oriented programming?",
-            options: ["Encapsulation", "Inheritance", "Polymorphism", "Compilation"],
-            correctAnswer: 3,
+            question: "Which feature allows Bungee users to compare multiple bridge options?",
+            options: ["Price Scanner", "Route Optimizer", "Bridge Marketplace", "Multi-path Viewer"],
+            correctAnswer: 1,
             difficulty: "medium"
         },
         {
-            question: "What does 'Big O' notation describe in algorithm analysis?",
-            options: ["Memory usage", "Time complexity", "Code readability", "Bug frequency"],
+            question: "What is the main purpose of Bungee's refuel feature?",
+            options: ["Buy gas tokens", "Get native tokens on destination chain", "Earn rewards", "Stake tokens"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "Which layer does Bungee operate on in blockchain architecture?",
+            options: ["Layer 1", "Application Layer", "Protocol Layer", "Network Layer"],
             correctAnswer: 1,
             difficulty: "above-medium"
         },
         {
-            question: "Which planet in our solar system has the most moons?",
-            options: ["Jupiter", "Saturn", "Neptune", "Uranus"],
+            question: "What does Bungee's API allow developers to integrate?",
+            options: ["NFT minting", "Cross-chain swaps into their apps", "Smart contracts", "Wallet creation"],
             correctAnswer: 1,
             difficulty: "medium"
         },
         {
-            question: "What is the smallest unit of data in a computer?",
-            options: ["Byte", "Bit", "Nibble", "Word"],
+            question: "How does Bungee handle slippage in cross-chain transactions?",
+            options: ["Ignores it", "Shows estimated slippage before swap", "Blocks all trades", "Random calculation"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "What is Socket Protocol (Bungee's underlying tech)?",
+            options: ["A new blockchain", "Cross-chain interoperability protocol", "DeFi lending platform", "NFT marketplace"],
+            correctAnswer: 1,
+            difficulty: "above-medium"
+        },
+        {
+            question: "Which networks can you bridge assets between using Bungee?",
+            options: ["Only Ethereum and BSC", "Only EVM chains", "Multiple chains including L2s", "Bitcoin networks only"],
+            correctAnswer: 2,
+            difficulty: "medium"
+        },
+        {
+            question: "What does Bungee optimize for when selecting routes?",
+            options: ["Only speed", "Only cost", "Best combination of cost, speed, and security", "Random selection"],
+            correctAnswer: 2,
+            difficulty: "medium"
+        },
+        {
+            question: "Does Bungee require KYC verification?",
+            options: ["Yes, always", "No, it's decentralized", "Only for large amounts", "Only for new users"],
             correctAnswer: 1,
             difficulty: "easy"
         },
         {
-            question: "Which programming language was originally called 'Oak'?",
-            options: ["JavaScript", "Java", "Python", "C++"],
+            question: "What is a key benefit of Bungee's aggregation model?",
+            options: ["Higher fees", "Access to multiple bridges and DEXs in one place", "Slower transactions", "Limited options"],
             correctAnswer: 1,
-            difficulty: "above-medium"
-        },
-        {
-            question: "What does 'HTTP' stand for?",
-            options: ["Hypertext Transfer Protocol", "High-Tech Transfer Process", "Hyperlink Text Transport Protocol", "Home Terminal Transfer Protocol"],
-            correctAnswer: 0,
             difficulty: "medium"
         },
         {
-            question: "Which of these is a NoSQL database?",
-            options: ["MySQL", "PostgreSQL", "MongoDB", "SQLite"],
+            question: "Can Bungee swap tokens within the same chain?",
+            options: ["No, only cross-chain", "Yes, it supports same-chain swaps too", "Only on Ethereum", "Only between L2s"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "What powers Bungee's route discovery?",
+            options: ["Manual input", "AI algorithms", "Off-chain agents competing for best routes", "Random selection"],
             correctAnswer: 2,
-            difficulty: "medium"
-        },
-        {
-            question: "What is the maximum value that can be stored in a 32-bit signed integer?",
-            options: ["2,147,483,647", "4,294,967,295", "1,073,741,823", "65,535"],
-            correctAnswer: 0,
             difficulty: "above-medium"
         },
         {
-            question: "Which sorting algorithm has the best average-case time complexity?",
-            options: ["Bubble Sort", "Quick Sort", "Selection Sort", "Insertion Sort"],
+            question: "Is Bungee custodial or non-custodial?",
+            options: ["Custodial", "Non-custodial", "Hybrid", "Depends on amount"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "What happens to transaction fees on Bungee?",
+            options: ["All go to Bungee", "Split between bridges and protocols used", "Burned completely", "Distributed to users"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "Which blockchain framework does Bungee support?",
+            options: ["Only EVM", "Only Cosmos", "Multiple including EVM, Cosmos, etc.", "Only Bitcoin"],
+            correctAnswer: 2,
+            difficulty: "above-medium"
+        },
+        {
+            question: "What is Bungee's widget feature?",
+            options: ["A game", "Embeddable swap interface for other dApps", "NFT viewer", "Wallet manager"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "How does Bungee ensure users get the best rates?",
+            options: ["Fixed pricing", "Compares multiple sources and routes", "Uses only one DEX", "Manual updates"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "Can Bungee handle token approvals automatically?",
+            options: ["No, manual only", "Yes, with user permission", "Not applicable", "Only on Ethereum"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "What does Bungee's 'gasless' feature do?",
+            options: ["Free transactions", "Pay gas fees with tokens being swapped", "No gas needed", "Gas fees waived forever"],
             correctAnswer: 1,
             difficulty: "above-medium"
         }
