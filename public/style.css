@@ -2714,14 +2714,14 @@ input[type="text"]::placeholder, textarea::placeholder {
 
 .answer-item.correct {
     border-color: #00ff88;
-    background: rgba(0, 0, 0, 1);
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+    background: rgba(0, 255, 136, 0.1);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
 }
 
 .answer-item.incorrect {
-    border-color: var(--accent-red);
-    background: rgba(0, 0, 0, 1);
-    box-shadow: 0 0 20px rgba(255, 8, 68, 0.2);
+    border-color: #ff0044;
+    background: rgba(255, 0, 68, 0.1);
+    box-shadow: 0 0 20px rgba(255, 0, 68, 0.3);
 }
 
 .answer-item.winner {
@@ -2799,11 +2799,21 @@ input[type="text"]::placeholder, textarea::placeholder {
 .answer-item.correct .answer-status {
     color: #00ff88;
     text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    font-weight: bold;
 }
 
 .answer-item.incorrect .answer-status {
-    color: var(--accent-red);
-    text-shadow: 0 0 10px rgba(255, 8, 68, 0.5);
+    color: #ff0044;
+    text-shadow: 0 0 10px rgba(255, 0, 68, 0.5);
+    font-weight: bold;
+}
+
+.answer-item.correct .answer-text {
+    color: #00ff88;
+}
+
+.answer-item.incorrect .answer-text {
+    color: #ff0044;
 }
 
 /* ===== TRIVIA CHALLENGE STYLES ===== */
