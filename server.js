@@ -932,14 +932,14 @@ async function startChallengePhase(roomCode) {
                 participants: nonWinners.map(p => p.name),
                 balloons: memoryData.balloons,
                 question: memoryData.question.text,
-                displayTime: 2,
+                displayTime: 3.5,
                 answerTime: 20
             });
             
-            // Timer for answer phase (2s display + 20s answer + 2s buffer)
+            // Timer for answer phase (3.5s display + 20s answer + 2s buffer)
             room.challengeTimer = setTimeout(() => {
                 evaluateMemoryResults(roomCode);
-            }, 24000);
+            }, 25500);
             
         } else {
             // Text-based challenges with 40 seconds
