@@ -1774,7 +1774,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('submit-riddle-answer', (data) => {
+    socket.on('submit-riddle-challenge-answer', (data) => {
         const room = rooms[data.roomCode];
         if (!room || room.gameState !== 'challenge-phase') return;
         const player = room.players.find(p => p.id === socket.id);
@@ -1790,7 +1790,7 @@ io.on('connection', (socket) => {
             const activePlayers = room.players.filter(p => !p.isSpectator);
             const expectedSubmissions = activePlayers.filter(p => p.name !== room.riddleWinner).length;
             
-            io.to(data.roomCode).emit('riddle-answer-submitted', {
+            io.to(data.roomCode).emit('riddle-challenge-answer-submitted', {
                 player: player.name,
                 totalSubmissions: Object.keys(room.riddleAnswers).length,
                 expectedSubmissions: expectedSubmissions
@@ -1798,7 +1798,7 @@ io.on('connection', (socket) => {
             
             // Check if all active players have answered
             if (Object.keys(room.riddleAnswers).length === expectedSubmissions) {
-                console.log('All active non-winners submitted riddle answer. Ending riddle phase early.');
+                console.log('All active non-winners submitted riddle challenge answer. Ending riddle challenge phase early.');
                 if (room.challengeTimer) {
                     clearTimeout(room.challengeTimer);
                     room.challengeTimer = null;

@@ -562,9 +562,9 @@ function onRiddleOptionClick(event) {
     
     event.target.classList.add('selected');
     
-    // Submit the answer
+    // Submit the answer - use different event for riddle challenge
     if (currentRoom) {
-        socket.emit('submit-riddle-answer', { 
+        socket.emit('submit-riddle-challenge-answer', { 
             roomCode: currentRoom, 
             answer: selectedOption 
         });
@@ -1574,7 +1574,7 @@ socket.on('trivia-answer-submitted', (data) => {
     }
 });
 
-socket.on('riddle-answer-submitted', (data) => {
+socket.on('riddle-challenge-answer-submitted', (data) => {
     const submissionCount = document.getElementById('riddle-challenge-submission-count');
     submissionCount.textContent = `${data.totalSubmissions}/${data.expectedSubmissions} players answered`;
     
