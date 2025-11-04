@@ -6,6 +6,10 @@ let tapCount = 0;
 let tapperActive = false;
 let gameEnded = false; // Track if game has ended to prevent stray overlays
 
+// Memory Challenge variables
+let memoryTimer = null;
+let memoryBalloons = [];
+
 // Replaced matrix rain with gentle, motion-sickness-free background animations
 
 // DOM elements
@@ -16,9 +20,13 @@ const pages = {
     riddle: document.getElementById('riddle-screen'),
     riddleResults: document.getElementById('riddle-results-screen'),
     textChallenge: document.getElementById('text-challenge-screen'),
+    riddleChallenge: document.getElementById('riddle-challenge-screen'),
+    riddleResults: document.getElementById('riddle-results-screen'),
     triviaChallenge: document.getElementById('trivia-challenge-screen'),
     triviaResults: document.getElementById('trivia-results-screen'),
     fastTapper: document.getElementById('fast-tapper-screen'),
+    memoryChallenge: document.getElementById('memory-challenge-screen'),
+    memoryResults: document.getElementById('memory-results-screen'),
     challengeResults: document.getElementById('challenge-results-screen'),
     waiting: document.getElementById('waiting-screen'),
     roundSummary: document.getElementById('round-summary-screen'),
@@ -138,6 +146,11 @@ document.getElementById('tap-button').addEventListener('click', onTap);
 // Trivia option event listeners
 document.querySelectorAll('.trivia-option').forEach(button => {
     button.addEventListener('click', onTriviaOptionClick);
+});
+
+// Riddle option event listeners
+document.querySelectorAll('.riddle-option').forEach(button => {
+    button.addEventListener('click', onRiddleOptionClick);
 });
 
 // Custom notification system
@@ -535,6 +548,29 @@ function onTriviaOptionClick(event) {
     }
 }
 
+function onRiddleOptionClick(event) {
+    const selectedOption = parseInt(event.target.dataset.option);
+    const buttons = document.querySelectorAll('.riddle-option');
+    
+    if (window.audioManager) window.audioManager.playSubmitSound();
+    
+    // Disable all buttons and highlight selected
+    buttons.forEach(btn => {
+        btn.disabled = true;
+        btn.classList.remove('selected');
+    });
+    
+    event.target.classList.add('selected');
+    
+    // Submit the answer
+    if (currentRoom) {
+        socket.emit('submit-riddle-answer', { 
+            roomCode: currentRoom, 
+            answer: selectedOption 
+        });
+    }
+}
+
 function startFastTapperTimer(duration) {
     tapperActive = true;
     let timeLeft = duration;
@@ -565,6 +601,89 @@ function startFastTapperTimer(duration) {
         }
     }, 1000);
 }
+
+function startMemoryChallenge(balloons, question, displayTime, answerTime) {
+    // Show balloons
+    displayBalloons(balloons);
+    document.getElementById('memory-instruction').textContent = 'Memorize the balloons and their numbers!';
+    document.getElementById('memory-display').style.display = 'flex';
+    document.getElementById('memory-question-section').style.display = 'none';
+    
+    // After display time, hide balloons and show question
+    setTimeout(() => {
+        // Hide balloons
+        document.getElementById('balloons-container').innerHTML = '';
+        document.getElementById('memory-display').style.display = 'none';
+        document.getElementById('memory-instruction').style.display = 'none';
+        
+        // Show question section
+        document.getElementById('memory-question-section').style.display = 'block';
+        document.getElementById('memory-question').textContent = question;
+        
+        // Reset and enable input
+        const answerInput = document.getElementById('memory-answer-input');
+        answerInput.value = '';
+        answerInput.disabled = false;
+        document.getElementById('submit-memory-answer').disabled = false;
+        
+        // Start answer timer
+        let timeLeft = answerTime;
+        document.getElementById('memory-timer').textContent = timeLeft;
+        
+        memoryTimer = setInterval(() => {
+            timeLeft--;
+            document.getElementById('memory-timer').textContent = timeLeft;
+            
+            if (timeLeft <= 3) {
+                document.getElementById('memory-timer').classList.add('urgent');
+                document.getElementById('memory-timer').classList.remove('danger');
+            } else if (timeLeft <= 5) {
+                document.getElementById('memory-timer').classList.add('danger');
+                document.getElementById('memory-timer').classList.remove('urgent');
+            }
+            
+            if (timeLeft <= 0) {
+                clearInterval(memoryTimer);
+                submitMemoryAnswer();
+            }
+        }, 1000);
+        
+    }, displayTime * 1000);
+}
+
+function displayBalloons(balloons) {
+    const container = document.getElementById('balloons-container');
+    container.innerHTML = '';
+    
+    balloons.forEach(balloon => {
+        const balloonEl = document.createElement('div');
+        balloonEl.className = `balloon ${balloon.color}`;
+        balloonEl.textContent = balloon.number;
+        container.appendChild(balloonEl);
+    });
+}
+
+function submitMemoryAnswer() {
+    const answerInput = document.getElementById('memory-answer-input');
+    const answer = answerInput.value.trim() || '[No answer]';
+    
+    socket.emit('submit-memory-answer', {
+        roomCode: currentRoom,
+        answer: answer
+    });
+    
+    // Disable input and button
+    answerInput.disabled = true;
+    document.getElementById('submit-memory-answer').disabled = true;
+    
+    showNotification('Answer submitted!', 'success');
+}
+
+// Add event listener for submit button
+document.getElementById('submit-memory-answer').addEventListener('click', submitMemoryAnswer);
+document.getElementById('memory-answer-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') submitMemoryAnswer();
+});
 
 function updateLobbyOwnerDisplay() {
     const lobbyHeader = document.querySelector('.lobby-header');
@@ -1246,6 +1365,31 @@ socket.on('trivia-challenge-start', (data) => {
     }
 });
 
+socket.on('riddle-challenge-start', (data) => {
+    const isParticipant = data.participants.includes(playerName);
+    
+    if (isParticipant) {
+        document.getElementById('riddle-question').textContent = data.question;
+        
+        const buttons = document.querySelectorAll('.riddle-option');
+        buttons.forEach((btn, index) => {
+            btn.textContent = data.options[index];
+            btn.disabled = false;
+            btn.classList.remove('selected');
+        });
+        
+        document.getElementById('riddle-submission-count').textContent = 
+            `0/${data.participants.length} players answered`;
+        
+        showPage('riddleChallenge');
+        startTimer('riddle-timer', data.timeLimit || 45);
+    } else {
+        document.getElementById('waiting-title').textContent = 'Riddle Challenge!';
+        document.getElementById('waiting-message').textContent = 'Others are solving a challenging riddle!';
+        showPage('waiting');
+    }
+});
+
 socket.on('fast-tapper-start', (data) => {
     const isParticipant = data.participants.includes(playerName);
     
@@ -1260,6 +1404,74 @@ socket.on('fast-tapper-start', (data) => {
         document.getElementById('waiting-title').textContent = 'Fast Tapper Challenge!';
         document.getElementById('waiting-message').textContent = 'Others are tapping as fast as they can!';
         showPage('waiting');
+    }
+});
+
+socket.on('memory-challenge-start', (data) => {
+    const isParticipant = data.participants.includes(playerName);
+    
+    if (isParticipant) {
+        memoryBalloons = data.balloons;
+        showPage('memoryChallenge');
+        startMemoryChallenge(data.balloons, data.question, data.displayTime || 2, data.answerTime || 20);
+    } else {
+        document.getElementById('waiting-title').textContent = 'Memory Challenge!';
+        document.getElementById('waiting-message').textContent = 'Others are testing their memory!';
+        showPage('waiting');
+    }
+});
+
+socket.on('memory-challenge-results', (data) => {
+    document.getElementById('memory-results-message').textContent = 
+        `Question: ${data.question}`;
+    
+    document.getElementById('memory-correct-answer-text').textContent = data.correctAnswer;
+    
+    const answersListEl = document.getElementById('all-memory-answers-list');
+    let answersHtml = '';
+    
+    data.results.forEach((result, index) => {
+        answersHtml += `
+            <div class="answer-item ${result.correct ? 'correct' : 'incorrect'} ${result.won ? 'winner' : ''}">
+                <div class="answer-header">
+                    <span class="player-name">${result.playerName}</span>
+                    ${result.won ? '<span class="winner-badge">WINNER</span>' : ''}
+                </div>
+                <div class="answer-text">"${result.answer}"</div>
+                <div class="answer-status">
+                    ${result.correct ? 'Correct' : 'Incorrect'}
+                </div>
+            </div>
+        `;
+    });
+    
+    answersListEl.innerHTML = answersHtml;
+    showPage('memoryResults');
+});
+
+socket.on('memory-answer-submitted', (data) => {
+    const submissionCount = document.getElementById('memory-submission-count');
+    submissionCount.textContent = `${data.totalSubmissions}/${data.expectedSubmissions} players answered`;
+    
+    // Show auto-advance indicator when all players have answered
+    if (data.totalSubmissions === data.expectedSubmissions) {
+        submissionCount.innerHTML = `
+            <span style="color: var(--accent-green); font-weight: bold;">
+                ✓ All players answered! Auto-advancing...
+            </span>
+        `;
+        
+        // Clear timer
+        if (memoryTimer) {
+            clearInterval(memoryTimer);
+            memoryTimer = null;
+        }
+        
+        const timer = document.getElementById('memory-timer');
+        if (timer) {
+            timer.textContent = 'ADVANCING...';
+            timer.classList.add('auto-submit');
+        }
     }
 });
 
@@ -1284,8 +1496,8 @@ socket.on('fast-tapper-results', (data) => {
         `Fastest fingers: ${data.maxTaps} taps!`;
     
     const resultsHtml = data.results.map(result => `
-        <div class="tap-result-item ${result.won ? 'winner' : ''}">
-            <span class="tap-result-name">${result.won ? 'WINNER ' : ''}${result.playerName}</span>
+        <div class="tap-result-item ${result.won ? 'winner correct' : 'incorrect'}">
+            <span class="tap-result-name">${result.won ? '🏆 ' : ''}${result.playerName}</span>
             <span class="tap-result-count">${result.taps} taps</span>
         </div>
     `).join('');
@@ -1355,6 +1567,33 @@ socket.on('trivia-answer-submitted', (data) => {
     }
 });
 
+socket.on('riddle-answer-submitted', (data) => {
+    const submissionCount = document.getElementById('riddle-submission-count');
+    submissionCount.textContent = `${data.totalSubmissions}/${data.expectedSubmissions} players answered`;
+    
+    // Show auto-advance indicator when all players have answered
+    if (data.totalSubmissions === data.expectedSubmissions) {
+        submissionCount.innerHTML = `
+            <span style="color: var(--accent-green); font-weight: bold;">
+                ✓ All players answered! Auto-advancing...
+            </span>
+        `;
+        
+        // Clear any running timer to prevent early termination
+        if (window.riddleTimer) {
+            clearInterval(window.riddleTimer);
+            window.riddleTimer = null;
+        }
+        
+        // Add visual feedback to timer
+        const timer = document.getElementById('riddle-timer');
+        if (timer) {
+            timer.textContent = 'ADVANCING...';
+            timer.classList.add('auto-submit');
+        }
+    }
+});
+
 socket.on('trivia-results', (data) => {
     document.getElementById('trivia-results-message').textContent = 
         `Correct answer: ${data.correctOption}`;
@@ -1384,6 +1623,37 @@ socket.on('trivia-results', (data) => {
     
     answersListEl.innerHTML = answersHtml;
     showPage('triviaResults');
+});
+
+socket.on('riddle-results', (data) => {
+    document.getElementById('riddle-results-message').textContent = 
+        `Correct answer: ${data.correctOption}`;
+    
+    document.getElementById('riddle-correct-answer-text').textContent = data.correctOption;
+    
+    const answersListEl = document.getElementById('all-riddle-answers-list');
+    let answersHtml = '';
+    
+    data.results.forEach((result, index) => {
+        const orderText = index === 0 ? '1st' : index === 1 ? '2nd' : index === 2 ? '3rd' : `${index + 1}th`;
+        
+        answersHtml += `
+            <div class="answer-item ${result.correct ? 'correct' : 'incorrect'} ${result.won ? 'winner' : ''}">
+                <div class="answer-header">
+                    <span class="player-name">${result.playerName}</span>
+                    <span class="answer-order">${orderText}</span>
+                    ${result.won ? '<span class="winner-badge">WINNER</span>' : ''}
+                </div>
+                <div class="answer-text">"${result.selectedOption}"</div>
+                <div class="answer-status">
+                    ${result.correct ? 'Correct' : 'Incorrect'}
+                </div>
+            </div>
+        `;
+    });
+    
+    answersListEl.innerHTML = answersHtml;
+    showPage('riddleResults');
 });
 
 socket.on('tap-result-submitted', (data) => {

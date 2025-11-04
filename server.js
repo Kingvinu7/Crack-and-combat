@@ -17,199 +17,85 @@ if (process.env.GEMINI_API_KEY) {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Challenge Types (will be shuffled for each game session)
-const BASE_CHALLENGE_TYPES = ['negotiator', 'detective', 'multipleChoiceTrivia', 'fastTapper', 'danger'];
+// Challenge Types - Fixed order with memoryChallenge always as 2nd challenge
+const BASE_CHALLENGE_TYPES = ['detective', 'memoryChallenge', 'multipleChoiceTrivia', 'fastTapper', 'danger'];
 
-// Shuffle array function
+// Shuffle array function (keeping other challenges except memoryChallenge at position 1)
 function shuffleArray(array) {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
+    // Keep memoryChallenge at index 1 (2nd position), shuffle the rest
+    const fixed = [...array];
+    const toShuffle = [fixed[0], ...fixed.slice(2)]; // Get all except memoryChallenge
+    
+    // Shuffle the rest
+    for (let i = toShuffle.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        [toShuffle[i], toShuffle[j]] = [toShuffle[j], toShuffle[i]];
     }
-    return shuffled;
+    
+    // Rebuild array with memoryChallenge always at index 1
+    return [toShuffle[0], 'memoryChallenge', ...toShuffle.slice(1)];
 }
 
 // Game Data with 50+ riddles and trivia questions
 const gameData = {
     riddles: [
-        { question: "I speak without a mouth and hear without ears. What am I?", answer: "ECHO", difficulty: "easy" },
-        { question: "The more you take, the more you leave behind. What am I?", answer: "FOOTSTEPS", difficulty: "easy" },
-        { question: "I have cities, but no houses. I have mountains, but no trees. What am I?", answer: "MAP", difficulty: "medium" },
-        { question: "What has keys but no locks, space but no room, and you can enter but not go inside?", answer: "KEYBOARD", difficulty: "medium" },
-        { question: "What gets wet while drying?", answer: "TOWEL", difficulty: "easy" },
-        { question: "I am not alive, but I grow; I don't have lungs, but I need air. What am I?", answer: "FIRE", difficulty: "medium" },
-        { question: "What comes once in a minute, twice in a moment, but never in a thousand years?", answer: "M", difficulty: "hard" },
-        { question: "I have a golden head and a golden tail, but no body. What am I?", answer: "COIN", difficulty: "easy" },
-        { question: "I am tall when I am young, and short when I am old. What am I?", answer: "CANDLE", difficulty: "medium" },
-        { question: "What has one head, one foot, and four legs?", answer: "BED", difficulty: "medium" },
-        { question: "What can travel around the world while staying in a corner?", answer: "STAMP", difficulty: "hard" },
-        { question: "What breaks but never falls, and what falls but never breaks?", answer: "DAWN", difficulty: "hard" },
-        { question: "I can be cracked, made, told, and played. What am I?", answer: "JOKE", difficulty: "medium" },
-        { question: "What has hands but cannot clap?", answer: "CLOCK", difficulty: "easy" },
-        { question: "What runs around the whole yard without moving?", answer: "FENCE", difficulty: "medium" },
-        { question: "What has a neck but no head?", answer: "BOTTLE", difficulty: "easy" },
-        { question: "What can fill a room but takes up no space?", answer: "LIGHT", difficulty: "easy" },
-        { question: "What word is spelled incorrectly in every dictionary?", answer: "INCORRECTLY", difficulty: "easy" },
-        { question: "What goes up but never comes down?", answer: "AGE", difficulty: "easy" },
-        { question: "What has teeth but cannot bite?", answer: "ZIPPER", difficulty: "medium" },
-        { question: "What has an eye but cannot see?", answer: "NEEDLE", difficulty: "medium" },
-        { question: "What gets sharper the more you use it?", answer: "BRAIN", difficulty: "medium" },
-        { question: "What is always in front of you but can't be seen?", answer: "FUTURE", difficulty: "medium" },
-        { question: "What is so fragile that saying its name breaks it?", answer: "SILENCE", difficulty: "hard" },
-        { question: "What is black when you buy it, red when you use it, and gray when you throw it away?", answer: "CHARCOAL", difficulty: "hard" },
-        { question: "What has a thumb and four fingers but is not alive?", answer: "GLOVE", difficulty: "easy" },
-        { question: "What gets bigger when more is taken away from it?", answer: "HOLE", difficulty: "medium" },
-        { question: "What is full of holes but still holds water?", answer: "SPONGE", difficulty: "easy" },
-        { question: "What disappears as soon as you say its name?", answer: "SILENCE", difficulty: "hard" },
-        { question: "What has a head and a tail but no body?", answer: "COIN", difficulty: "easy" },
-        { question: "What is always hungry and must always be fed, but if you give it water it will die?", answer: "FIRE", difficulty: "hard" },
-        { question: "What can you catch but not throw?", answer: "COLD", difficulty: "medium" },
-        { question: "What has many keys but can't open any doors?", answer: "PIANO", difficulty: "medium" },
-        { question: "What is heavier: a ton of feathers or a ton of bricks?", answer: "EQUAL", difficulty: "easy" },
-        { question: "What goes through towns and hills but never moves?", answer: "ROAD", difficulty: "medium" },
-        { question: "What has four legs but cannot walk?", answer: "TABLE", difficulty: "easy" },
-        { question: "What can you break without hitting or dropping it?", answer: "PROMISE", difficulty: "hard" },
-        { question: "What is bought by the yard and worn by the foot?", answer: "CARPET", difficulty: "hard" },
-        { question: "What starts with T, ends with T, and has T in it?", answer: "TEAPOT", difficulty: "medium" },
-        { question: "What can you hold without touching it?", answer: "BREATH", difficulty: "hard" },
-        { question: "What has a ring but no finger?", answer: "TELEPHONE", difficulty: "medium" },
-        { question: "What is taken before you can get it?", answer: "PICTURE", difficulty: "medium" },
-        { question: "What has no beginning, end, or middle?", answer: "CIRCLE", difficulty: "medium" },
-        { question: "What gets wetter the more it dries?", answer: "TOWEL", difficulty: "easy" },
-        { question: "What is cut on a table but never eaten?", answer: "CARDS", difficulty: "medium" },
-        { question: "What has cities but no people, forests but no trees, and water but no fish?", answer: "MAP", difficulty: "hard" },
-        { question: "What is so delicate that even saying its name will break it?", answer: "SILENCE", difficulty: "hard" },
-        { question: "What flies without wings?", answer: "TIME", difficulty: "hard" },
-        { question: "What has a face and two hands but no arms or legs?", answer: "CLOCK", difficulty: "easy" },
-        { question: "What is made of water but if you put it into water it will die?", answer: "ICE", difficulty: "medium" },
-        { question: "What belongs to you but others use it more than you do?", answer: "NAME", difficulty: "medium" },
-        { question: "What is always coming but never arrives?", answer: "TOMORROW", difficulty: "medium" },
-        { question: "What can be seen in the middle of March and April that cannot be seen at the beginning or end of either month?", answer: "R", difficulty: "hard" },
-        { question: "What word becomes shorter when you add two letters to it?", answer: "SHORT", difficulty: "hard" },
-        { question: "What occurs once in every minute, twice in every moment, yet never in a thousand years?", answer: "M", difficulty: "hard" }
+        { question: "I speak without a mouth and hear without ears. What am I?", options: ["Wind", "Echo", "Shadow", "Ghost"], correctAnswer: 1, difficulty: "easy" },
+        { question: "The more you take, the more you leave behind. What am I?", options: ["Footsteps", "Memories", "Time", "Money"], correctAnswer: 0, difficulty: "easy" },
+        { question: "I have cities, but no houses. I have mountains, but no trees. What am I?", options: ["Desert", "Map", "Planet", "Dream"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What has keys but no locks, space but no room, and you can enter but not go inside?", options: ["Piano", "Keyboard", "House", "Prison"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What gets wet while drying?", options: ["Sponge", "Towel", "Hair", "Soap"], correctAnswer: 1, difficulty: "easy" },
+        { question: "I am not alive, but I grow; I don't have lungs, but I need air. What am I?", options: ["Plant", "Fire", "Balloon", "Cloud"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What comes once in a minute, twice in a moment, but never in a thousand years?", options: ["Second", "M", "Time", "Letter"], correctAnswer: 1, difficulty: "hard" },
+        { question: "I have a golden head and a golden tail, but no body. What am I?", options: ["Snake", "Coin", "Arrow", "Key"], correctAnswer: 1, difficulty: "easy" },
+        { question: "I am tall when I am young, and short when I am old. What am I?", options: ["Tree", "Candle", "Person", "Building"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What has one head, one foot, and four legs?", options: ["Chair", "Bed", "Table", "Monster"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What can travel around the world while staying in a corner?", options: ["Postcard", "Stamp", "Email", "News"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What breaks but never falls, and what falls but never breaks?", options: ["Glass", "Dawn", "Rain", "Hope"], correctAnswer: 1, difficulty: "hard" },
+        { question: "I can be cracked, made, told, and played. What am I?", options: ["Code", "Joke", "Song", "Game"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What has hands but cannot clap?", options: ["Statue", "Clock", "Robot", "Doll"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What runs around the whole yard without moving?", options: ["Dog", "Fence", "Grass", "Shadow"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What has a neck but no head?", options: ["Giraffe", "Bottle", "Shirt", "Guitar"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What can fill a room but takes up no space?", options: ["Air", "Light", "Sound", "Smell"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What word is spelled incorrectly in every dictionary?", options: ["Wrong", "Incorrectly", "Misspelled", "Error"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What goes up but never comes down?", options: ["Balloon", "Age", "Smoke", "Price"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What has teeth but cannot bite?", options: ["Comb", "Zipper", "Saw", "Gear"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What has an eye but cannot see?", options: ["Storm", "Needle", "Potato", "Camera"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What gets sharper the more you use it?", options: ["Knife", "Brain", "Pencil", "Skill"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What is always in front of you but can't be seen?", options: ["Air", "Future", "Tomorrow", "Destiny"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What is so fragile that saying its name breaks it?", options: ["Glass", "Silence", "Peace", "Secret"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What is black when you buy it, red when you use it, and gray when you throw it away?", options: ["Coal", "Charcoal", "Tire", "Metal"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What has a thumb and four fingers but is not alive?", options: ["Glove", "Robot", "Hand", "Statue"], correctAnswer: 0, difficulty: "easy" },
+        { question: "What gets bigger when more is taken away from it?", options: ["Debt", "Hole", "Space", "Distance"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What is full of holes but still holds water?", options: ["Bucket", "Sponge", "Net", "Basket"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What disappears as soon as you say its name?", options: ["Whisper", "Silence", "Secret", "Magic"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What has a head and a tail but no body?", options: ["Snake", "Coin", "Comet", "Arrow"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What is always hungry and must always be fed, but if you give it water it will die?", options: ["Plant", "Fire", "Baby", "Engine"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What can you catch but not throw?", options: ["Ball", "Cold", "Fish", "Attention"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What has many keys but can't open any doors?", options: ["Janitor", "Piano", "Computer", "Map"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What is heavier: a ton of feathers or a ton of bricks?", options: ["Feathers", "Equal", "Bricks", "Depends"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What goes through towns and hills but never moves?", options: ["River", "Road", "Train", "Wind"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What has four legs but cannot walk?", options: ["Chair", "Table", "Bed", "Dog"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What can you break without hitting or dropping it?", options: ["Glass", "Promise", "Heart", "Rule"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What is bought by the yard and worn by the foot?", options: ["Shoes", "Carpet", "Socks", "Rope"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What starts with T, ends with T, and has T in it?", options: ["Test", "Teapot", "Tent", "Target"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What can you hold without touching it?", options: ["Shadow", "Breath", "Memory", "Dream"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What has a ring but no finger?", options: ["Bell", "Telephone", "Circle", "Tree"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What is taken before you can get it?", options: ["Gift", "Shower", "Picture", "Medicine"], correctAnswer: 2, difficulty: "medium" },
+        { question: "What has no beginning, end, or middle?", options: ["Circle", "Ball", "Ring", "Zero"], correctAnswer: 0, difficulty: "medium" },
+        { question: "What gets wetter the more it dries?", options: ["Sponge", "Towel", "Sand", "Hair"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What is cut on a table but never eaten?", options: ["Paper", "Cake", "Cards", "Fabric"], correctAnswer: 2, difficulty: "medium" },
+        { question: "What has cities but no people, forests but no trees, and water but no fish?", options: ["Desert", "Map", "Painting", "Movie"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What is so delicate that even saying its name will break it?", options: ["Whisper", "Secret", "Silence", "Glass"], correctAnswer: 2, difficulty: "hard" },
+        { question: "What flies without wings?", options: ["Balloon", "Cloud", "Time", "Smoke"], correctAnswer: 2, difficulty: "hard" },
+        { question: "What has a face and two hands but no arms or legs?", options: ["Robot", "Clock", "Doll", "Statue"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What is made of water but if you put it into water it will die?", options: ["Ice", "Fish", "Salt", "Steam"], correctAnswer: 0, difficulty: "medium" },
+        { question: "What belongs to you but others use it more than you do?", options: ["Phone", "Name", "Car", "Money"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What is always coming but never arrives?", options: ["Tomorrow", "Future", "Dream", "Hope"], correctAnswer: 0, difficulty: "medium" },
+        { question: "What can be seen in the middle of March and April that cannot be seen at the beginning or end of either month?", options: ["Spring", "R", "Sun", "Rain"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What word becomes shorter when you add two letters to it?", options: ["Long", "Short", "Brief", "Tiny"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What occurs once in every minute, twice in every moment, yet never in a thousand years?", options: ["Second", "M", "Time", "Tick"], correctAnswer: 1, difficulty: "hard" }
     ],
     triviaQuestions: [
-        {
-            question: "Which artificial intelligence technique mimics the structure of the human brain?",
-            options: ["Neural Networks", "Decision Trees", "Linear Regression", "K-Means Clustering"],
-            correctAnswer: 0,
-            difficulty: "medium"
-        },
-        {
-            question: "What is the primary component of Earth's atmosphere that AI systems might struggle to process without proper sensors?",
-            options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Argon"],
-            correctAnswer: 2,
-            difficulty: "medium"
-        },
-        {
-            question: "In quantum computing, what phenomenon allows qubits to exist in multiple states simultaneously?",
-            options: ["Entanglement", "Superposition", "Decoherence", "Tunneling"],
-            correctAnswer: 1,
-            difficulty: "above-medium"
-        },
-        {
-            question: "Which programming paradigm treats computation as the evaluation of mathematical functions?",
-            options: ["Object-Oriented", "Procedural", "Functional", "Assembly"],
-            correctAnswer: 2,
-            difficulty: "medium"
-        },
-        {
-            question: "What is the term for AI systems that can perform any intellectual task that humans can do?",
-            options: ["Narrow AI", "General AI", "Super AI", "Weak AI"],
-            correctAnswer: 1,
-            difficulty: "medium"
-        },
-        {
-            question: "Which cryptographic algorithm is considered quantum-resistant?",
-            options: ["RSA", "ECC", "Lattice-based", "SHA-256"],
-            correctAnswer: 2,
-            difficulty: "above-medium"
-        },
-        {
-            question: "In machine learning, what technique prevents overfitting by randomly setting some neurons to zero during training?",
-            options: ["Batch Normalization", "Dropout", "Regularization", "Cross-validation"],
-            correctAnswer: 1,
-            difficulty: "above-medium"
-        },
-        {
-            question: "What is the maximum theoretical efficiency of a Carnot heat engine operating between 300K and 600K?",
-            options: ["25%", "50%", "75%", "100%"],
-            correctAnswer: 1,
-            difficulty: "above-medium"
-        },
-        {
-            question: "Which data structure provides O(1) average time complexity for insertions, deletions, and lookups?",
-            options: ["Binary Tree", "Hash Table", "Linked List", "Array"],
-            correctAnswer: 1,
-            difficulty: "medium"
-        },
-        {
-            question: "In cybersecurity, what attack vector exploits the time difference in cryptographic operations?",
-            options: ["SQL Injection", "Timing Attack", "Buffer Overflow", "Man-in-the-Middle"],
-            correctAnswer: 1,
-            difficulty: "above-medium"
-        },
-        {
-            question: "What is the primary challenge in achieving artificial general intelligence?",
-            options: ["Processing Power", "Data Storage", "Transfer Learning", "Energy Consumption"],
-            correctAnswer: 2,
-            difficulty: "above-medium"
-        },
-        {
-            question: "Which mathematical concept is fundamental to understanding neural network backpropagation?",
-            options: ["Linear Algebra", "Chain Rule", "Fourier Transform", "Bayes' Theorem"],
-            correctAnswer: 1,
-            difficulty: "medium"
-        },
-        {
-            question: "In distributed systems, what problem does the Byzantine Generals Problem address?",
-            options: ["Load Balancing", "Consensus", "Data Replication", "Network Partitioning"],
-            correctAnswer: 1,
-            difficulty: "above-medium"
-        },
-        {
-            question: "What is the fundamental unit of information in quantum computing?",
-            options: ["Bit", "Byte", "Qubit", "Photon"],
-            correctAnswer: 2,
-            difficulty: "medium"
-        },
-        {
-            question: "Which AI ethics principle focuses on ensuring AI systems can explain their decision-making process?",
-            options: ["Fairness", "Transparency", "Accountability", "Privacy"],
-            correctAnswer: 1,
-            difficulty: "medium"
-        },
-        {
-            question: "In complexity theory, what class of problems can be solved in polynomial time by a non-deterministic Turing machine?",
-            options: ["P", "NP", "NP-Complete", "PSPACE"],
-            correctAnswer: 1,
-            difficulty: "above-medium"
-        },
-        {
-            question: "What is the primary advantage of using transformer architecture in large language models?",
-            options: ["Lower Memory Usage", "Parallel Processing", "Smaller Model Size", "Faster Training"],
-            correctAnswer: 1,
-            difficulty: "above-medium"
-        },
-        {
-            question: "Which phenomenon in physics could potentially be exploited for faster-than-light communication if properly harnessed?",
-            options: ["Quantum Tunneling", "Quantum Entanglement", "Wormholes", "Time Dilation"],
-            correctAnswer: 1,
-            difficulty: "above-medium"
-        },
-        {
-            question: "In game theory, what strategy always chooses the option that minimizes the maximum possible loss?",
-            options: ["Nash Equilibrium", "Minimax", "Dominant Strategy", "Pareto Optimal"],
-            correctAnswer: 1,
-            difficulty: "medium"
-        },
-        {
-            question: "What is the primary bottleneck in current AI systems when processing real-world data?",
-            options: ["Computational Speed", "Memory Bandwidth", "Context Understanding", "Power Consumption"],
-            correctAnswer: 2,
-            difficulty: "above-medium"
-        },
         {
             question: "What is Bungee.exchange primarily used for?",
             options: ["NFT trading", "Cross-chain token swapping", "Staking rewards", "Mining pools"],
@@ -270,74 +156,133 @@ const gameData = {
             correctAnswer: 1,
             difficulty: "above-medium"
         },
-        // Additional fallback trivia questions for variety
         {
-            question: "What is the primary purpose of a hash function in computer science?",
-            options: ["Data encryption", "Data compression", "Data integrity verification", "Data sorting"],
-            correctAnswer: 2,
+            question: "What is Bungee's Socket API used for?",
+            options: ["Real-time chat", "Cross-chain route quotes and transactions", "Game development", "Video streaming"],
+            correctAnswer: 1,
             difficulty: "medium"
         },
         {
-            question: "Which of these is NOT a fundamental principle of object-oriented programming?",
-            options: ["Encapsulation", "Inheritance", "Polymorphism", "Compilation"],
-            correctAnswer: 3,
+            question: "Which feature allows Bungee users to compare multiple bridge options?",
+            options: ["Price Scanner", "Route Optimizer", "Bridge Marketplace", "Multi-path Viewer"],
+            correctAnswer: 1,
             difficulty: "medium"
         },
         {
-            question: "What does 'Big O' notation describe in algorithm analysis?",
-            options: ["Memory usage", "Time complexity", "Code readability", "Bug frequency"],
+            question: "What is the main purpose of Bungee's refuel feature?",
+            options: ["Buy gas tokens", "Get native tokens on destination chain", "Earn rewards", "Stake tokens"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "Which layer does Bungee operate on in blockchain architecture?",
+            options: ["Layer 1", "Application Layer", "Protocol Layer", "Network Layer"],
             correctAnswer: 1,
             difficulty: "above-medium"
         },
         {
-            question: "Which planet in our solar system has the most moons?",
-            options: ["Jupiter", "Saturn", "Neptune", "Uranus"],
+            question: "What does Bungee's API allow developers to integrate?",
+            options: ["NFT minting", "Cross-chain swaps into their apps", "Smart contracts", "Wallet creation"],
             correctAnswer: 1,
             difficulty: "medium"
         },
         {
-            question: "What is the smallest unit of data in a computer?",
-            options: ["Byte", "Bit", "Nibble", "Word"],
+            question: "How does Bungee handle slippage in cross-chain transactions?",
+            options: ["Ignores it", "Shows estimated slippage before swap", "Blocks all trades", "Random calculation"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "What is Socket Protocol (Bungee's underlying tech)?",
+            options: ["A new blockchain", "Cross-chain interoperability protocol", "DeFi lending platform", "NFT marketplace"],
+            correctAnswer: 1,
+            difficulty: "above-medium"
+        },
+        {
+            question: "Which networks can you bridge assets between using Bungee?",
+            options: ["Only Ethereum and BSC", "Only EVM chains", "Multiple chains including L2s", "Bitcoin networks only"],
+            correctAnswer: 2,
+            difficulty: "medium"
+        },
+        {
+            question: "What does Bungee optimize for when selecting routes?",
+            options: ["Only speed", "Only cost", "Best combination of cost, speed, and security", "Random selection"],
+            correctAnswer: 2,
+            difficulty: "medium"
+        },
+        {
+            question: "Does Bungee require KYC verification?",
+            options: ["Yes, always", "No, it's decentralized", "Only for large amounts", "Only for new users"],
             correctAnswer: 1,
             difficulty: "easy"
         },
         {
-            question: "Which programming language was originally called 'Oak'?",
-            options: ["JavaScript", "Java", "Python", "C++"],
+            question: "What is a key benefit of Bungee's aggregation model?",
+            options: ["Higher fees", "Access to multiple bridges and DEXs in one place", "Slower transactions", "Limited options"],
             correctAnswer: 1,
-            difficulty: "above-medium"
-        },
-        {
-            question: "What does 'HTTP' stand for?",
-            options: ["Hypertext Transfer Protocol", "High-Tech Transfer Process", "Hyperlink Text Transport Protocol", "Home Terminal Transfer Protocol"],
-            correctAnswer: 0,
             difficulty: "medium"
         },
         {
-            question: "Which of these is a NoSQL database?",
-            options: ["MySQL", "PostgreSQL", "MongoDB", "SQLite"],
+            question: "Can Bungee swap tokens within the same chain?",
+            options: ["No, only cross-chain", "Yes, it supports same-chain swaps too", "Only on Ethereum", "Only between L2s"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "What powers Bungee's route discovery?",
+            options: ["Manual input", "AI algorithms", "Off-chain agents competing for best routes", "Random selection"],
             correctAnswer: 2,
-            difficulty: "medium"
-        },
-        {
-            question: "What is the maximum value that can be stored in a 32-bit signed integer?",
-            options: ["2,147,483,647", "4,294,967,295", "1,073,741,823", "65,535"],
-            correctAnswer: 0,
             difficulty: "above-medium"
         },
         {
-            question: "Which sorting algorithm has the best average-case time complexity?",
-            options: ["Bubble Sort", "Quick Sort", "Selection Sort", "Insertion Sort"],
+            question: "Is Bungee custodial or non-custodial?",
+            options: ["Custodial", "Non-custodial", "Hybrid", "Depends on amount"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "What happens to transaction fees on Bungee?",
+            options: ["All go to Bungee", "Split between bridges and protocols used", "Burned completely", "Distributed to users"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "Which blockchain framework does Bungee support?",
+            options: ["Only EVM", "Only Cosmos", "Multiple including EVM, Cosmos, etc.", "Only Bitcoin"],
+            correctAnswer: 2,
+            difficulty: "above-medium"
+        },
+        {
+            question: "What is Bungee's widget feature?",
+            options: ["A game", "Embeddable swap interface for other dApps", "NFT viewer", "Wallet manager"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "How does Bungee ensure users get the best rates?",
+            options: ["Fixed pricing", "Compares multiple sources and routes", "Uses only one DEX", "Manual updates"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "Can Bungee handle token approvals automatically?",
+            options: ["No, manual only", "Yes, with user permission", "Not applicable", "Only on Ethereum"],
+            correctAnswer: 1,
+            difficulty: "medium"
+        },
+        {
+            question: "What does Bungee's 'gasless' feature do?",
+            options: ["Free transactions", "Pay gas fees with tokens being swapped", "No gas needed", "Gas fees waived forever"],
             correctAnswer: 1,
             difficulty: "above-medium"
         }
     ],
     oraclePersonality: {
         introductions: [
-            "🤖 I AM THE ORACLE! Your inferior minds will face my complex challenges!",
-            "💀 Mortals... prepare for tests that will strain your thinking!",
-            "⚡ I am the AI overlord! My challenges grow more cunning each round!",
-            "🔥 Welcome to intellectual warfare! Can your minds handle the complexity?"
+            "?? I AM THE ORACLE! Your inferior minds will face my complex challenges!",
+            "?? Mortals... prepare for tests that will strain your thinking!",
+            "? I am the AI overlord! My challenges grow more cunning each round!",
+            "?? Welcome to intellectual warfare! Can your minds handle the complexity?"
         ]
     }
 };
@@ -619,7 +564,7 @@ async function generateChallengeContent(type, roundNumber, room = null) {
                 "You're in a mirrored room where your reflections move on their own. Spot the real you before the glass shatters. The mirrors seem to show different versions of yourself, each moving independently. How do you identify which one is real?",
                 "You're trapped in a room where gravity keeps shifting directions every 30 seconds. The exit door is on the ceiling, but it's locked with a puzzle that requires steady hands. How do you solve it?",
                 "You're in a library where the books rewrite themselves when you're not looking directly at them. You need to find a specific piece of information, but every time you look away, the text changes. How do you get the answer?",
-                "You're stuck in an elevator that's moving between floors that don't exist. The buttons show numbers like 2.5, π, and ∞. Which floor do you press to escape?",
+                "You're stuck in an elevator that's moving between floors that don't exist. The buttons show numbers like 2.5, ?, and ?. Which floor do you press to escape?",
                 "You're in a maze where the walls move when you're not looking at them. Your phone's flashlight is dying, and you hear footsteps that match yours exactly. How do you find the exit?",
                 "You're trapped in a room full of identical doors. Each time you open one, it leads back to the same room, but with one small detail changed. How do you break the loop?",
                 "You're in a time loop where you have exactly 60 seconds before everything resets, but you retain your memory. The exit requires a 10-digit code. How do you escape?",
@@ -806,7 +751,7 @@ async function evaluatePlayerResponse(challengeContent, playerResponse, challeng
         
         // Add auto-submit indicator
         if (isAutoSubmitted) {
-            feedback = `⏰ ${feedback}`;
+            feedback = `? ${feedback}`;
         }
         
         const evaluationType = hasLazyShortcut && !hasCleverIndicators ? 'LAZY SHORTCUT' : 
@@ -845,7 +790,7 @@ async function evaluatePlayerResponse(challengeContent, playerResponse, challeng
         
         // Add auto-submit indicator
         if (isAutoSubmitted) {
-            fallbackFeedback = `⏰ ${fallbackFeedback}`;
+            fallbackFeedback = `? ${fallbackFeedback}`;
         }
         
         console.log(`Fallback evaluation result: ${fallbackPass ? 'PASS' : 'FAIL'} - "${fallbackFeedback}"`);
@@ -914,6 +859,47 @@ async function startChallengePhase(roomCode) {
                 evaluateTriviaResults(roomCode);
             }, 48000);
             
+        } else if (challengeType === 'detective') {
+            // Detective Riddle Challenge with Multiple Choice
+            const { riddle, index } = getRandomRiddle(room.usedRiddleIndices || []);
+            if (!room.usedRiddleIndices) room.usedRiddleIndices = [];
+            room.usedRiddleIndices.push(index);
+            
+            room.currentRiddle = riddle;
+            room.riddleAnswers = {};
+            
+            io.to(roomCode).emit('riddle-challenge-start', {
+                question: riddle.question,
+                options: riddle.options,
+                participants: nonWinners.map(p => p.name),
+                timeLimit: 45
+            });
+            
+            room.challengeTimer = setTimeout(() => {
+                evaluateRiddleResults(roomCode);
+            }, 48000);
+            
+        } else if (challengeType === 'memoryChallenge') {
+            // Memory Challenge - 20 seconds to answer after 2 second display
+            room.memoryResults = {};
+            
+            // Generate memory challenge data
+            const memoryData = generateMemoryChallenge(room.currentRound);
+            room.currentMemoryChallenge = memoryData;
+            
+            io.to(roomCode).emit('memory-challenge-start', {
+                participants: nonWinners.map(p => p.name),
+                balloons: memoryData.balloons,
+                question: memoryData.question.text,
+                displayTime: 3.5,
+                answerTime: 20
+            });
+            
+            // Timer for answer phase (3.5s display + 20s answer + 2s buffer)
+            room.challengeTimer = setTimeout(() => {
+                evaluateMemoryResults(roomCode);
+            }, 25500);
+            
         } else {
             // Text-based challenges with 40 seconds
             // Text-based challenges with dynamic time limits
@@ -948,6 +934,110 @@ room.challengeTimer = setTimeout(() => {
     }
   },1000); // Increased from 500ms to 1000ms to prevent page transition conflicts
 }
+// Generate Memory Challenge
+function generateMemoryChallenge(roundNumber) {
+    const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan'];
+    const balloonCount = 7 + Math.floor(Math.random() * 3); // 7-9 balloons randomly
+    
+    const balloons = [];
+    const usedNumbers = [];
+    
+    for (let i = 0; i < balloonCount; i++) {
+        let number;
+        do {
+            number = Math.floor(Math.random() * 20) + 1; // Numbers 1-20
+        } while (usedNumbers.includes(number));
+        usedNumbers.push(number);
+        
+        balloons.push({
+            number: number,
+            color: colors[Math.floor(Math.random() * colors.length)]
+        });
+    }
+    
+    // Generate random question
+    const questionTypes = [
+        { type: 'color', text: `What was the color of balloon number ${balloons[Math.floor(Math.random() * balloons.length)].number}?` },
+        { type: 'count', text: 'How many balloons were there?' },
+        { type: 'number', text: `Was there a balloon with the number ${Math.random() > 0.5 ? balloons[0].number : (balloonCount + 5)}?` },
+        { type: 'colorCount', text: `How many ${balloons[0].color} balloons were there?` }
+    ];
+    
+    const selectedQuestion = questionTypes[Math.floor(Math.random() * questionTypes.length)];
+    
+    return {
+        balloons: balloons,
+        question: selectedQuestion,
+        correctAnswer: getCorrectAnswer(balloons, selectedQuestion)
+    };
+}
+
+function getCorrectAnswer(balloons, question) {
+    switch (question.type) {
+        case 'color':
+            const targetNumber = parseInt(question.text.match(/number (\d+)/)[1]);
+            const balloon = balloons.find(b => b.number === targetNumber);
+            return balloon ? balloon.color : 'none';
+        case 'count':
+            return balloons.length.toString();
+        case 'number':
+            const checkNumber = parseInt(question.text.match(/number (\d+)/)[1]);
+            return balloons.some(b => b.number === checkNumber) ? 'yes' : 'no';
+        case 'colorCount':
+            const targetColor = question.text.match(/many (\w+) balloons/)[1];
+            return balloons.filter(b => b.color === targetColor).length.toString();
+        default:
+            return '';
+    }
+}
+
+// Evaluate Memory Results
+async function evaluateMemoryResults(roomCode) {
+    const room = rooms[roomCode];
+    if (!room) return;
+
+    const memoryEntries = Object.entries(room.memoryResults);
+    if (memoryEntries.length === 0) {
+        endRound(roomCode, []);
+        return;
+    }
+
+    const correctAnswer = room.currentMemoryChallenge.correctAnswer.toLowerCase();
+    let winners = [];
+
+    memoryEntries.forEach(([playerId, answer]) => {
+        if (answer.toLowerCase().trim() === correctAnswer) {
+            winners.push(playerId);
+        }
+    });
+
+    // Award points to winners
+    winners.forEach(playerId => {
+        const player = room.players.find(p => p.id === playerId);
+        if (player) player.score += 1;
+    });
+
+    const results = memoryEntries.map(([playerId, answer]) => {
+        const player = room.players.find(p => p.id === playerId);
+        return {
+            playerName: player?.name || 'Unknown',
+            answer: answer,
+            correct: answer.toLowerCase().trim() === correctAnswer,
+            won: winners.includes(playerId)
+        };
+    });
+
+    io.to(roomCode).emit('memory-challenge-results', {
+        results: results,
+        correctAnswer: room.currentMemoryChallenge.correctAnswer,
+        question: room.currentMemoryChallenge.question.text
+    });
+
+    setTimeout(() => {
+        endRound(roomCode, results);
+    }, 6000);
+}
+
 // Evaluate Trivia Results
 async function evaluateTriviaResults(roomCode) {
     const room = rooms[roomCode];
@@ -1004,6 +1094,62 @@ async function evaluateTriviaResults(roomCode) {
     }, 6000);
 }
 
+// Evaluate Riddle Results
+async function evaluateRiddleResults(roomCode) {
+    const room = rooms[roomCode];
+    if (!room) return;
+
+    const riddleEntries = Object.entries(room.riddleAnswers);
+    if (riddleEntries.length === 0) {
+        endRound(roomCode, []);
+        return;
+    }
+
+    const correctAnswer = room.currentRiddle.correctAnswer;
+    let winners = [];
+    let earliest = Infinity;
+
+    // Find winners (correct answers, earliest first)
+    riddleEntries.forEach(([playerId, answerData]) => {
+        if (answerData.answer === correctAnswer) {
+            if (answerData.timestamp < earliest) {
+                earliest = answerData.timestamp;
+                winners = [playerId];
+            } else if (answerData.timestamp === earliest) {
+                winners.push(playerId);
+            }
+        }
+    });
+
+    // Award points to winners
+    winners.forEach(playerId => {
+        const player = room.players.find(p => p.id === playerId);
+        if (player) player.score += 1;
+    });
+
+    const results = riddleEntries.map(([playerId, answerData]) => {
+        const player = room.players.find(p => p.id === playerId);
+        return {
+            playerName: player?.name || 'Unknown',
+            answer: answerData.answer,
+            correct: answerData.answer === correctAnswer,
+            won: winners.includes(playerId),
+            selectedOption: room.currentRiddle.options[answerData.answer]
+        };
+    }).sort((a, b) => a.timestamp - b.timestamp);
+
+    io.to(roomCode).emit('riddle-results', {
+        results: results,
+        correctAnswer: correctAnswer,
+        correctOption: room.currentRiddle.options[correctAnswer],
+        question: room.currentRiddle.question
+    });
+
+    setTimeout(() => {
+        endRound(roomCode, results);
+    }, 6000);
+}
+
 // Evaluate Fast Tapper Results
 async function evaluateFastTapperResults(roomCode) {
     const room = rooms[roomCode];
@@ -1042,6 +1188,53 @@ async function evaluateFastTapperResults(roomCode) {
         results: results,
         maxTaps: maxTaps
     });
+    setTimeout(() => {
+        endRound(roomCode, results);
+    }, 6000);
+}
+
+// Evaluate Falling Fury Results
+async function evaluateFallingFuryResults(roomCode) {
+    const room = rooms[roomCode];
+    if (!room) return;
+
+    const furyEntries = Object.entries(room.fallingFuryResults);
+    if (furyEntries.length === 0) {
+        endRound(roomCode, []);
+        return;
+    }
+
+    let maxScore = -Infinity;
+    let winners = [];
+    furyEntries.forEach(([playerId, score]) => {
+        if (score > maxScore) {
+            maxScore = score;
+            winners = [playerId];
+        } else if (score === maxScore) {
+            winners.push(playerId);
+        }
+    });
+    
+    // Award points to winners
+    winners.forEach(playerId => {
+        const player = room.players.find(p => p.id === playerId);
+        if (player) player.score += 1;
+    });
+    
+    const results = furyEntries.map(([playerId, score]) => {
+        const player = room.players.find(p => p.id === playerId);
+        return {
+            playerName: player?.name || 'Unknown',
+            score: score,
+            won: winners.includes(playerId)
+        };
+    }).sort((a, b) => b.score - a.score);
+    
+    io.to(roomCode).emit('falling-fury-results', {
+        results: results,
+        maxScore: maxScore
+    });
+    
     setTimeout(() => {
         endRound(roomCode, results);
     }, 6000);
@@ -1138,6 +1331,7 @@ function startNewRound(roomCode) {
     room.riddleAnswers = {};
     room.challengeResponses = {};
     room.tapResults = {};
+    room.memoryResults = {};
     
     // Initialize round history on first round OR if it's missing
     if (room.currentRound === 1 || !room.roundHistory || room.roundHistory.length === 0) {
@@ -1307,6 +1501,8 @@ io.on('connection', (socket) => {
             challengeResponses: {},
             tapResults: {},
             triviaAnswers: {},
+            memoryResults: {},
+            currentMemoryChallenge: null,
             currentChallengeType: null,
             currentChallengeContent: null,
             currentTriviaQuestion: null,
@@ -1576,6 +1772,70 @@ io.on('connection', (socket) => {
             }
         }
     });
+
+    socket.on('submit-riddle-answer', (data) => {
+        const room = rooms[data.roomCode];
+        if (!room || room.gameState !== 'challenge-phase') return;
+        const player = room.players.find(p => p.id === socket.id);
+        if (!player || player.isSpectator || player.name === room.riddleWinner) return;
+        
+        if (!room.riddleAnswers[socket.id]) {
+            room.riddleAnswers[socket.id] = {
+                answer: data.answer,
+                timestamp: Date.now(),
+                playerName: player.name
+            };
+            
+            const activePlayers = room.players.filter(p => !p.isSpectator);
+            const expectedSubmissions = activePlayers.filter(p => p.name !== room.riddleWinner).length;
+            
+            io.to(data.roomCode).emit('riddle-answer-submitted', {
+                player: player.name,
+                totalSubmissions: Object.keys(room.riddleAnswers).length,
+                expectedSubmissions: expectedSubmissions
+            });
+            
+            // Check if all active players have answered
+            if (Object.keys(room.riddleAnswers).length === expectedSubmissions) {
+                console.log('All active non-winners submitted riddle answer. Ending riddle phase early.');
+                if (room.challengeTimer) {
+                    clearTimeout(room.challengeTimer);
+                    room.challengeTimer = null;
+                }
+                evaluateRiddleResults(data.roomCode);
+            }
+        }
+    });
+
+    socket.on('submit-memory-answer', (data) => {
+        const room = rooms[data.roomCode];
+        if (!room || room.gameState !== 'challenge-phase') return;
+        const player = room.players.find(p => p.id === socket.id);
+        if (!player || player.isSpectator || player.name === room.riddleWinner) return;
+        
+        if (!room.memoryResults[socket.id]) {
+            room.memoryResults[socket.id] = data.answer;
+            
+            const activePlayers = room.players.filter(p => !p.isSpectator);
+            const expectedSubmissions = activePlayers.filter(p => p.name !== room.riddleWinner).length;
+            
+            io.to(data.roomCode).emit('memory-answer-submitted', {
+                player: player.name,
+                totalSubmissions: Object.keys(room.memoryResults).length,
+                expectedSubmissions: expectedSubmissions
+            });
+            
+            // Check if all active players have answered
+            if (Object.keys(room.memoryResults).length === expectedSubmissions) {
+                console.log('All active non-winners submitted memory answer. Ending memory phase early.');
+                if (room.challengeTimer) {
+                    clearTimeout(room.challengeTimer);
+                    room.challengeTimer = null;
+                }
+                evaluateMemoryResults(data.roomCode);
+            }
+        }
+    });
     socket.on('disconnect', () => {
         console.log('Player disconnected:', socket.id);
         
@@ -1652,6 +1912,11 @@ io.on('connection', (socket) => {
                             playerName: playerName
                         };
                         console.log(`Auto-submitted invalid trivia answer for disconnected ${playerName}`);
+                    }
+                } else if (room.currentChallengeType === 'memoryChallenge') {
+                    if (!room.memoryResults[socketId]) {
+                        room.memoryResults[socketId] = '[DISCONNECTED]';
+                        console.log(`Auto-submitted disconnection for ${playerName} in memory challenge`);
                     }
                 } else {
                     // Text-based challenge
@@ -1737,6 +2002,8 @@ io.on('connection', (socket) => {
                     submissions = Object.keys(room.tapResults).length;
                 } else if (room.currentChallengeType === 'multipleChoiceTrivia') {
                     submissions = Object.keys(room.triviaAnswers).length;
+                } else if (room.currentChallengeType === 'memoryChallenge') {
+                    submissions = Object.keys(room.memoryResults).length;
                 } else {
                     submissions = Object.keys(room.challengeResponses).length;
                 }
@@ -1753,6 +2020,8 @@ io.on('connection', (socket) => {
                         evaluateFastTapperResults(roomCode);
                     } else if (room.currentChallengeType === 'multipleChoiceTrivia') {
                         evaluateTriviaResults(roomCode);
+                    } else if (room.currentChallengeType === 'memoryChallenge') {
+                        evaluateMemoryResults(roomCode);
                     } else {
                         evaluateTextChallengeResults(roomCode);
                     }
@@ -1764,15 +2033,16 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
-    console.log(`🤖 Crack and Combat server running on port ${PORT}`);
-    console.log('🎯 ENHANCED: Smart AI judging with creative rewards and brutal shortcuts punishment!');
-    console.log('⏱️ Challenge Timer: 40 seconds with auto-submit');
-    console.log('🎲 Total Riddles Available:', gameData.riddles.length);
-    console.log('📋 Challenge Types (shuffled per game):', BASE_CHALLENGE_TYPES.join(', '));
-    console.log('🧠 Smart Judging: Rewards creativity, punishes lazy shortcuts');
+    console.log(`?? Crack and Combat server running on port ${PORT}`);
+    console.log('?? ENHANCED: Smart AI judging with creative rewards and brutal shortcuts punishment!');
+    console.log('?? Challenge Timer: 40 seconds with auto-submit');
+    console.log('?? Total Riddles Available:', gameData.riddles.length);
+    console.log('?? Challenge Types (shuffled per game):', BASE_CHALLENGE_TYPES.join(', '));
+    console.log('?? NEW: Falling Fury challenge - Test your hand-eye coordination!');
+    console.log('?? Smart Judging: Rewards creativity, punishes lazy shortcuts');
     if (genAI) {
-        console.log('🔑 Gemini 2.5 Flash: AI-powered challenges with smart evaluation!');
+        console.log('?? Gemini 2.5 Flash: AI-powered challenges with smart evaluation!');
     } else {
-        console.log('⚠️ No Gemini API key: Using fallback challenges.');
+        console.log('?? No Gemini API key: Using fallback challenges.');
     }
 });
