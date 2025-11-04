@@ -1134,7 +1134,8 @@ async function evaluateRiddleResults(roomCode) {
             answer: answerData.answer,
             correct: answerData.answer === correctAnswer,
             won: winners.includes(playerId),
-            selectedOption: room.currentRiddle.options[answerData.answer]
+            selectedOption: room.currentRiddle.options[answerData.answer],
+            timestamp: answerData.timestamp
         };
     }).sort((a, b) => a.timestamp - b.timestamp);
 

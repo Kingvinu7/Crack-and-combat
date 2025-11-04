@@ -21,7 +21,7 @@ const pages = {
     riddleResults: document.getElementById('riddle-results-screen'),
     textChallenge: document.getElementById('text-challenge-screen'),
     riddleChallenge: document.getElementById('riddle-challenge-screen'),
-    riddleResults: document.getElementById('riddle-results-screen'),
+    riddleChallengeResults: document.getElementById('riddle-challenge-results-screen'),
     triviaChallenge: document.getElementById('trivia-challenge-screen'),
     triviaResults: document.getElementById('trivia-results-screen'),
     fastTapper: document.getElementById('fast-tapper-screen'),
@@ -824,6 +824,9 @@ function startTimer(elementId, seconds) {
     if (elementId === 'riddle-timer' && window.riddleTimer) {
         clearInterval(window.riddleTimer);
         window.riddleTimer = null;
+    } else if (elementId === 'riddle-challenge-timer' && window.riddleChallengeTimer) {
+        clearInterval(window.riddleChallengeTimer);
+        window.riddleChallengeTimer = null;
     } else if (elementId === 'trivia-timer' && window.triviaTimer) {
         clearInterval(window.triviaTimer);
         window.triviaTimer = null;
@@ -857,6 +860,8 @@ function startTimer(elementId, seconds) {
             // Clear the global reference
             if (elementId === 'riddle-timer') {
                 window.riddleTimer = null;
+            } else if (elementId === 'riddle-challenge-timer') {
+                window.riddleChallengeTimer = null;
             } else if (elementId === 'trivia-timer') {
                 window.triviaTimer = null;
             }
@@ -866,6 +871,8 @@ function startTimer(elementId, seconds) {
     // Store timer reference globally for proper cleanup
     if (elementId === 'riddle-timer') {
         window.riddleTimer = timer;
+    } else if (elementId === 'riddle-challenge-timer') {
+        window.riddleChallengeTimer = timer;
     } else if (elementId === 'trivia-timer') {
         window.triviaTimer = timer;
     }
@@ -1369,20 +1376,20 @@ socket.on('riddle-challenge-start', (data) => {
     const isParticipant = data.participants.includes(playerName);
     
     if (isParticipant) {
-        document.getElementById('riddle-question').textContent = data.question;
+        document.getElementById('riddle-challenge-question').textContent = data.question;
         
-        const buttons = document.querySelectorAll('.riddle-option');
+        const buttons = document.querySelectorAll('#riddle-challenge-options .riddle-option');
         buttons.forEach((btn, index) => {
             btn.textContent = data.options[index];
             btn.disabled = false;
             btn.classList.remove('selected');
         });
         
-        document.getElementById('riddle-submission-count').textContent = 
+        document.getElementById('riddle-challenge-submission-count').textContent = 
             `0/${data.participants.length} players answered`;
         
         showPage('riddleChallenge');
-        startTimer('riddle-timer', data.timeLimit || 45);
+        startTimer('riddle-challenge-timer', data.timeLimit || 45);
     } else {
         document.getElementById('waiting-title').textContent = 'Riddle Challenge!';
         document.getElementById('waiting-message').textContent = 'Others are solving a challenging riddle!';
@@ -1568,7 +1575,7 @@ socket.on('trivia-answer-submitted', (data) => {
 });
 
 socket.on('riddle-answer-submitted', (data) => {
-    const submissionCount = document.getElementById('riddle-submission-count');
+    const submissionCount = document.getElementById('riddle-challenge-submission-count');
     submissionCount.textContent = `${data.totalSubmissions}/${data.expectedSubmissions} players answered`;
     
     // Show auto-advance indicator when all players have answered
@@ -1580,13 +1587,13 @@ socket.on('riddle-answer-submitted', (data) => {
         `;
         
         // Clear any running timer to prevent early termination
-        if (window.riddleTimer) {
-            clearInterval(window.riddleTimer);
-            window.riddleTimer = null;
+        if (window.riddleChallengeTimer) {
+            clearInterval(window.riddleChallengeTimer);
+            window.riddleChallengeTimer = null;
         }
         
         // Add visual feedback to timer
-        const timer = document.getElementById('riddle-timer');
+        const timer = document.getElementById('riddle-challenge-timer');
         if (timer) {
             timer.textContent = 'ADVANCING...';
             timer.classList.add('auto-submit');
@@ -1626,12 +1633,12 @@ socket.on('trivia-results', (data) => {
 });
 
 socket.on('riddle-results', (data) => {
-    document.getElementById('riddle-results-message').textContent = 
+    document.getElementById('riddle-challenge-results-message').textContent = 
         `Correct answer: ${data.correctOption}`;
     
-    document.getElementById('riddle-correct-answer-text').textContent = data.correctOption;
+    document.getElementById('riddle-challenge-correct-answer-text').textContent = data.correctOption;
     
-    const answersListEl = document.getElementById('all-riddle-answers-list');
+    const answersListEl = document.getElementById('all-riddle-challenge-answers-list');
     let answersHtml = '';
     
     data.results.forEach((result, index) => {
@@ -1653,7 +1660,7 @@ socket.on('riddle-results', (data) => {
     });
     
     answersListEl.innerHTML = answersHtml;
-    showPage('riddleResults');
+    showPage('riddleChallengeResults');
 });
 
 socket.on('tap-result-submitted', (data) => {
@@ -2008,6 +2015,11 @@ function cleanupTimers() {
     if (window.riddleTimer) {
         clearInterval(window.riddleTimer);
         window.riddleTimer = null;
+    }
+    
+    if (window.riddleChallengeTimer) {
+        clearInterval(window.riddleChallengeTimer);
+        window.riddleChallengeTimer = null;
     }
     
     if (window.triviaTimer) {
