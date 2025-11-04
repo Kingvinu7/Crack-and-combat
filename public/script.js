@@ -20,8 +20,6 @@ const pages = {
     riddle: document.getElementById('riddle-screen'),
     riddleResults: document.getElementById('riddle-results-screen'),
     textChallenge: document.getElementById('text-challenge-screen'),
-    riddleChallenge: document.getElementById('riddle-challenge-screen'),
-    riddleChallengeResults: document.getElementById('riddle-challenge-results-screen'),
     triviaChallenge: document.getElementById('trivia-challenge-screen'),
     triviaResults: document.getElementById('trivia-results-screen'),
     fastTapper: document.getElementById('fast-tapper-screen'),
@@ -148,10 +146,6 @@ document.querySelectorAll('.trivia-option').forEach(button => {
     button.addEventListener('click', onTriviaOptionClick);
 });
 
-// Riddle option event listeners
-document.querySelectorAll('.riddle-option').forEach(button => {
-    button.addEventListener('click', onRiddleOptionClick);
-});
 
 // Custom notification system
 function showNotification(message, type = 'info') {
@@ -548,28 +542,6 @@ function onTriviaOptionClick(event) {
     }
 }
 
-function onRiddleOptionClick(event) {
-    const selectedOption = parseInt(event.target.dataset.option);
-    const buttons = document.querySelectorAll('.riddle-option');
-    
-    if (window.audioManager) window.audioManager.playSubmitSound();
-    
-    // Disable all buttons and highlight selected
-    buttons.forEach(btn => {
-        btn.disabled = true;
-        btn.classList.remove('selected');
-    });
-    
-    event.target.classList.add('selected');
-    
-    // Submit the answer - use different event for riddle challenge
-    if (currentRoom) {
-        socket.emit('submit-riddle-challenge-answer', { 
-            roomCode: currentRoom, 
-            answer: selectedOption 
-        });
-    }
-}
 
 function startFastTapperTimer(duration) {
     tapperActive = true;
@@ -824,9 +796,6 @@ function startTimer(elementId, seconds) {
     if (elementId === 'riddle-timer' && window.riddleTimer) {
         clearInterval(window.riddleTimer);
         window.riddleTimer = null;
-    } else if (elementId === 'riddle-challenge-timer' && window.riddleChallengeTimer) {
-        clearInterval(window.riddleChallengeTimer);
-        window.riddleChallengeTimer = null;
     } else if (elementId === 'trivia-timer' && window.triviaTimer) {
         clearInterval(window.triviaTimer);
         window.triviaTimer = null;
@@ -860,8 +829,6 @@ function startTimer(elementId, seconds) {
             // Clear the global reference
             if (elementId === 'riddle-timer') {
                 window.riddleTimer = null;
-            } else if (elementId === 'riddle-challenge-timer') {
-                window.riddleChallengeTimer = null;
             } else if (elementId === 'trivia-timer') {
                 window.triviaTimer = null;
             }
@@ -871,8 +838,6 @@ function startTimer(elementId, seconds) {
     // Store timer reference globally for proper cleanup
     if (elementId === 'riddle-timer') {
         window.riddleTimer = timer;
-    } else if (elementId === 'riddle-challenge-timer') {
-        window.riddleChallengeTimer = timer;
     } else if (elementId === 'trivia-timer') {
         window.triviaTimer = timer;
     }
@@ -1372,30 +1337,6 @@ socket.on('trivia-challenge-start', (data) => {
     }
 });
 
-socket.on('riddle-challenge-start', (data) => {
-    const isParticipant = data.participants.includes(playerName);
-    
-    if (isParticipant) {
-        document.getElementById('riddle-challenge-question').textContent = data.question;
-        
-        const buttons = document.querySelectorAll('#riddle-challenge-options .riddle-option');
-        buttons.forEach((btn, index) => {
-            btn.textContent = data.options[index];
-            btn.disabled = false;
-            btn.classList.remove('selected');
-        });
-        
-        document.getElementById('riddle-challenge-submission-count').textContent = 
-            `0/${data.participants.length} players answered`;
-        
-        showPage('riddleChallenge');
-        startTimer('riddle-challenge-timer', data.timeLimit || 45);
-    } else {
-        document.getElementById('waiting-title').textContent = 'Riddle Challenge!';
-        document.getElementById('waiting-message').textContent = 'Others are solving a challenging riddle!';
-        showPage('waiting');
-    }
-});
 
 socket.on('fast-tapper-start', (data) => {
     const isParticipant = data.participants.includes(playerName);
@@ -1574,32 +1515,6 @@ socket.on('trivia-answer-submitted', (data) => {
     }
 });
 
-socket.on('riddle-challenge-answer-submitted', (data) => {
-    const submissionCount = document.getElementById('riddle-challenge-submission-count');
-    submissionCount.textContent = `${data.totalSubmissions}/${data.expectedSubmissions} players answered`;
-    
-    // Show auto-advance indicator when all players have answered
-    if (data.totalSubmissions === data.expectedSubmissions) {
-        submissionCount.innerHTML = `
-            <span style="color: var(--accent-green); font-weight: bold;">
-                ✓ All players answered! Auto-advancing...
-            </span>
-        `;
-        
-        // Clear any running timer to prevent early termination
-        if (window.riddleChallengeTimer) {
-            clearInterval(window.riddleChallengeTimer);
-            window.riddleChallengeTimer = null;
-        }
-        
-        // Add visual feedback to timer
-        const timer = document.getElementById('riddle-challenge-timer');
-        if (timer) {
-            timer.textContent = 'ADVANCING...';
-            timer.classList.add('auto-submit');
-        }
-    }
-});
 
 socket.on('trivia-results', (data) => {
     document.getElementById('trivia-results-message').textContent = 
@@ -1632,36 +1547,6 @@ socket.on('trivia-results', (data) => {
     showPage('triviaResults');
 });
 
-socket.on('riddle-results', (data) => {
-    document.getElementById('riddle-challenge-results-message').textContent = 
-        `Correct answer: ${data.correctOption}`;
-    
-    document.getElementById('riddle-challenge-correct-answer-text').textContent = data.correctOption;
-    
-    const answersListEl = document.getElementById('all-riddle-challenge-answers-list');
-    let answersHtml = '';
-    
-    data.results.forEach((result, index) => {
-        const orderText = index === 0 ? '1st' : index === 1 ? '2nd' : index === 2 ? '3rd' : `${index + 1}th`;
-        
-        answersHtml += `
-            <div class="answer-item ${result.correct ? 'correct' : 'incorrect'} ${result.won ? 'winner' : ''}">
-                <div class="answer-header">
-                    <span class="player-name">${result.playerName}</span>
-                    <span class="answer-order">${orderText}</span>
-                    ${result.won ? '<span class="winner-badge">WINNER</span>' : ''}
-                </div>
-                <div class="answer-text">"${result.selectedOption}"</div>
-                <div class="answer-status">
-                    ${result.correct ? 'Correct' : 'Incorrect'}
-                </div>
-            </div>
-        `;
-    });
-    
-    answersListEl.innerHTML = answersHtml;
-    showPage('riddleChallengeResults');
-});
 
 socket.on('tap-result-submitted', (data) => {
     console.log(`${data.player} tapped ${data.taps} times`);
@@ -2015,11 +1900,6 @@ function cleanupTimers() {
     if (window.riddleTimer) {
         clearInterval(window.riddleTimer);
         window.riddleTimer = null;
-    }
-    
-    if (window.riddleChallengeTimer) {
-        clearInterval(window.riddleChallengeTimer);
-        window.riddleChallengeTimer = null;
     }
     
     if (window.triviaTimer) {

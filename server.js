@@ -860,24 +860,22 @@ async function startChallengePhase(roomCode) {
             }, 48000);
             
         } else if (challengeType === 'detective') {
-            // Detective Riddle Challenge with Multiple Choice
-            const { riddle, index } = getRandomRiddle(room.usedRiddleIndices || []);
-            if (!room.usedRiddleIndices) room.usedRiddleIndices = [];
-            room.usedRiddleIndices.push(index);
+            // Detective Mystery Challenge - text-based detective scenarios
+            const detectiveScenario = await generateDetectiveChallenge();
+            room.currentChallengeType = 'detective';
+            room.currentChallengeContent = detectiveScenario;
+            room.challengeResponses = {};
             
-            room.currentRiddle = riddle;
-            room.riddleAnswers = {};
-            
-            io.to(roomCode).emit('riddle-challenge-start', {
-                question: riddle.question,
-                options: riddle.options,
+            io.to(roomCode).emit('text-challenge-start', {
+                challengeType: 'detective',
+                challengeContent: detectiveScenario,
                 participants: nonWinners.map(p => p.name),
-                timeLimit: 45
+                timeLimit: 60
             });
             
             room.challengeTimer = setTimeout(() => {
-                evaluateRiddleResults(roomCode);
-            }, 48000);
+                evaluateTextChallengeResults(roomCode);
+            }, 68000);
             
         } else if (challengeType === 'memoryChallenge') {
             // Memory Challenge - 20 seconds to answer after 2 second display
@@ -934,6 +932,11 @@ room.challengeTimer = setTimeout(() => {
     }
   },1000); // Increased from 500ms to 1000ms to prevent page transition conflicts
 }
+// Generate Detective Challenge
+async function generateDetectiveChallenge() {
+    return await generateChallengeContent('detective', 1);
+}
+
 // Generate Memory Challenge
 function generateMemoryChallenge(roundNumber) {
     const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan'];
@@ -1095,61 +1098,6 @@ async function evaluateTriviaResults(roomCode) {
 }
 
 // Evaluate Riddle Results
-async function evaluateRiddleResults(roomCode) {
-    const room = rooms[roomCode];
-    if (!room) return;
-
-    const riddleEntries = Object.entries(room.riddleAnswers);
-    if (riddleEntries.length === 0) {
-        endRound(roomCode, []);
-        return;
-    }
-
-    const correctAnswer = room.currentRiddle.correctAnswer;
-    let winners = [];
-    let earliest = Infinity;
-
-    // Find winners (correct answers, earliest first)
-    riddleEntries.forEach(([playerId, answerData]) => {
-        if (answerData.answer === correctAnswer) {
-            if (answerData.timestamp < earliest) {
-                earliest = answerData.timestamp;
-                winners = [playerId];
-            } else if (answerData.timestamp === earliest) {
-                winners.push(playerId);
-            }
-        }
-    });
-
-    // Award points to winners
-    winners.forEach(playerId => {
-        const player = room.players.find(p => p.id === playerId);
-        if (player) player.score += 1;
-    });
-
-    const results = riddleEntries.map(([playerId, answerData]) => {
-        const player = room.players.find(p => p.id === playerId);
-        return {
-            playerName: player?.name || 'Unknown',
-            answer: answerData.answer,
-            correct: answerData.answer === correctAnswer,
-            won: winners.includes(playerId),
-            selectedOption: room.currentRiddle.options[answerData.answer],
-            timestamp: answerData.timestamp
-        };
-    }).sort((a, b) => a.timestamp - b.timestamp);
-
-    io.to(roomCode).emit('riddle-results', {
-        results: results,
-        correctAnswer: correctAnswer,
-        correctOption: room.currentRiddle.options[correctAnswer],
-        question: room.currentRiddle.question
-    });
-
-    setTimeout(() => {
-        endRound(roomCode, results);
-    }, 6000);
-}
 
 // Evaluate Fast Tapper Results
 async function evaluateFastTapperResults(roomCode) {
@@ -1774,39 +1722,6 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('submit-riddle-challenge-answer', (data) => {
-        const room = rooms[data.roomCode];
-        if (!room || room.gameState !== 'challenge-phase') return;
-        const player = room.players.find(p => p.id === socket.id);
-        if (!player || player.isSpectator || player.name === room.riddleWinner) return;
-        
-        if (!room.riddleAnswers[socket.id]) {
-            room.riddleAnswers[socket.id] = {
-                answer: data.answer,
-                timestamp: Date.now(),
-                playerName: player.name
-            };
-            
-            const activePlayers = room.players.filter(p => !p.isSpectator);
-            const expectedSubmissions = activePlayers.filter(p => p.name !== room.riddleWinner).length;
-            
-            io.to(data.roomCode).emit('riddle-challenge-answer-submitted', {
-                player: player.name,
-                totalSubmissions: Object.keys(room.riddleAnswers).length,
-                expectedSubmissions: expectedSubmissions
-            });
-            
-            // Check if all active players have answered
-            if (Object.keys(room.riddleAnswers).length === expectedSubmissions) {
-                console.log('All active non-winners submitted riddle challenge answer. Ending riddle challenge phase early.');
-                if (room.challengeTimer) {
-                    clearTimeout(room.challengeTimer);
-                    room.challengeTimer = null;
-                }
-                evaluateRiddleResults(data.roomCode);
-            }
-        }
-    });
 
     socket.on('submit-memory-answer', (data) => {
         const room = rooms[data.roomCode];
