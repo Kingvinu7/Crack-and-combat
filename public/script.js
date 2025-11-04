@@ -20,8 +20,6 @@ const pages = {
     riddle: document.getElementById('riddle-screen'),
     riddleResults: document.getElementById('riddle-results-screen'),
     textChallenge: document.getElementById('text-challenge-screen'),
-    riddleChallenge: document.getElementById('riddle-challenge-screen'),
-    riddleResults: document.getElementById('riddle-results-screen'),
     triviaChallenge: document.getElementById('trivia-challenge-screen'),
     triviaResults: document.getElementById('trivia-results-screen'),
     fastTapper: document.getElementById('fast-tapper-screen'),
@@ -34,12 +32,10 @@ const pages = {
 };
 const playerNameInput = document.getElementById('player-name');
 const roomCodeInput = document.getElementById('room-code');
-const riddleAnswer = document.getElementById('riddle-answer');
 
 const createRoomBtn = document.getElementById('create-room-btn');
 const joinRoomBtn = document.getElementById('join-room-btn');
 const startGameBtn = document.getElementById('start-game-btn');
-const submitRiddleBtn = document.getElementById('submit-riddle');
 const howToPlayBtn = document.getElementById('how-to-play-btn');
 const howToPlayModal = document.getElementById('how-to-play-modal');
 const closeHowToPlayBtn = document.getElementById('close-how-to-play');
@@ -86,7 +82,6 @@ if (joinRoomBtn) {
 }
 
 startGameBtn.addEventListener('click', startGame);
-submitRiddleBtn.addEventListener('click', submitRiddleAnswer);
 howToPlayBtn.addEventListener('click', showHowToPlay);
 closeHowToPlayBtn.addEventListener('click', hideHowToPlay);
 
@@ -104,9 +99,6 @@ playerNameInput.addEventListener('keypress', (e) => {
 });
 roomCodeInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') joinRoom();
-});
-riddleAnswer.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') submitRiddleAnswer();
 });
 
 // Close modal when clicking outside
@@ -149,9 +141,10 @@ document.querySelectorAll('.trivia-option').forEach(button => {
 });
 
 // Riddle option event listeners
-document.querySelectorAll('.riddle-option').forEach(button => {
+document.querySelectorAll('#riddle-options .riddle-option').forEach(button => {
     button.addEventListener('click', onRiddleOptionClick);
 });
+
 
 // Custom notification system
 function showNotification(message, type = 'info') {
@@ -469,14 +462,27 @@ function startGame() {
     }
 }
 
-function submitRiddleAnswer() {
-    const answer = riddleAnswer.value.trim();
-    if (!answer || !currentRoom) return;
+function onRiddleOptionClick(event) {
+    const selectedOption = parseInt(event.target.dataset.option);
+    const buttons = document.querySelectorAll('#riddle-options .riddle-option');
+    
     if (window.audioManager) window.audioManager.playSubmitSound();
-    socket.emit('submit-riddle-answer', { roomCode: currentRoom, answer: answer });
-    riddleAnswer.disabled = true;
-    submitRiddleBtn.disabled = true;
-    submitRiddleBtn.textContent = 'Submitted!';
+    
+    // Disable all buttons and highlight selected
+    buttons.forEach(btn => {
+        btn.disabled = true;
+        btn.classList.remove('selected');
+    });
+    
+    event.target.classList.add('selected');
+    
+    // Submit the answer
+    if (currentRoom) {
+        socket.emit('submit-riddle-answer', { 
+            roomCode: currentRoom, 
+            answer: selectedOption 
+        });
+    }
 }
 
 function submitChallengeResponse(isAutoSubmit = false) {
@@ -548,28 +554,6 @@ function onTriviaOptionClick(event) {
     }
 }
 
-function onRiddleOptionClick(event) {
-    const selectedOption = parseInt(event.target.dataset.option);
-    const buttons = document.querySelectorAll('.riddle-option');
-    
-    if (window.audioManager) window.audioManager.playSubmitSound();
-    
-    // Disable all buttons and highlight selected
-    buttons.forEach(btn => {
-        btn.disabled = true;
-        btn.classList.remove('selected');
-    });
-    
-    event.target.classList.add('selected');
-    
-    // Submit the answer
-    if (currentRoom) {
-        socket.emit('submit-riddle-answer', { 
-            roomCode: currentRoom, 
-            answer: selectedOption 
-        });
-    }
-}
 
 function startFastTapperTimer(duration) {
     tapperActive = true;
@@ -1231,11 +1215,13 @@ socket.on('riddle-presented', (data) => {
     document.getElementById('round-display').textContent = `Round ${data.round}/${data.maxRounds}`;
     riddleText.textContent = data.riddle.question;
     
-    riddleAnswer.disabled = false;
-    riddleAnswer.value = '';
-    riddleAnswer.focus();
-    submitRiddleBtn.disabled = false;
-    submitRiddleBtn.textContent = 'Submit Answer';
+    // Set up the multiple choice options
+    const buttons = document.querySelectorAll('#riddle-options .riddle-option');
+    buttons.forEach((btn, index) => {
+        btn.textContent = data.riddle.options[index];
+        btn.disabled = false;
+        btn.classList.remove('selected');
+    });
     
     document.getElementById('submission-count').textContent = '0/0 players answered';
     
@@ -1365,30 +1351,6 @@ socket.on('trivia-challenge-start', (data) => {
     }
 });
 
-socket.on('riddle-challenge-start', (data) => {
-    const isParticipant = data.participants.includes(playerName);
-    
-    if (isParticipant) {
-        document.getElementById('riddle-question').textContent = data.question;
-        
-        const buttons = document.querySelectorAll('.riddle-option');
-        buttons.forEach((btn, index) => {
-            btn.textContent = data.options[index];
-            btn.disabled = false;
-            btn.classList.remove('selected');
-        });
-        
-        document.getElementById('riddle-submission-count').textContent = 
-            `0/${data.participants.length} players answered`;
-        
-        showPage('riddleChallenge');
-        startTimer('riddle-timer', data.timeLimit || 45);
-    } else {
-        document.getElementById('waiting-title').textContent = 'Riddle Challenge!';
-        document.getElementById('waiting-message').textContent = 'Others are solving a challenging riddle!';
-        showPage('waiting');
-    }
-});
 
 socket.on('fast-tapper-start', (data) => {
     const isParticipant = data.participants.includes(playerName);
@@ -1567,32 +1529,6 @@ socket.on('trivia-answer-submitted', (data) => {
     }
 });
 
-socket.on('riddle-answer-submitted', (data) => {
-    const submissionCount = document.getElementById('riddle-submission-count');
-    submissionCount.textContent = `${data.totalSubmissions}/${data.expectedSubmissions} players answered`;
-    
-    // Show auto-advance indicator when all players have answered
-    if (data.totalSubmissions === data.expectedSubmissions) {
-        submissionCount.innerHTML = `
-            <span style="color: var(--accent-green); font-weight: bold;">
-                ✓ All players answered! Auto-advancing...
-            </span>
-        `;
-        
-        // Clear any running timer to prevent early termination
-        if (window.riddleTimer) {
-            clearInterval(window.riddleTimer);
-            window.riddleTimer = null;
-        }
-        
-        // Add visual feedback to timer
-        const timer = document.getElementById('riddle-timer');
-        if (timer) {
-            timer.textContent = 'ADVANCING...';
-            timer.classList.add('auto-submit');
-        }
-    }
-});
 
 socket.on('trivia-results', (data) => {
     document.getElementById('trivia-results-message').textContent = 
@@ -1625,36 +1561,6 @@ socket.on('trivia-results', (data) => {
     showPage('triviaResults');
 });
 
-socket.on('riddle-results', (data) => {
-    document.getElementById('riddle-results-message').textContent = 
-        `Correct answer: ${data.correctOption}`;
-    
-    document.getElementById('riddle-correct-answer-text').textContent = data.correctOption;
-    
-    const answersListEl = document.getElementById('all-riddle-answers-list');
-    let answersHtml = '';
-    
-    data.results.forEach((result, index) => {
-        const orderText = index === 0 ? '1st' : index === 1 ? '2nd' : index === 2 ? '3rd' : `${index + 1}th`;
-        
-        answersHtml += `
-            <div class="answer-item ${result.correct ? 'correct' : 'incorrect'} ${result.won ? 'winner' : ''}">
-                <div class="answer-header">
-                    <span class="player-name">${result.playerName}</span>
-                    <span class="answer-order">${orderText}</span>
-                    ${result.won ? '<span class="winner-badge">WINNER</span>' : ''}
-                </div>
-                <div class="answer-text">"${result.selectedOption}"</div>
-                <div class="answer-status">
-                    ${result.correct ? 'Correct' : 'Incorrect'}
-                </div>
-            </div>
-        `;
-    });
-    
-    answersListEl.innerHTML = answersHtml;
-    showPage('riddleResults');
-});
 
 socket.on('tap-result-submitted', (data) => {
     console.log(`${data.player} tapped ${data.taps} times`);

@@ -195,9 +195,13 @@
                 <h2 id="round-display">Round 1/5</h2>
                 <p id="riddle-text" class="riddle-question">Loading riddle...</p>
             </div>
-            <div class="answer-section">
-                <input type="text" id="riddle-answer" placeholder="Type your answer..." maxlength="50">
-                <button id="submit-riddle" class="btn primary large">Submit Answer</button>
+            <div class="riddle-options-section">
+                <div class="riddle-options" id="riddle-options">
+                    <button class="riddle-option btn" data-option="0">Option A</button>
+                    <button class="riddle-option btn" data-option="1">Option B</button>
+                    <button class="riddle-option btn" data-option="2">Option C</button>
+                    <button class="riddle-option btn" data-option="3">Option D</button>
+                </div>
                 <div class="submission-status">
                     <p id="submission-count">0/0 players answered</p>
                 </div>
@@ -329,63 +333,6 @@
                 <div class="all-trivia-answers-section">
                     <h3>All Answers</h3>
                     <div id="all-trivia-answers-list"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Riddle Challenge Screen -->
-    <div id="riddle-challenge-screen" class="page">
-        <!-- Matrix Background Effect with multiple layers -->
-        <div class="matrix-bg">
-            <div class="matrix-layer-1"></div>
-            <div class="matrix-layer-2"></div>
-            <div class="matrix-layer-3"></div>
-        </div>
-        <div class="page-content">
-            <div class="timer-section">
-                <div id="riddle-timer" class="timer">45</div>
-                <p>seconds to answer</p>
-            </div>
-            <div class="riddle-section">
-                <h2>🔍 RIDDLE CHALLENGE</h2>
-                <p id="riddle-question" class="riddle-question-text">Loading riddle...</p>
-            </div>
-            <div class="riddle-options-section">
-                <div class="riddle-options" id="riddle-options">
-                    <button class="riddle-option btn" data-option="0">Option A</button>
-                    <button class="riddle-option btn" data-option="1">Option B</button>
-                    <button class="riddle-option btn" data-option="2">Option C</button>
-                    <button class="riddle-option btn" data-option="3">Option D</button>
-                </div>
-                <div class="submission-status">
-                    <p id="riddle-submission-count">0/0 players answered</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Riddle Results Screen -->
-    <div id="riddle-results-screen" class="page">
-        <!-- Matrix Background Effect with multiple layers -->
-        <div class="matrix-bg">
-            <div class="matrix-layer-1"></div>
-            <div class="matrix-layer-2"></div>
-            <div class="matrix-layer-3"></div>
-        </div>
-        <div class="page-content">
-            <div class="results-header">
-                <h2>🎯 RIDDLE RESULTS</h2>
-                <p id="riddle-results-message">Analyzing your answers...</p>
-            </div>
-            <div class="riddle-results-section">
-                <div class="correct-answer-display">
-                    <h3>Correct Answer</h3>
-                    <p id="riddle-correct-answer-text">Loading...</p>
-                </div>
-                <div class="all-riddle-answers-section">
-                    <h3>All Answers</h3>
-                    <div id="all-riddle-answers-list"></div>
                 </div>
             </div>
         </div>
