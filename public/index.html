@@ -195,9 +195,13 @@
                 <h2 id="round-display">Round 1/5</h2>
                 <p id="riddle-text" class="riddle-question">Loading riddle...</p>
             </div>
-            <div class="answer-section">
-                <input type="text" id="riddle-answer" placeholder="Type your answer..." maxlength="50">
-                <button id="submit-riddle" class="btn primary large">Submit Answer</button>
+            <div class="riddle-options-section">
+                <div class="riddle-options" id="riddle-options">
+                    <button class="riddle-option btn" data-option="0">Option A</button>
+                    <button class="riddle-option btn" data-option="1">Option B</button>
+                    <button class="riddle-option btn" data-option="2">Option C</button>
+                    <button class="riddle-option btn" data-option="3">Option D</button>
+                </div>
                 <div class="submission-status">
                     <p id="submission-count">0/0 players answered</p>
                 </div>

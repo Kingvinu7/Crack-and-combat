@@ -32,12 +32,10 @@ const pages = {
 };
 const playerNameInput = document.getElementById('player-name');
 const roomCodeInput = document.getElementById('room-code');
-const riddleAnswer = document.getElementById('riddle-answer');
 
 const createRoomBtn = document.getElementById('create-room-btn');
 const joinRoomBtn = document.getElementById('join-room-btn');
 const startGameBtn = document.getElementById('start-game-btn');
-const submitRiddleBtn = document.getElementById('submit-riddle');
 const howToPlayBtn = document.getElementById('how-to-play-btn');
 const howToPlayModal = document.getElementById('how-to-play-modal');
 const closeHowToPlayBtn = document.getElementById('close-how-to-play');
@@ -84,7 +82,6 @@ if (joinRoomBtn) {
 }
 
 startGameBtn.addEventListener('click', startGame);
-submitRiddleBtn.addEventListener('click', submitRiddleAnswer);
 howToPlayBtn.addEventListener('click', showHowToPlay);
 closeHowToPlayBtn.addEventListener('click', hideHowToPlay);
 
@@ -102,9 +99,6 @@ playerNameInput.addEventListener('keypress', (e) => {
 });
 roomCodeInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') joinRoom();
-});
-riddleAnswer.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') submitRiddleAnswer();
 });
 
 // Close modal when clicking outside
@@ -144,6 +138,11 @@ document.getElementById('tap-button').addEventListener('click', onTap);
 // Trivia option event listeners
 document.querySelectorAll('.trivia-option').forEach(button => {
     button.addEventListener('click', onTriviaOptionClick);
+});
+
+// Riddle option event listeners
+document.querySelectorAll('#riddle-options .riddle-option').forEach(button => {
+    button.addEventListener('click', onRiddleOptionClick);
 });
 
 
@@ -463,14 +462,27 @@ function startGame() {
     }
 }
 
-function submitRiddleAnswer() {
-    const answer = riddleAnswer.value.trim();
-    if (!answer || !currentRoom) return;
+function onRiddleOptionClick(event) {
+    const selectedOption = parseInt(event.target.dataset.option);
+    const buttons = document.querySelectorAll('#riddle-options .riddle-option');
+    
     if (window.audioManager) window.audioManager.playSubmitSound();
-    socket.emit('submit-riddle-answer', { roomCode: currentRoom, answer: answer });
-    riddleAnswer.disabled = true;
-    submitRiddleBtn.disabled = true;
-    submitRiddleBtn.textContent = 'Submitted!';
+    
+    // Disable all buttons and highlight selected
+    buttons.forEach(btn => {
+        btn.disabled = true;
+        btn.classList.remove('selected');
+    });
+    
+    event.target.classList.add('selected');
+    
+    // Submit the answer
+    if (currentRoom) {
+        socket.emit('submit-riddle-answer', { 
+            roomCode: currentRoom, 
+            answer: selectedOption 
+        });
+    }
 }
 
 function submitChallengeResponse(isAutoSubmit = false) {
@@ -1203,11 +1215,13 @@ socket.on('riddle-presented', (data) => {
     document.getElementById('round-display').textContent = `Round ${data.round}/${data.maxRounds}`;
     riddleText.textContent = data.riddle.question;
     
-    riddleAnswer.disabled = false;
-    riddleAnswer.value = '';
-    riddleAnswer.focus();
-    submitRiddleBtn.disabled = false;
-    submitRiddleBtn.textContent = 'Submit Answer';
+    // Set up the multiple choice options
+    const buttons = document.querySelectorAll('#riddle-options .riddle-option');
+    buttons.forEach((btn, index) => {
+        btn.textContent = data.riddle.options[index];
+        btn.disabled = false;
+        btn.classList.remove('selected');
+    });
     
     document.getElementById('submission-count').textContent = '0/0 players answered';
     

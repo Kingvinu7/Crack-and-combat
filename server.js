@@ -1319,10 +1319,10 @@ function endRiddlePhase(roomCode) {
         room.riddleTimer = null;
     }
     
-    const correctAnswer = room.currentRiddle.answer.toUpperCase();
+    const correctAnswer = room.currentRiddle.correctAnswer; // This is an option index (number)
     let winner = null, earliest = Infinity;
     for (const [pid, ans] of Object.entries(room.riddleAnswers)) {
-        if (ans.answer.toUpperCase() === correctAnswer && ans.timestamp < earliest) {
+        if (ans.answer === correctAnswer && ans.timestamp < earliest) {
             earliest = ans.timestamp;
             const player = room.players.find(p => p.id === pid);
             if (player) { winner = player.name; room.riddleWinner = winner; }
@@ -1337,15 +1337,15 @@ function endRiddlePhase(roomCode) {
         const player = room.players.find(p => p.id === pid);
         return {
             playerName: player?.name ?? 'Unknown',
-            answer: ans.answer,
-            correct: ans.answer.toUpperCase() === correctAnswer,
+            answer: room.currentRiddle.options[ans.answer] || 'Invalid option',
+            correct: ans.answer === correctAnswer,
             winner: player?.name === winner,
             timestamp: ans.timestamp
         };
     }).sort((a, b) => a.timestamp - b.timestamp);
     io.to(roomCode).emit('riddle-results-reveal', {
         winner: winner,
-        correctAnswer: room.currentRiddle.answer,
+        correctAnswer: room.currentRiddle.options[correctAnswer],
         message: winner ? `${winner} solved it first!` : `No one solved my riddle!`,
         allAnswers: answersDisplay
     });
@@ -1602,7 +1602,7 @@ io.on('connection', (socket) => {
     });
     socket.on('submit-riddle-answer', (data) => {
         try {
-            if (!data || !data.roomCode || !data.answer) {
+            if (!data || !data.roomCode || data.answer === undefined) {
                 console.warn('Invalid riddle answer submission:', data);
                 return;
             }
@@ -1613,7 +1613,7 @@ io.on('connection', (socket) => {
             
             if (!room.riddleAnswers[socket.id]) {
                 room.riddleAnswers[socket.id] = {
-                    answer: data.answer.trim(),
+                    answer: parseInt(data.answer), // Store as option number
                     timestamp: Date.now(),
                     playerName: player.name
                 };
