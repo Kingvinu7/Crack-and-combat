@@ -39,61 +39,61 @@ function shuffleArray(array) {
 // Game Data with 50+ riddles and trivia questions
 const gameData = {
     riddles: [
-        { question: "I speak without a mouth and hear without ears. What am I?", answer: "ECHO", difficulty: "easy" },
-        { question: "The more you take, the more you leave behind. What am I?", answer: "FOOTSTEPS", difficulty: "easy" },
-        { question: "I have cities, but no houses. I have mountains, but no trees. What am I?", answer: "MAP", difficulty: "medium" },
-        { question: "What has keys but no locks, space but no room, and you can enter but not go inside?", answer: "KEYBOARD", difficulty: "medium" },
-        { question: "What gets wet while drying?", answer: "TOWEL", difficulty: "easy" },
-        { question: "I am not alive, but I grow; I don't have lungs, but I need air. What am I?", answer: "FIRE", difficulty: "medium" },
-        { question: "What comes once in a minute, twice in a moment, but never in a thousand years?", answer: "M", difficulty: "hard" },
-        { question: "I have a golden head and a golden tail, but no body. What am I?", answer: "COIN", difficulty: "easy" },
-        { question: "I am tall when I am young, and short when I am old. What am I?", answer: "CANDLE", difficulty: "medium" },
-        { question: "What has one head, one foot, and four legs?", answer: "BED", difficulty: "medium" },
-        { question: "What can travel around the world while staying in a corner?", answer: "STAMP", difficulty: "hard" },
-        { question: "What breaks but never falls, and what falls but never breaks?", answer: "DAWN", difficulty: "hard" },
-        { question: "I can be cracked, made, told, and played. What am I?", answer: "JOKE", difficulty: "medium" },
-        { question: "What has hands but cannot clap?", answer: "CLOCK", difficulty: "easy" },
-        { question: "What runs around the whole yard without moving?", answer: "FENCE", difficulty: "medium" },
-        { question: "What has a neck but no head?", answer: "BOTTLE", difficulty: "easy" },
-        { question: "What can fill a room but takes up no space?", answer: "LIGHT", difficulty: "easy" },
-        { question: "What word is spelled incorrectly in every dictionary?", answer: "INCORRECTLY", difficulty: "easy" },
-        { question: "What goes up but never comes down?", answer: "AGE", difficulty: "easy" },
-        { question: "What has teeth but cannot bite?", answer: "ZIPPER", difficulty: "medium" },
-        { question: "What has an eye but cannot see?", answer: "NEEDLE", difficulty: "medium" },
-        { question: "What gets sharper the more you use it?", answer: "BRAIN", difficulty: "medium" },
-        { question: "What is always in front of you but can't be seen?", answer: "FUTURE", difficulty: "medium" },
-        { question: "What is so fragile that saying its name breaks it?", answer: "SILENCE", difficulty: "hard" },
-        { question: "What is black when you buy it, red when you use it, and gray when you throw it away?", answer: "CHARCOAL", difficulty: "hard" },
-        { question: "What has a thumb and four fingers but is not alive?", answer: "GLOVE", difficulty: "easy" },
-        { question: "What gets bigger when more is taken away from it?", answer: "HOLE", difficulty: "medium" },
-        { question: "What is full of holes but still holds water?", answer: "SPONGE", difficulty: "easy" },
-        { question: "What disappears as soon as you say its name?", answer: "SILENCE", difficulty: "hard" },
-        { question: "What has a head and a tail but no body?", answer: "COIN", difficulty: "easy" },
-        { question: "What is always hungry and must always be fed, but if you give it water it will die?", answer: "FIRE", difficulty: "hard" },
-        { question: "What can you catch but not throw?", answer: "COLD", difficulty: "medium" },
-        { question: "What has many keys but can't open any doors?", answer: "PIANO", difficulty: "medium" },
-        { question: "What is heavier: a ton of feathers or a ton of bricks?", answer: "EQUAL", difficulty: "easy" },
-        { question: "What goes through towns and hills but never moves?", answer: "ROAD", difficulty: "medium" },
-        { question: "What has four legs but cannot walk?", answer: "TABLE", difficulty: "easy" },
-        { question: "What can you break without hitting or dropping it?", answer: "PROMISE", difficulty: "hard" },
-        { question: "What is bought by the yard and worn by the foot?", answer: "CARPET", difficulty: "hard" },
-        { question: "What starts with T, ends with T, and has T in it?", answer: "TEAPOT", difficulty: "medium" },
-        { question: "What can you hold without touching it?", answer: "BREATH", difficulty: "hard" },
-        { question: "What has a ring but no finger?", answer: "TELEPHONE", difficulty: "medium" },
-        { question: "What is taken before you can get it?", answer: "PICTURE", difficulty: "medium" },
-        { question: "What has no beginning, end, or middle?", answer: "CIRCLE", difficulty: "medium" },
-        { question: "What gets wetter the more it dries?", answer: "TOWEL", difficulty: "easy" },
-        { question: "What is cut on a table but never eaten?", answer: "CARDS", difficulty: "medium" },
-        { question: "What has cities but no people, forests but no trees, and water but no fish?", answer: "MAP", difficulty: "hard" },
-        { question: "What is so delicate that even saying its name will break it?", answer: "SILENCE", difficulty: "hard" },
-        { question: "What flies without wings?", answer: "TIME", difficulty: "hard" },
-        { question: "What has a face and two hands but no arms or legs?", answer: "CLOCK", difficulty: "easy" },
-        { question: "What is made of water but if you put it into water it will die?", answer: "ICE", difficulty: "medium" },
-        { question: "What belongs to you but others use it more than you do?", answer: "NAME", difficulty: "medium" },
-        { question: "What is always coming but never arrives?", answer: "TOMORROW", difficulty: "medium" },
-        { question: "What can be seen in the middle of March and April that cannot be seen at the beginning or end of either month?", answer: "R", difficulty: "hard" },
-        { question: "What word becomes shorter when you add two letters to it?", answer: "SHORT", difficulty: "hard" },
-        { question: "What occurs once in every minute, twice in every moment, yet never in a thousand years?", answer: "M", difficulty: "hard" }
+        { question: "I speak without a mouth and hear without ears. What am I?", options: ["Wind", "Echo", "Shadow", "Ghost"], correctAnswer: 1, difficulty: "easy" },
+        { question: "The more you take, the more you leave behind. What am I?", options: ["Footsteps", "Memories", "Time", "Money"], correctAnswer: 0, difficulty: "easy" },
+        { question: "I have cities, but no houses. I have mountains, but no trees. What am I?", options: ["Desert", "Map", "Planet", "Dream"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What has keys but no locks, space but no room, and you can enter but not go inside?", options: ["Piano", "Keyboard", "House", "Prison"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What gets wet while drying?", options: ["Sponge", "Towel", "Hair", "Soap"], correctAnswer: 1, difficulty: "easy" },
+        { question: "I am not alive, but I grow; I don't have lungs, but I need air. What am I?", options: ["Plant", "Fire", "Balloon", "Cloud"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What comes once in a minute, twice in a moment, but never in a thousand years?", options: ["Second", "M", "Time", "Letter"], correctAnswer: 1, difficulty: "hard" },
+        { question: "I have a golden head and a golden tail, but no body. What am I?", options: ["Snake", "Coin", "Arrow", "Key"], correctAnswer: 1, difficulty: "easy" },
+        { question: "I am tall when I am young, and short when I am old. What am I?", options: ["Tree", "Candle", "Person", "Building"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What has one head, one foot, and four legs?", options: ["Chair", "Bed", "Table", "Monster"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What can travel around the world while staying in a corner?", options: ["Postcard", "Stamp", "Email", "News"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What breaks but never falls, and what falls but never breaks?", options: ["Glass", "Dawn", "Rain", "Hope"], correctAnswer: 1, difficulty: "hard" },
+        { question: "I can be cracked, made, told, and played. What am I?", options: ["Code", "Joke", "Song", "Game"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What has hands but cannot clap?", options: ["Statue", "Clock", "Robot", "Doll"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What runs around the whole yard without moving?", options: ["Dog", "Fence", "Grass", "Shadow"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What has a neck but no head?", options: ["Giraffe", "Bottle", "Shirt", "Guitar"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What can fill a room but takes up no space?", options: ["Air", "Light", "Sound", "Smell"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What word is spelled incorrectly in every dictionary?", options: ["Wrong", "Incorrectly", "Misspelled", "Error"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What goes up but never comes down?", options: ["Balloon", "Age", "Smoke", "Price"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What has teeth but cannot bite?", options: ["Comb", "Zipper", "Saw", "Gear"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What has an eye but cannot see?", options: ["Storm", "Needle", "Potato", "Camera"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What gets sharper the more you use it?", options: ["Knife", "Brain", "Pencil", "Skill"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What is always in front of you but can't be seen?", options: ["Air", "Future", "Tomorrow", "Destiny"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What is so fragile that saying its name breaks it?", options: ["Glass", "Silence", "Peace", "Secret"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What is black when you buy it, red when you use it, and gray when you throw it away?", options: ["Coal", "Charcoal", "Tire", "Metal"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What has a thumb and four fingers but is not alive?", options: ["Glove", "Robot", "Hand", "Statue"], correctAnswer: 0, difficulty: "easy" },
+        { question: "What gets bigger when more is taken away from it?", options: ["Debt", "Hole", "Space", "Distance"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What is full of holes but still holds water?", options: ["Bucket", "Sponge", "Net", "Basket"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What disappears as soon as you say its name?", options: ["Whisper", "Silence", "Secret", "Magic"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What has a head and a tail but no body?", options: ["Snake", "Coin", "Comet", "Arrow"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What is always hungry and must always be fed, but if you give it water it will die?", options: ["Plant", "Fire", "Baby", "Engine"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What can you catch but not throw?", options: ["Ball", "Cold", "Fish", "Attention"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What has many keys but can't open any doors?", options: ["Janitor", "Piano", "Computer", "Map"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What is heavier: a ton of feathers or a ton of bricks?", options: ["Feathers", "Equal", "Bricks", "Depends"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What goes through towns and hills but never moves?", options: ["River", "Road", "Train", "Wind"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What has four legs but cannot walk?", options: ["Chair", "Table", "Bed", "Dog"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What can you break without hitting or dropping it?", options: ["Glass", "Promise", "Heart", "Rule"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What is bought by the yard and worn by the foot?", options: ["Shoes", "Carpet", "Socks", "Rope"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What starts with T, ends with T, and has T in it?", options: ["Test", "Teapot", "Tent", "Target"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What can you hold without touching it?", options: ["Shadow", "Breath", "Memory", "Dream"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What has a ring but no finger?", options: ["Bell", "Telephone", "Circle", "Tree"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What is taken before you can get it?", options: ["Gift", "Shower", "Picture", "Medicine"], correctAnswer: 2, difficulty: "medium" },
+        { question: "What has no beginning, end, or middle?", options: ["Circle", "Ball", "Ring", "Zero"], correctAnswer: 0, difficulty: "medium" },
+        { question: "What gets wetter the more it dries?", options: ["Sponge", "Towel", "Sand", "Hair"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What is cut on a table but never eaten?", options: ["Paper", "Cake", "Cards", "Fabric"], correctAnswer: 2, difficulty: "medium" },
+        { question: "What has cities but no people, forests but no trees, and water but no fish?", options: ["Desert", "Map", "Painting", "Movie"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What is so delicate that even saying its name will break it?", options: ["Whisper", "Secret", "Silence", "Glass"], correctAnswer: 2, difficulty: "hard" },
+        { question: "What flies without wings?", options: ["Balloon", "Cloud", "Time", "Smoke"], correctAnswer: 2, difficulty: "hard" },
+        { question: "What has a face and two hands but no arms or legs?", options: ["Robot", "Clock", "Doll", "Statue"], correctAnswer: 1, difficulty: "easy" },
+        { question: "What is made of water but if you put it into water it will die?", options: ["Ice", "Fish", "Salt", "Steam"], correctAnswer: 0, difficulty: "medium" },
+        { question: "What belongs to you but others use it more than you do?", options: ["Phone", "Name", "Car", "Money"], correctAnswer: 1, difficulty: "medium" },
+        { question: "What is always coming but never arrives?", options: ["Tomorrow", "Future", "Dream", "Hope"], correctAnswer: 0, difficulty: "medium" },
+        { question: "What can be seen in the middle of March and April that cannot be seen at the beginning or end of either month?", options: ["Spring", "R", "Sun", "Rain"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What word becomes shorter when you add two letters to it?", options: ["Long", "Short", "Brief", "Tiny"], correctAnswer: 1, difficulty: "hard" },
+        { question: "What occurs once in every minute, twice in every moment, yet never in a thousand years?", options: ["Second", "M", "Time", "Tick"], correctAnswer: 1, difficulty: "hard" }
     ],
     triviaQuestions: [
         {
@@ -859,6 +859,26 @@ async function startChallengePhase(roomCode) {
                 evaluateTriviaResults(roomCode);
             }, 48000);
             
+        } else if (challengeType === 'detective') {
+            // Detective Riddle Challenge with Multiple Choice
+            const { riddle, index } = getRandomRiddle(room.usedRiddleIndices || []);
+            if (!room.usedRiddleIndices) room.usedRiddleIndices = [];
+            room.usedRiddleIndices.push(index);
+            
+            room.currentRiddle = riddle;
+            room.riddleAnswers = {};
+            
+            io.to(roomCode).emit('riddle-challenge-start', {
+                question: riddle.question,
+                options: riddle.options,
+                participants: nonWinners.map(p => p.name),
+                timeLimit: 45
+            });
+            
+            room.challengeTimer = setTimeout(() => {
+                evaluateRiddleResults(roomCode);
+            }, 48000);
+            
         } else if (challengeType === 'memoryChallenge') {
             // Memory Challenge - 20 seconds to answer after 2 second display
             room.memoryResults = {};
@@ -1067,6 +1087,62 @@ async function evaluateTriviaResults(roomCode) {
         correctAnswer: correctAnswer,
         correctOption: room.currentTriviaQuestion.options[correctAnswer],
         question: room.currentTriviaQuestion.question
+    });
+
+    setTimeout(() => {
+        endRound(roomCode, results);
+    }, 6000);
+}
+
+// Evaluate Riddle Results
+async function evaluateRiddleResults(roomCode) {
+    const room = rooms[roomCode];
+    if (!room) return;
+
+    const riddleEntries = Object.entries(room.riddleAnswers);
+    if (riddleEntries.length === 0) {
+        endRound(roomCode, []);
+        return;
+    }
+
+    const correctAnswer = room.currentRiddle.correctAnswer;
+    let winners = [];
+    let earliest = Infinity;
+
+    // Find winners (correct answers, earliest first)
+    riddleEntries.forEach(([playerId, answerData]) => {
+        if (answerData.answer === correctAnswer) {
+            if (answerData.timestamp < earliest) {
+                earliest = answerData.timestamp;
+                winners = [playerId];
+            } else if (answerData.timestamp === earliest) {
+                winners.push(playerId);
+            }
+        }
+    });
+
+    // Award points to winners
+    winners.forEach(playerId => {
+        const player = room.players.find(p => p.id === playerId);
+        if (player) player.score += 1;
+    });
+
+    const results = riddleEntries.map(([playerId, answerData]) => {
+        const player = room.players.find(p => p.id === playerId);
+        return {
+            playerName: player?.name || 'Unknown',
+            answer: answerData.answer,
+            correct: answerData.answer === correctAnswer,
+            won: winners.includes(playerId),
+            selectedOption: room.currentRiddle.options[answerData.answer]
+        };
+    }).sort((a, b) => a.timestamp - b.timestamp);
+
+    io.to(roomCode).emit('riddle-results', {
+        results: results,
+        correctAnswer: correctAnswer,
+        correctOption: room.currentRiddle.options[correctAnswer],
+        question: room.currentRiddle.question
     });
 
     setTimeout(() => {
@@ -1693,6 +1769,40 @@ io.on('connection', (socket) => {
                     room.challengeTimer = null;
                 }
                 evaluateTriviaResults(data.roomCode);
+            }
+        }
+    });
+
+    socket.on('submit-riddle-answer', (data) => {
+        const room = rooms[data.roomCode];
+        if (!room || room.gameState !== 'challenge-phase') return;
+        const player = room.players.find(p => p.id === socket.id);
+        if (!player || player.isSpectator || player.name === room.riddleWinner) return;
+        
+        if (!room.riddleAnswers[socket.id]) {
+            room.riddleAnswers[socket.id] = {
+                answer: data.answer,
+                timestamp: Date.now(),
+                playerName: player.name
+            };
+            
+            const activePlayers = room.players.filter(p => !p.isSpectator);
+            const expectedSubmissions = activePlayers.filter(p => p.name !== room.riddleWinner).length;
+            
+            io.to(data.roomCode).emit('riddle-answer-submitted', {
+                player: player.name,
+                totalSubmissions: Object.keys(room.riddleAnswers).length,
+                expectedSubmissions: expectedSubmissions
+            });
+            
+            // Check if all active players have answered
+            if (Object.keys(room.riddleAnswers).length === expectedSubmissions) {
+                console.log('All active non-winners submitted riddle answer. Ending riddle phase early.');
+                if (room.challengeTimer) {
+                    clearTimeout(room.challengeTimer);
+                    room.challengeTimer = null;
+                }
+                evaluateRiddleResults(data.roomCode);
             }
         }
     });
