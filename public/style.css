@@ -3231,6 +3231,8 @@ input[type="text"]::placeholder, textarea::placeholder {
     height: auto;
     will-change: transform;
     touch-action: none;
+    cursor: pointer;
+    user-select: none;
 }
 
 .stacking-controls {

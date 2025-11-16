@@ -690,10 +690,12 @@ class StackingBlocksGame {
         this.blockSpeed = 2.5; // Moderate speed for mobile
         this.direction = 1;
         this.colors = ['#00ff41', '#ff0080', '#00d4ff', '#ffcc00', '#ff4500', '#9d00ff'];
+        this.animationFrameId = null;
         
         // Performance optimization flags
         this.useSimplePhysics = true; // Use simplified physics for mobile
         this.lastUpdate = Date.now();
+        this.lastRender = Date.now();
         this.updateInterval = 1000 / 30; // 30 FPS for battery efficiency
     }
     
@@ -816,11 +818,6 @@ class StackingBlocksGame {
     update() {
         if (!this.gameActive || !this.currentBlock?.moving) return;
         
-        // Throttle updates for mobile performance
-        const now = Date.now();
-        if (now - this.lastUpdate < this.updateInterval) return;
-        this.lastUpdate = now;
-        
         // Move current block horizontally
         this.currentBlock.x += this.blockSpeed * this.direction;
         
@@ -876,17 +873,30 @@ class StackingBlocksGame {
     }
     
     gameLoop() {
-        if (!this.gameActive && !this.currentBlock?.moving) return;
+        if (!this.gameActive && !this.currentBlock?.moving) {
+            this.stop();
+            return;
+        }
         
-        this.update();
-        this.render();
+        const now = Date.now();
         
-        // Use requestAnimationFrame with throttling for better mobile performance
-        requestAnimationFrame(() => this.gameLoop());
+        // Throttle both update and render to 30 FPS
+        if (now - this.lastRender >= this.updateInterval) {
+            this.update();
+            this.render();
+            this.lastRender = now;
+        }
+        
+        // Continue the loop
+        this.animationFrameId = requestAnimationFrame(() => this.gameLoop());
     }
     
     stop() {
         this.gameActive = false;
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+            this.animationFrameId = null;
+        }
     }
 }
 
@@ -901,15 +911,20 @@ function startStackingBlocksChallenge(duration) {
     // Setup button handlers
     const dropBtn = document.getElementById('drop-block-btn');
     const retryBtn = document.getElementById('retry-stacking-btn');
+    const canvas = document.getElementById('stacking-canvas');
     
     dropBtn.onclick = () => stackingGame.dropBlock();
     retryBtn.onclick = () => stackingGame.retry();
     
-    // Touch controls for mobile
-    dropBtn.addEventListener('touchstart', (e) => {
+    // Touch and click controls on canvas for easy mobile play
+    const handleDrop = (e) => {
         e.preventDefault();
         stackingGame.dropBlock();
-    });
+    };
+    
+    canvas.addEventListener('touchstart', handleDrop);
+    canvas.addEventListener('click', handleDrop);
+    dropBtn.addEventListener('touchstart', handleDrop);
     
     // Start timer
     let timeLeft = duration;
