@@ -824,10 +824,13 @@ class StackingBlocksGame {
         // Move current block horizontally
         this.currentBlock.x += this.blockSpeed * this.direction;
         
-        // Bounce off walls
-        if (this.currentBlock.x <= 0 || 
-            this.currentBlock.x + this.currentBlock.width >= this.canvas.width) {
-            this.direction *= -1;
+        // Bounce off walls and clamp position
+        if (this.currentBlock.x <= 0) {
+            this.currentBlock.x = 0;
+            this.direction = 1;
+        } else if (this.currentBlock.x + this.currentBlock.width >= this.canvas.width) {
+            this.currentBlock.x = this.canvas.width - this.currentBlock.width;
+            this.direction = -1;
         }
     }
     
