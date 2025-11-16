@@ -3203,6 +3203,132 @@ input[type="text"]::placeholder, textarea::placeholder {
     transform: none !important;
 }
 
+/* ===== STACKING BLOCKS CHALLENGE STYLES ===== */
+.stacking-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.stacking-game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+
+#stacking-canvas {
+    border: 2px solid var(--accent-cyan);
+    border-radius: 10px;
+    background: #0a0a0a;
+    box-shadow: var(--glow-cyan), inset 0 0 20px rgba(0, 0, 0, 0.5);
+    max-width: 100%;
+    height: auto;
+    will-change: transform;
+    touch-action: none;
+}
+
+.stacking-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.stacking-stats {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    max-width: 350px;
+    padding: 15px;
+    background: rgba(0, 255, 255, 0.05);
+    border: 1px solid var(--border-cyan);
+    border-radius: 10px;
+    gap: 20px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--accent-cyan);
+    font-family: 'JetBrains Mono', monospace;
+    text-shadow: var(--glow-cyan);
+}
+
+.stacking-btn {
+    font-size: 1.5rem;
+    padding: 15px 40px;
+    min-width: 200px;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+#drop-block-btn {
+    background: var(--gradient-cyan);
+    color: #000;
+    border: 3px solid var(--accent-cyan);
+    box-shadow: var(--glow-cyan);
+}
+
+#drop-block-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+}
+
+#drop-block-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+#drop-block-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#retry-stacking-btn {
+    background: rgba(255, 0, 68, 0.2);
+    color: var(--accent-red);
+    border: 2px solid var(--accent-red);
+    box-shadow: var(--glow-red);
+}
+
+#retry-stacking-btn:hover {
+    background: rgba(255, 0, 68, 0.3);
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(255, 0, 68, 0.6);
+}
+
+#retry-stacking-btn:active {
+    transform: scale(0.95);
+}
+
 /* ===== CHALLENGE RESULTS ===== */
 .challenge-result-item, .tap-result-item {
     background: rgba(0, 0, 0, 0.9);
@@ -6279,5 +6405,55 @@ body::before { z-index: -1; }
     
     .memory-instruction {
         font-size: 1em;
+    }
+}
+
+/* ===== STACKING BLOCKS MOBILE OPTIMIZATIONS ===== */
+@media (max-width: 768px) {
+    #stacking-canvas {
+        width: 100%;
+        max-width: 320px;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+    }
+    
+    .stacking-btn {
+        font-size: 1.1rem !important;
+        padding: 10px 25px !important;
+        min-width: 150px !important;
+    }
+    
+    .stat-value {
+        font-size: 1.4rem !important;
+    }
+    
+    .stacking-stats {
+        padding: 10px !important;
+        gap: 10px !important;
+        max-width: 320px;
+    }
+}
+
+@media (max-width: 480px) {
+    #stacking-canvas {
+        max-width: 280px;
+    }
+    
+    .stacking-section {
+        padding: 10px;
+    }
+    
+    .stacking-btn {
+        font-size: 0.95rem !important;
+        padding: 8px 20px !important;
+        min-width: 130px !important;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem !important;
+    }
+    
+    .stat-value {
+        font-size: 1.2rem !important;
     }
 }

@@ -312,6 +312,43 @@
         </div>
     </div>
 
+    <!-- Stacking Blocks Challenge Screen -->
+    <div id="stacking-blocks-screen" class="page">
+        <!-- Matrix Background Effect with multiple layers -->
+        <div class="matrix-bg">
+            <div class="matrix-layer-1"></div>
+            <div class="matrix-layer-2"></div>
+            <div class="matrix-layer-3"></div>
+        </div>
+        <div class="page-content">
+            <div class="timer-section">
+                <div id="stacking-timer" class="timer">30</div>
+                <p>seconds remaining</p>
+            </div>
+            <div class="stacking-section">
+                <h2>🧱 STACKING BLOCKS CHALLENGE</h2>
+                <p class="challenge-description" id="stacking-instruction">Stack as many blocks as you can!</p>
+                <div class="stacking-game-area">
+                    <canvas id="stacking-canvas" width="350" height="500"></canvas>
+                    <div class="stacking-controls">
+                        <div class="stacking-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Blocks Stacked:</span>
+                                <span id="blocks-stacked" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Best Attempt:</span>
+                                <span id="best-attempt" class="stat-value">0</span>
+                            </div>
+                        </div>
+                        <button id="drop-block-btn" class="btn primary stacking-btn">DROP BLOCK</button>
+                        <button id="retry-stacking-btn" class="btn secondary stacking-btn" style="display: none;">RETRY</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Trivia Results Screen -->
     <div id="trivia-results-screen" class="page">
         <!-- Matrix Background Effect with multiple layers -->

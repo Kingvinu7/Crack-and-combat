@@ -18,7 +18,7 @@ if (process.env.GEMINI_API_KEY) {
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Challenge Types - Fixed order with memoryChallenge always as 2nd challenge
-const BASE_CHALLENGE_TYPES = ['detective', 'memoryChallenge', 'multipleChoiceTrivia', 'fastTapper', 'danger'];
+const BASE_CHALLENGE_TYPES = ['stackingBlocks', 'memoryChallenge', 'multipleChoiceTrivia', 'fastTapper', 'danger'];
 
 // Shuffle array function (keeping other challenges except memoryChallenge at position 1)
 function shuffleArray(array) {
@@ -859,23 +859,19 @@ async function startChallengePhase(roomCode) {
                 evaluateTriviaResults(roomCode);
             }, 48000);
             
-        } else if (challengeType === 'detective') {
-            // Detective Mystery Challenge - text-based detective scenarios
-            const detectiveScenario = await generateDetectiveChallenge();
-            room.currentChallengeType = 'detective';
-            room.currentChallengeContent = detectiveScenario;
-            room.challengeResponses = {};
+        } else if (challengeType === 'stackingBlocks') {
+            // Stacking Blocks Challenge - mobile-friendly skill game
+            room.stackingResults = {};
+            room.currentChallengeType = 'stackingBlocks';
             
-            io.to(roomCode).emit('text-challenge-start', {
-                challengeType: 'detective',
-                challengeContent: detectiveScenario,
+            io.to(roomCode).emit('stacking-blocks-start', {
                 participants: nonWinners.map(p => p.name),
-                timeLimit: 60
+                duration: 30
             });
             
             room.challengeTimer = setTimeout(() => {
-                evaluateTextChallengeResults(roomCode);
-            }, 68000);
+                evaluateStackingBlocksResults(roomCode);
+            }, 32000);
             
         } else if (challengeType === 'memoryChallenge') {
             // Memory Challenge - 20 seconds to answer after 2 second display
@@ -932,10 +928,8 @@ room.challengeTimer = setTimeout(() => {
     }
   },1000); // Increased from 500ms to 1000ms to prevent page transition conflicts
 }
-// Generate Detective Challenge
-async function generateDetectiveChallenge() {
-    return await generateChallengeContent('detective', 1);
-}
+// Note: Stacking Blocks challenge doesn't need content generation
+// It's a skill-based game that runs entirely client-side
 
 // Generate Memory Challenge
 function generateMemoryChallenge(roundNumber) {
@@ -1137,6 +1131,48 @@ async function evaluateFastTapperResults(roomCode) {
         results: results,
         maxTaps: maxTaps
     });
+    setTimeout(() => {
+        endRound(roomCode, results);
+    }, 6000);
+}
+
+// Evaluate Stacking Blocks Results
+function evaluateStackingBlocksResults(roomCode) {
+    const room = rooms[roomCode];
+    if (!room) return;
+    
+    const stackingEntries = Object.entries(room.stackingResults);
+    if (stackingEntries.length === 0) {
+        endRound(roomCode, []);
+        return;
+    }
+    
+    let maxBlocks = 0;
+    const results = stackingEntries.map(([playerId, blocksStacked]) => {
+        const player = room.players.find(p => p.id === playerId);
+        if (blocksStacked > maxBlocks) maxBlocks = blocksStacked;
+        return {
+            playerName: player ? player.name : 'Unknown',
+            playerId: playerId,
+            blocksStacked: blocksStacked,
+            won: false
+        };
+    }).sort((a, b) => b.blocksStacked - a.blocksStacked);
+    
+    // Mark winners
+    results.forEach(r => {
+        if (r.blocksStacked === maxBlocks && maxBlocks > 0) {
+            r.won = true;
+            const player = room.players.find(p => p.id === r.playerId);
+            if (player) player.score += 1;
+        }
+    });
+    
+    io.to(roomCode).emit('stacking-blocks-results', {
+        results: results,
+        maxBlocks: maxBlocks
+    });
+    
     setTimeout(() => {
         endRound(roomCode, results);
     }, 6000);
@@ -1688,6 +1724,24 @@ io.on('connection', (socket) => {
         });
     });
 
+    socket.on('submit-stacking-result', (data) => {
+        const room = rooms[data.roomCode];
+        if (!room || room.gameState !== 'challenge-phase') return;
+        const player = room.players.find(p => p.id === socket.id);
+        if (!player || player.isSpectator || player.name === room.riddleWinner) return;
+        
+        room.stackingResults[socket.id] = data.blocksStacked;
+        
+        const activePlayers = room.players.filter(p => !p.isSpectator);
+        
+        io.to(data.roomCode).emit('stacking-result-submitted', {
+            player: player.name,
+            blocksStacked: data.blocksStacked,
+            totalSubmissions: Object.keys(room.stackingResults).length,
+            expectedSubmissions: activePlayers.filter(p => p.name !== room.riddleWinner).length
+        });
+    });
+
     socket.on('submit-trivia-answer', (data) => {
         const room = rooms[data.roomCode];
         if (!room || room.gameState !== 'challenge-phase') return;
@@ -1820,6 +1874,11 @@ io.on('connection', (socket) => {
                         room.tapResults[socketId] = 0; // 0 taps
                         console.log(`Auto-submitted 0 taps for disconnected ${playerName}`);
                     }
+                } else if (room.currentChallengeType === 'stackingBlocks') {
+                    if (!room.stackingResults[socketId]) {
+                        room.stackingResults[socketId] = 0; // 0 blocks
+                        console.log(`Auto-submitted 0 blocks for disconnected ${playerName}`);
+                    }
                 } else if (room.currentChallengeType === 'multipleChoiceTrivia') {
                     if (!room.triviaAnswers[socketId]) {
                         room.triviaAnswers[socketId] = {
@@ -1916,6 +1975,8 @@ io.on('connection', (socket) => {
                 
                 if (room.currentChallengeType === 'fastTapper') {
                     submissions = Object.keys(room.tapResults).length;
+                } else if (room.currentChallengeType === 'stackingBlocks') {
+                    submissions = Object.keys(room.stackingResults).length;
                 } else if (room.currentChallengeType === 'multipleChoiceTrivia') {
                     submissions = Object.keys(room.triviaAnswers).length;
                 } else if (room.currentChallengeType === 'memoryChallenge') {
@@ -1934,6 +1995,8 @@ io.on('connection', (socket) => {
                     // Evaluate results based on challenge type
                     if (room.currentChallengeType === 'fastTapper') {
                         evaluateFastTapperResults(roomCode);
+                    } else if (room.currentChallengeType === 'stackingBlocks') {
+                        evaluateStackingBlocksResults(roomCode);
                     } else if (room.currentChallengeType === 'multipleChoiceTrivia') {
                         evaluateTriviaResults(roomCode);
                     } else if (room.currentChallengeType === 'memoryChallenge') {
