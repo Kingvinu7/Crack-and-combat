@@ -700,10 +700,29 @@ class StackingBlocksGame {
     }
     
     init() {
+        // Set canvas internal resolution based on CSS size
+        const rect = this.canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        
+        // Set display size (CSS pixels)
+        this.canvas.style.width = rect.width + 'px';
+        this.canvas.style.height = rect.height + 'px';
+        
+        // Set actual canvas size (scaled for device pixel ratio)
+        this.canvas.width = Math.floor(rect.width * dpr);
+        this.canvas.height = Math.floor(rect.height * dpr);
+        
+        // Scale context to account for device pixel ratio
+        this.ctx.scale(dpr, dpr);
+        
+        // Store logical size for game calculations
+        this.logicalWidth = rect.width;
+        this.logicalHeight = rect.height;
+        
         // Create base block (fixed at bottom)
         this.baseBlock = {
-            x: this.canvas.width / 2 - 40,
-            y: this.canvas.height - 30,
+            x: this.logicalWidth / 2 - 40,
+            y: this.logicalHeight - 30,
             width: 80,
             height: 20,
             color: '#555',
@@ -737,23 +756,40 @@ class StackingBlocksGame {
     }
     
     dropBlock() {
-        if (!this.currentBlock || !this.currentBlock.moving || !this.gameActive) return;
+        if (!this.currentBlock || !this.currentBlock.moving || !this.gameActive) {
+            console.log('Drop blocked:', {
+                hasBlock: !!this.currentBlock,
+                isMoving: this.currentBlock?.moving,
+                isActive: this.gameActive
+            });
+            return;
+        }
         
         this.currentBlock.moving = false;
         const lastBlock = this.blocks[this.blocks.length - 1];
         
         // Check overlap with last block
-        const overlapLeft = Math.max(this.currentBlock.x, lastBlock.x);
-        const overlapRight = Math.min(
-            this.currentBlock.x + this.currentBlock.width,
-            lastBlock.x + lastBlock.width
-        );
+        const currentLeft = this.currentBlock.x;
+        const currentRight = this.currentBlock.x + this.currentBlock.width;
+        const lastLeft = lastBlock.x;
+        const lastRight = lastBlock.x + lastBlock.width;
+        
+        const overlapLeft = Math.max(currentLeft, lastLeft);
+        const overlapRight = Math.min(currentRight, lastRight);
         const overlap = overlapRight - overlapLeft;
         
-        // Need at least 30% overlap to stack successfully
-        const minOverlap = Math.min(this.currentBlock.width, lastBlock.width) * 0.3;
+        // Need at least 20% overlap to stack successfully (more forgiving)
+        const minOverlap = Math.min(this.currentBlock.width, lastBlock.width) * 0.2;
         
-        if (overlap > minOverlap) {
+        console.log('Drop attempt:', {
+            currentPos: `${currentLeft.toFixed(1)} - ${currentRight.toFixed(1)}`,
+            lastPos: `${lastLeft.toFixed(1)} - ${lastRight.toFixed(1)}`,
+            overlap: overlap.toFixed(1),
+            minRequired: minOverlap.toFixed(1),
+            success: overlap >= minOverlap
+        });
+        
+        if (overlap >= minOverlap) {
             // Success! Adjust block to overlapped area
             this.currentBlock.x = overlapLeft;
             this.currentBlock.width = overlap;
@@ -771,10 +807,15 @@ class StackingBlocksGame {
             // Play success sound
             if (window.audioManager) window.audioManager.playCorrectSound();
             
-            // Spawn next block
-            setTimeout(() => this.spawnNewBlock(), 300);
+            // Spawn next block after a short delay
+            setTimeout(() => {
+                if (this.gameActive) {
+                    this.spawnNewBlock();
+                }
+            }, 300);
         } else {
             // Failed! Blocks fall
+            console.log('Stack failed - not enough overlap');
             this.gameActive = false;
             this.triggerFall();
         }
@@ -791,7 +832,7 @@ class StackingBlocksGame {
                 }
             });
             
-            if (fallStep > 20 || this.blocks[1]?.y > this.canvas.height) {
+            if (fallStep > 20 || this.blocks[1]?.y > this.logicalHeight) {
                 clearInterval(fallAnimation);
                 // Show retry button
                 document.getElementById('retry-stacking-btn').style.display = 'inline-block';
@@ -825,8 +866,8 @@ class StackingBlocksGame {
         if (this.currentBlock.x <= 0) {
             this.currentBlock.x = 0;
             this.direction = 1;
-        } else if (this.currentBlock.x + this.currentBlock.width >= this.canvas.width) {
-            this.currentBlock.x = this.canvas.width - this.currentBlock.width;
+        } else if (this.currentBlock.x + this.currentBlock.width >= this.logicalWidth) {
+            this.currentBlock.x = this.logicalWidth - this.currentBlock.width;
             this.direction = -1;
         }
     }
@@ -834,15 +875,15 @@ class StackingBlocksGame {
     render() {
         // Clear canvas
         this.ctx.fillStyle = '#0a0a0a';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.fillRect(0, 0, this.logicalWidth, this.logicalHeight);
         
         // Draw grid for depth perception
         this.ctx.strokeStyle = '#1a1a1a';
         this.ctx.lineWidth = 1;
-        for (let i = 0; i < this.canvas.height; i += 25) {
+        for (let i = 0; i < this.logicalHeight; i += 25) {
             this.ctx.beginPath();
             this.ctx.moveTo(0, i);
-            this.ctx.lineTo(this.canvas.width, i);
+            this.ctx.lineTo(this.logicalWidth, i);
             this.ctx.stroke();
         }
         
