@@ -3209,9 +3209,16 @@ input[type="text"]::placeholder, textarea::placeholder {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 10px;
     max-width: 500px;
     margin: 0 auto;
+    width: 100%;
+}
+
+.stacking-title {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+    text-align: center;
 }
 
 .stacking-game-area {
@@ -3227,10 +3234,13 @@ input[type="text"]::placeholder, textarea::placeholder {
     border-radius: 10px;
     background: #0a0a0a;
     box-shadow: var(--glow-cyan), inset 0 0 20px rgba(0, 0, 0, 0.5);
-    max-width: 100%;
-    height: auto;
-    will-change: transform;
+    width: 90vw;
+    max-width: 320px;
+    height: 400px;
+    display: block;
     touch-action: none;
+    cursor: pointer;
+    user-select: none;
 }
 
 .stacking-controls {
@@ -6436,11 +6446,21 @@ body::before { z-index: -1; }
 
 @media (max-width: 480px) {
     #stacking-canvas {
+        width: 85vw;
         max-width: 280px;
+        height: 380px;
     }
     
     .stacking-section {
-        padding: 10px;
+        padding: 5px;
+    }
+    
+    .stacking-title {
+        font-size: 1.2rem !important;
+    }
+    
+    .challenge-description {
+        font-size: 0.85rem !important;
     }
     
     .stacking-btn {

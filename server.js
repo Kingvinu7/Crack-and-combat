@@ -17,14 +17,14 @@ if (process.env.GEMINI_API_KEY) {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Challenge Types - Fixed order with memoryChallenge always as 2nd challenge
-const BASE_CHALLENGE_TYPES = ['stackingBlocks', 'memoryChallenge', 'multipleChoiceTrivia', 'fastTapper', 'danger'];
+// Challenge Types - Fixed order with stackingBlocks always as 2nd challenge
+const BASE_CHALLENGE_TYPES = ['memoryChallenge', 'stackingBlocks', 'multipleChoiceTrivia', 'fastTapper', 'danger'];
 
-// Shuffle array function (keeping other challenges except memoryChallenge at position 1)
+// Shuffle array function (keeping other challenges except stackingBlocks at position 1)
 function shuffleArray(array) {
-    // Keep memoryChallenge at index 1 (2nd position), shuffle the rest
+    // Keep stackingBlocks at index 1 (2nd position), shuffle the rest
     const fixed = [...array];
-    const toShuffle = [fixed[0], ...fixed.slice(2)]; // Get all except memoryChallenge
+    const toShuffle = [fixed[0], ...fixed.slice(2)]; // Get all except stackingBlocks
     
     // Shuffle the rest
     for (let i = toShuffle.length - 1; i > 0; i--) {
@@ -32,8 +32,8 @@ function shuffleArray(array) {
         [toShuffle[i], toShuffle[j]] = [toShuffle[j], toShuffle[i]];
     }
     
-    // Rebuild array with memoryChallenge always at index 1
-    return [toShuffle[0], 'memoryChallenge', ...toShuffle.slice(1)];
+    // Rebuild array with stackingBlocks always at index 1
+    return [toShuffle[0], 'stackingBlocks', ...toShuffle.slice(1)];
 }
 
 // Game Data with 50+ riddles and trivia questions

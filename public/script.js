@@ -690,18 +690,29 @@ class StackingBlocksGame {
         this.blockSpeed = 2.5; // Moderate speed for mobile
         this.direction = 1;
         this.colors = ['#00ff41', '#ff0080', '#00d4ff', '#ffcc00', '#ff4500', '#9d00ff'];
+        this.animationFrameId = null;
         
         // Performance optimization flags
         this.useSimplePhysics = true; // Use simplified physics for mobile
         this.lastUpdate = Date.now();
+        this.lastRender = Date.now();
         this.updateInterval = 1000 / 30; // 30 FPS for battery efficiency
     }
     
     init() {
+        // Use canvas dimensions directly
+        this.logicalWidth = this.canvas.width;
+        this.logicalHeight = this.canvas.height;
+        
+        console.log('Canvas initialized:', {
+            width: this.logicalWidth,
+            height: this.logicalHeight
+        });
+        
         // Create base block (fixed at bottom)
         this.baseBlock = {
-            x: this.canvas.width / 2 - 40,
-            y: this.canvas.height - 30,
+            x: this.logicalWidth / 2 - 40,
+            y: this.logicalHeight - 30,
             width: 80,
             height: 20,
             color: '#555',
@@ -735,23 +746,40 @@ class StackingBlocksGame {
     }
     
     dropBlock() {
-        if (!this.currentBlock || !this.currentBlock.moving || !this.gameActive) return;
+        if (!this.currentBlock || !this.currentBlock.moving || !this.gameActive) {
+            console.log('Drop blocked:', {
+                hasBlock: !!this.currentBlock,
+                isMoving: this.currentBlock?.moving,
+                isActive: this.gameActive
+            });
+            return;
+        }
         
         this.currentBlock.moving = false;
         const lastBlock = this.blocks[this.blocks.length - 1];
         
         // Check overlap with last block
-        const overlapLeft = Math.max(this.currentBlock.x, lastBlock.x);
-        const overlapRight = Math.min(
-            this.currentBlock.x + this.currentBlock.width,
-            lastBlock.x + lastBlock.width
-        );
+        const currentLeft = this.currentBlock.x;
+        const currentRight = this.currentBlock.x + this.currentBlock.width;
+        const lastLeft = lastBlock.x;
+        const lastRight = lastBlock.x + lastBlock.width;
+        
+        const overlapLeft = Math.max(currentLeft, lastLeft);
+        const overlapRight = Math.min(currentRight, lastRight);
         const overlap = overlapRight - overlapLeft;
         
-        // Need at least 30% overlap to stack successfully
-        const minOverlap = Math.min(this.currentBlock.width, lastBlock.width) * 0.3;
+        // Need at least 20% overlap to stack successfully (more forgiving)
+        const minOverlap = Math.min(this.currentBlock.width, lastBlock.width) * 0.2;
         
-        if (overlap > minOverlap) {
+        console.log('Drop attempt:', {
+            currentPos: `${currentLeft.toFixed(1)} - ${currentRight.toFixed(1)}`,
+            lastPos: `${lastLeft.toFixed(1)} - ${lastRight.toFixed(1)}`,
+            overlap: overlap.toFixed(1),
+            minRequired: minOverlap.toFixed(1),
+            success: overlap >= minOverlap
+        });
+        
+        if (overlap >= minOverlap) {
             // Success! Adjust block to overlapped area
             this.currentBlock.x = overlapLeft;
             this.currentBlock.width = overlap;
@@ -769,10 +797,15 @@ class StackingBlocksGame {
             // Play success sound
             if (window.audioManager) window.audioManager.playCorrectSound();
             
-            // Spawn next block
-            setTimeout(() => this.spawnNewBlock(), 300);
+            // Spawn next block after a short delay
+            setTimeout(() => {
+                if (this.gameActive) {
+                    this.spawnNewBlock();
+                }
+            }, 300);
         } else {
             // Failed! Blocks fall
+            console.log('Stack failed - not enough overlap');
             this.gameActive = false;
             this.triggerFall();
         }
@@ -789,7 +822,7 @@ class StackingBlocksGame {
                 }
             });
             
-            if (fallStep > 20 || this.blocks[1]?.y > this.canvas.height) {
+            if (fallStep > 20 || this.blocks[1]?.y > this.logicalHeight) {
                 clearInterval(fallAnimation);
                 // Show retry button
                 document.getElementById('retry-stacking-btn').style.display = 'inline-block';
@@ -816,33 +849,31 @@ class StackingBlocksGame {
     update() {
         if (!this.gameActive || !this.currentBlock?.moving) return;
         
-        // Throttle updates for mobile performance
-        const now = Date.now();
-        if (now - this.lastUpdate < this.updateInterval) return;
-        this.lastUpdate = now;
-        
         // Move current block horizontally
         this.currentBlock.x += this.blockSpeed * this.direction;
         
-        // Bounce off walls
-        if (this.currentBlock.x <= 0 || 
-            this.currentBlock.x + this.currentBlock.width >= this.canvas.width) {
-            this.direction *= -1;
+        // Bounce off walls and clamp position
+        if (this.currentBlock.x <= 0) {
+            this.currentBlock.x = 0;
+            this.direction = 1;
+        } else if (this.currentBlock.x + this.currentBlock.width >= this.logicalWidth) {
+            this.currentBlock.x = this.logicalWidth - this.currentBlock.width;
+            this.direction = -1;
         }
     }
     
     render() {
         // Clear canvas
         this.ctx.fillStyle = '#0a0a0a';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.fillRect(0, 0, this.logicalWidth, this.logicalHeight);
         
         // Draw grid for depth perception
         this.ctx.strokeStyle = '#1a1a1a';
         this.ctx.lineWidth = 1;
-        for (let i = 0; i < this.canvas.height; i += 25) {
+        for (let i = 0; i < this.logicalHeight; i += 25) {
             this.ctx.beginPath();
             this.ctx.moveTo(0, i);
-            this.ctx.lineTo(this.canvas.width, i);
+            this.ctx.lineTo(this.logicalWidth, i);
             this.ctx.stroke();
         }
         
@@ -873,17 +904,30 @@ class StackingBlocksGame {
     }
     
     gameLoop() {
-        if (!this.gameActive && !this.currentBlock?.moving) return;
+        if (!this.gameActive && !this.currentBlock?.moving) {
+            this.stop();
+            return;
+        }
         
-        this.update();
-        this.render();
+        const now = Date.now();
         
-        // Use requestAnimationFrame with throttling for better mobile performance
-        requestAnimationFrame(() => this.gameLoop());
+        // Throttle both update and render to 30 FPS
+        if (now - this.lastRender >= this.updateInterval) {
+            this.update();
+            this.render();
+            this.lastRender = now;
+        }
+        
+        // Continue the loop
+        this.animationFrameId = requestAnimationFrame(() => this.gameLoop());
     }
     
     stop() {
         this.gameActive = false;
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+            this.animationFrameId = null;
+        }
     }
 }
 
@@ -898,15 +942,20 @@ function startStackingBlocksChallenge(duration) {
     // Setup button handlers
     const dropBtn = document.getElementById('drop-block-btn');
     const retryBtn = document.getElementById('retry-stacking-btn');
+    const canvas = document.getElementById('stacking-canvas');
     
     dropBtn.onclick = () => stackingGame.dropBlock();
     retryBtn.onclick = () => stackingGame.retry();
     
-    // Touch controls for mobile
-    dropBtn.addEventListener('touchstart', (e) => {
+    // Touch and click controls on canvas for easy mobile play
+    const handleDrop = (e) => {
         e.preventDefault();
         stackingGame.dropBlock();
-    });
+    };
+    
+    canvas.addEventListener('touchstart', handleDrop);
+    canvas.addEventListener('click', handleDrop);
+    dropBtn.addEventListener('touchstart', handleDrop);
     
     // Start timer
     let timeLeft = duration;
