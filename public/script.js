@@ -700,24 +700,14 @@ class StackingBlocksGame {
     }
     
     init() {
-        // Set canvas internal resolution based on CSS size
-        const rect = this.canvas.getBoundingClientRect();
-        const dpr = window.devicePixelRatio || 1;
+        // Use canvas dimensions directly
+        this.logicalWidth = this.canvas.width;
+        this.logicalHeight = this.canvas.height;
         
-        // Set display size (CSS pixels)
-        this.canvas.style.width = rect.width + 'px';
-        this.canvas.style.height = rect.height + 'px';
-        
-        // Set actual canvas size (scaled for device pixel ratio)
-        this.canvas.width = Math.floor(rect.width * dpr);
-        this.canvas.height = Math.floor(rect.height * dpr);
-        
-        // Scale context to account for device pixel ratio
-        this.ctx.scale(dpr, dpr);
-        
-        // Store logical size for game calculations
-        this.logicalWidth = rect.width;
-        this.logicalHeight = rect.height;
+        console.log('Canvas initialized:', {
+            width: this.logicalWidth,
+            height: this.logicalHeight
+        });
         
         // Create base block (fixed at bottom)
         this.baseBlock = {
