@@ -1147,6 +1147,7 @@ function showHowToPlay() {
         howToPlayModal.classList.add('show');
         document.body.style.overflow = 'hidden'; // Prevent background scrolling
         console.log('Modal should now be visible');
+        if (window.audioManager) window.audioManager.playClickSound();
     } else {
         console.error('howToPlayModal element not found!');
     }
@@ -1154,8 +1155,10 @@ function showHowToPlay() {
 
 function hideHowToPlay() {
     console.log('hideHowToPlay called');
-    howToPlayModal.classList.remove('show');
-    document.body.style.overflow = 'auto'; // Restore scrolling
+    if (howToPlayModal) {
+        howToPlayModal.classList.remove('show');
+        document.body.style.overflow = 'auto'; // Restore scrolling
+    }
 }
 
 // Audio control functions
