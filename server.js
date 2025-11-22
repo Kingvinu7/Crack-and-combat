@@ -1806,12 +1806,23 @@ io.on('connection', (socket) => {
         };
         
         const activePlayers = room.players.filter(p => !p.isSpectator);
+        const expectedSubmissions = activePlayers.filter(p => p.name !== room.riddleWinner).length;
         
         io.to(data.roomCode).emit('sayit-answer-submitted', {
             player: player.name,
             totalSubmissions: Object.keys(room.sayItResults).length,
-            expectedSubmissions: activePlayers.filter(p => p.name !== room.riddleWinner).length
+            expectedSubmissions: expectedSubmissions
         });
+        
+        // Check if all active players have answered - auto-advance
+        if (Object.keys(room.sayItResults).length === expectedSubmissions) {
+            console.log('All active non-winners submitted SayIt answers. Ending SayIt phase early.');
+            if (room.challengeTimer) {
+                clearTimeout(room.challengeTimer);
+                room.challengeTimer = null;
+            }
+            evaluateSayItResults(data.roomCode);
+        }
     });
 
     socket.on('submit-trivia-answer', (data) => {

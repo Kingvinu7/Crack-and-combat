@@ -715,34 +715,44 @@ function startSayItChallenge(letter, duration) {
         if (timeLeft <= 0) {
             clearInterval(sayItTimer);
             sayItActive = false;
-            submitSayItAnswer();
+            submitSayItAnswer(true); // true = auto-submit
         }
     }, 1000);
 }
 
-function submitSayItAnswer() {
+function submitSayItAnswer(isAutoSubmit = false) {
     const answerInput = document.getElementById('sayit-answer-input');
     const answer = answerInput.value.trim();
     
     if (!currentRoom) return;
     
-    // Check minimum length
-    if (answer && answer.length < 3) {
-        showNotification(`Your word must be at least 3 letters long!`, 'warning');
-        if (window.audioManager) window.audioManager.playIncorrectSound();
-        return;
+    // Only validate if it's NOT an auto-submit (manual submit by user)
+    if (!isAutoSubmit) {
+        // Check minimum length
+        if (answer && answer.length < 3) {
+            showNotification(`Your word must be at least 3 letters long!`, 'warning');
+            if (window.audioManager) window.audioManager.playIncorrectSound();
+            return;
+        }
+        
+        // Check if answer starts with the correct letter
+        if (answer && !answer.toUpperCase().startsWith(sayItLetter)) {
+            showNotification(`Your word must start with the letter ${sayItLetter}!`, 'warning');
+            if (window.audioManager) window.audioManager.playIncorrectSound();
+            return;
+        }
     }
     
-    // Check if answer starts with the correct letter
-    if (answer && !answer.toUpperCase().startsWith(sayItLetter)) {
-        showNotification(`Your word must start with the letter ${sayItLetter}!`, 'warning');
-        if (window.audioManager) window.audioManager.playIncorrectSound();
-        return;
+    // For auto-submit, add a prefix if there's an answer that doesn't meet requirements
+    let finalAnswer = answer || '[No answer]';
+    if (isAutoSubmit && answer) {
+        // If auto-submitted with content, mark it
+        finalAnswer = answer;
     }
     
     socket.emit('submit-sayit-answer', {
         roomCode: currentRoom,
-        word: answer || '[No answer]'
+        word: finalAnswer
     });
     
     // Disable input and button
@@ -750,7 +760,12 @@ function submitSayItAnswer() {
     document.getElementById('submit-sayit-btn').disabled = true;
     
     if (window.audioManager) window.audioManager.playSubmitSound();
-    showNotification('Answer submitted!', 'success');
+    
+    if (isAutoSubmit) {
+        showNotification('Time expired! Answer auto-submitted.', 'info');
+    } else {
+        showNotification('Answer submitted!', 'success');
+    }
 }
 
 // Add event listeners for submit button and enter key
