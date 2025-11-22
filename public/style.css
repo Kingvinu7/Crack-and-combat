@@ -4088,6 +4088,8 @@ input[type="text"]::placeholder, textarea::placeholder {
     
     .ai-symbol-container {
         margin: 8px 0;
+        display: block !important;
+        visibility: visible !important;
     }
     
     .game-controls {
@@ -4286,7 +4288,25 @@ input[type="text"]::placeholder, textarea::placeholder {
     }
     
     #home-screen .ai-symbol-container {
-        display: none !important; /* Hide AI symbol on very small screens */
+        margin: 5px 0 !important;
+        transform: scale(0.45) !important;
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    #home-screen .hexagon-wrapper {
+        width: 70px !important;
+        height: 70px !important;
+    }
+    
+    #home-screen .hexagon-outer {
+        width: 60px !important;
+        height: 60px !important;
+    }
+    
+    #home-screen .hexagon-inner {
+        width: 50px !important;
+        height: 50px !important;
     }
     
     #home-screen .cyber-title {
@@ -5111,33 +5131,33 @@ textarea:focus {
         max-height: 100vh !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: flex-start !important;
+        justify-content: center !important;
         align-items: center !important;
         max-width: 100% !important;
         width: 100% !important;
         margin: 0 !important;
         position: relative !important;
         overflow-y: auto !important;
-        padding-top: 20px !important;
     }
     
     #home-screen .main-content {
         padding: 15px !important;
-        margin: 0 !important;
-        max-width: 100% !important;
+        margin: 0 auto !important;
+        max-width: 95% !important;
         width: 100% !important;
-        max-height: 100vh !important;
+        max-height: 90vh !important;
         overflow-y: auto !important;
         transform: none !important;
         box-sizing: border-box !important;
-        background: rgba(0, 0, 0, 0.5) !important;
+        background: rgba(0, 0, 0, 0.8) !important;
         border: 2px solid rgba(0, 255, 255, 0.4) !important;
         border-radius: 15px !important;
         position: relative !important;
         z-index: 1 !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: flex-start !important;
+        justify-content: center !important;
+        align-items: center !important;
     }
     
     #home-screen .title-section {
@@ -5146,24 +5166,25 @@ textarea:focus {
     }
     
     #home-screen .ai-symbol-container {
-        margin: 5px 0 !important;
-        transform: scale(0.5) !important;
-        max-height: 60px !important;
+        margin: 8px 0 !important;
+        transform: scale(0.6) !important;
+        display: block !important;
+        visibility: visible !important;
     }
     
     #home-screen .hexagon-wrapper {
+        width: 90px !important;
+        height: 90px !important;
+    }
+    
+    #home-screen .hexagon-outer {
         width: 80px !important;
         height: 80px !important;
     }
     
-    #home-screen .hexagon-outer {
+    #home-screen .hexagon-inner {
         width: 70px !important;
         height: 70px !important;
-    }
-    
-    #home-screen .hexagon-inner {
-        width: 60px !important;
-        height: 60px !important;
     }
     
     #home-screen .game-controls {
