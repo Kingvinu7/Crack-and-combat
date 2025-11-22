@@ -29,8 +29,8 @@ function isValidWord(word) {
     
     const cleanWord = word.trim().toLowerCase();
     
-    // Must be at least 2 characters
-    if (cleanWord.length < 2) return false;
+    // Must be at least 3 characters
+    if (cleanWord.length < 3) return false;
     
     // Must contain only letters
     if (!/^[a-z]+$/i.test(cleanWord)) return false;
@@ -56,13 +56,7 @@ function isValidWord(word) {
         if (vowelRatio < 0.15 || vowelRatio > 0.85) return false;
     }
     
-    // Additional checks for very short words (2-3 letters)
-    // Common 2-letter words patterns
-    const valid2Letter = ['am', 'an', 'as', 'at', 'be', 'by', 'do', 'go', 'he', 'hi', 'ho', 'if', 'in', 'is', 'it', 'me', 'my', 'no', 'of', 'oh', 'on', 'or', 'so', 'to', 'up', 'us', 'we', 'ye'];
-    if (cleanWord.length === 2) {
-        // Check if it's a known valid 2-letter word or has at least one vowel
-        return valid2Letter.includes(cleanWord) || /[aeiou]/i.test(cleanWord);
-    }
+    // No additional checks needed for 3-letter minimum
     
     return true;
 }

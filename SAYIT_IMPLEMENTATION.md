@@ -13,7 +13,7 @@ The SayIt challenge has been simplified and improved. Players now type **any val
 The system now checks if a word is actually valid using multiple criteria:
 
 #### Validation Rules:
-- **Minimum Length**: Words must be at least 2 characters
+- **Minimum Length**: Words must be at least **3 characters** (e.g., Bus, Cat, Dog)
 - **Letters Only**: No numbers or special characters allowed
 - **Vowel Requirement**: Must contain at least one vowel (a, e, i, o, u)
 - **No Gibberish Patterns**:
@@ -21,23 +21,23 @@ The system now checks if a word is actually valid using multiple criteria:
   - No more than 3 consecutive same letters
 - **Reasonable Vowel Distribution**: 
   - Words longer than 3 characters should have 15-85% vowels
-- **Common 2-Letter Words**: Accepts common 2-letter words like "be", "by", "to", "go", etc.
 
 ### 3. Example Scenarios
 
 **Letter: B**
-- ✅ Valid: Bible, Bear, Book, Beautiful, Blue, Be, By
-- ❌ Invalid: bpbhj (gibberish), bcdfg (no vowels), bbbbb (repetitive)
+- ✅ Valid: Bus, Bible, Bear, Book, Beautiful, Blue, Box, Bat, Big
+- ❌ Invalid: Be (too short), By (too short), bpbhj (gibberish), bcdfg (no vowels), bbbbb (repetitive)
 
 **Letter: A**
-- ✅ Valid: Apple, Amazing, Art, At, An
-- ❌ Invalid: axyz (no real pattern), aaaaa (repetitive)
+- ✅ Valid: Apple, Amazing, Art, And, Age, Ant
+- ❌ Invalid: At (too short), An (too short), axyz (no real pattern), aaaaa (repetitive)
 
 ### 4. Updated UI
 - Shows only the letter requirement
 - Clear prompt: "Type any valid word that starts with the letter below!"
-- Hint text: "Type any real word starting with this letter"
+- Hint text: "Type any real word (3+ letters) starting with this letter"
 - Results show reason for invalid words
+- Client-side validation warns if word is too short
 
 ### 5. Results Display
 The results screen now shows:

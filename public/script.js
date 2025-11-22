@@ -726,6 +726,13 @@ function submitSayItAnswer() {
     
     if (!currentRoom) return;
     
+    // Check minimum length
+    if (answer && answer.length < 3) {
+        showNotification(`Your word must be at least 3 letters long!`, 'warning');
+        if (window.audioManager) window.audioManager.playIncorrectSound();
+        return;
+    }
+    
     // Check if answer starts with the correct letter
     if (answer && !answer.toUpperCase().startsWith(sayItLetter)) {
         showNotification(`Your word must start with the letter ${sayItLetter}!`, 'warning');
