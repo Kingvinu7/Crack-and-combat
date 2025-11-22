@@ -312,8 +312,8 @@
         </div>
     </div>
 
-    <!-- Stacking Blocks Challenge Screen -->
-    <div id="stacking-blocks-screen" class="page">
+    <!-- SayIt Challenge Screen -->
+    <div id="sayit-challenge-screen" class="page">
         <!-- Matrix Background Effect with multiple layers -->
         <div class="matrix-bg">
             <div class="matrix-layer-1"></div>
@@ -322,28 +322,40 @@
         </div>
         <div class="page-content">
             <div class="timer-section">
-                <div id="stacking-timer" class="timer">30</div>
+                <div id="sayit-timer" class="timer">15</div>
                 <p>seconds remaining</p>
             </div>
-            <div class="stacking-section">
-                <h2>🧱 STACKING BLOCKS CHALLENGE</h2>
-                <p class="challenge-description" id="stacking-instruction">Stack as many blocks as you can!</p>
-                <div class="stacking-game-area">
-                    <canvas id="stacking-canvas" width="350" height="500"></canvas>
-                    <div class="stacking-controls">
-                        <div class="stacking-stats">
-                            <div class="stat-item">
-                                <span class="stat-label">Blocks Stacked:</span>
-                                <span id="blocks-stacked" class="stat-value">0</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-label">Best Attempt:</span>
-                                <span id="best-attempt" class="stat-value">0</span>
-                            </div>
+            <div class="sayit-section">
+                <h2>💬 SAYIT CHALLENGE</h2>
+                <p class="challenge-description">Type a word that starts with the given letter!</p>
+                
+                <div class="sayit-prompt">
+                    <div class="prompt-box">
+                        <div class="letter-display">
+                            <span class="prompt-label">Letter:</span>
+                            <span id="sayit-letter" class="letter-value">B</span>
                         </div>
-                        <button id="drop-block-btn" class="btn primary stacking-btn">DROP BLOCK</button>
-                        <button id="retry-stacking-btn" class="btn secondary stacking-btn" style="display: none;">RETRY</button>
+                        <div class="category-display">
+                            <span class="prompt-label">Category:</span>
+                            <span id="sayit-category" class="category-value">Animal</span>
+                        </div>
                     </div>
+                </div>
+                
+                <div class="sayit-input-section">
+                    <input 
+                        type="text" 
+                        id="sayit-answer-input" 
+                        class="sayit-input" 
+                        placeholder="Type your answer here..."
+                        autocomplete="off"
+                        maxlength="50"
+                    />
+                    <button id="submit-sayit-btn" class="btn primary">Submit Answer</button>
+                </div>
+                
+                <div class="submission-count" id="sayit-submission-count">
+                    0/0 players answered
                 </div>
             </div>
         </div>

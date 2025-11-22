@@ -18,7 +18,11 @@ if (process.env.GEMINI_API_KEY) {
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Challenge Types - Fixed order with memoryChallenge always as 2nd challenge
-const BASE_CHALLENGE_TYPES = ['stackingBlocks', 'memoryChallenge', 'multipleChoiceTrivia', 'fastTapper', 'danger'];
+const BASE_CHALLENGE_TYPES = ['sayIt', 'memoryChallenge', 'multipleChoiceTrivia', 'fastTapper', 'danger'];
+
+// sayIt Challenge Categories and Letters
+const SAYIT_CATEGORIES = ['Animal', 'Color', 'Food', 'Country', 'Object', 'Sport'];
+const SAYIT_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
 // Shuffle array function (keeping other challenges except memoryChallenge at position 1)
 function shuffleArray(array) {
@@ -859,19 +863,26 @@ async function startChallengePhase(roomCode) {
                 evaluateTriviaResults(roomCode);
             }, 48000);
             
-        } else if (challengeType === 'stackingBlocks') {
-            // Stacking Blocks Challenge - mobile-friendly skill game
-            room.stackingResults = {};
-            room.currentChallengeType = 'stackingBlocks';
+        } else if (challengeType === 'sayIt') {
+            // sayIt Challenge - type a word starting with given letter for category
+            room.sayItResults = {};
+            room.currentChallengeType = 'sayIt';
             
-            io.to(roomCode).emit('stacking-blocks-start', {
+            // Generate random letter and category
+            const letter = SAYIT_LETTERS[Math.floor(Math.random() * SAYIT_LETTERS.length)];
+            const category = SAYIT_CATEGORIES[Math.floor(Math.random() * SAYIT_CATEGORIES.length)];
+            room.currentSayItChallenge = { letter, category };
+            
+            io.to(roomCode).emit('sayit-challenge-start', {
                 participants: nonWinners.map(p => p.name),
-                duration: 30
+                letter: letter,
+                category: category,
+                duration: 15
             });
             
             room.challengeTimer = setTimeout(() => {
-                evaluateStackingBlocksResults(roomCode);
-            }, 32000);
+                evaluateSayItResults(roomCode);
+            }, 17000);
             
         } else if (challengeType === 'memoryChallenge') {
             // Memory Challenge - 20 seconds to answer after 2 second display
@@ -1136,41 +1147,58 @@ async function evaluateFastTapperResults(roomCode) {
     }, 6000);
 }
 
-// Evaluate Stacking Blocks Results
-function evaluateStackingBlocksResults(roomCode) {
+// Evaluate sayIt Results
+function evaluateSayItResults(roomCode) {
     const room = rooms[roomCode];
     if (!room) return;
     
-    const stackingEntries = Object.entries(room.stackingResults);
-    if (stackingEntries.length === 0) {
+    const sayItEntries = Object.entries(room.sayItResults);
+    if (sayItEntries.length === 0) {
         endRound(roomCode, []);
         return;
     }
     
-    let maxBlocks = 0;
-    const results = stackingEntries.map(([playerId, blocksStacked]) => {
+    const { letter, category } = room.currentSayItChallenge;
+    const results = sayItEntries.map(([playerId, answer]) => {
         const player = room.players.find(p => p.id === playerId);
-        if (blocksStacked > maxBlocks) maxBlocks = blocksStacked;
+        
+        // Validate answer: must start with the letter
+        const isValid = answer && 
+                       answer.word && 
+                       answer.word.trim().length > 0 && 
+                       answer.word.trim().toUpperCase().startsWith(letter);
+        
         return {
             playerName: player ? player.name : 'Unknown',
             playerId: playerId,
-            blocksStacked: blocksStacked,
+            word: answer.word || '[No answer]',
+            timestamp: answer.timestamp,
+            isValid: isValid,
             won: false
         };
-    }).sort((a, b) => b.blocksStacked - a.blocksStacked);
+    });
     
-    // Mark winners
+    // Sort by validity and timestamp (valid answers first, then by fastest time)
+    results.sort((a, b) => {
+        if (a.isValid && !b.isValid) return -1;
+        if (!a.isValid && b.isValid) return 1;
+        return a.timestamp - b.timestamp;
+    });
+    
+    // Award points to all valid answers
     results.forEach(r => {
-        if (r.blocksStacked === maxBlocks && maxBlocks > 0) {
+        if (r.isValid) {
             r.won = true;
             const player = room.players.find(p => p.id === r.playerId);
             if (player) player.score += 1;
         }
     });
     
-    io.to(roomCode).emit('stacking-blocks-results', {
+    io.to(roomCode).emit('sayit-results', {
         results: results,
-        maxBlocks: maxBlocks
+        letter: letter,
+        category: category,
+        totalValid: results.filter(r => r.isValid).length
     });
     
     setTimeout(() => {
@@ -1724,20 +1752,25 @@ io.on('connection', (socket) => {
         });
     });
 
-    socket.on('submit-stacking-result', (data) => {
+    socket.on('submit-sayit-answer', (data) => {
         const room = rooms[data.roomCode];
         if (!room || room.gameState !== 'challenge-phase') return;
         const player = room.players.find(p => p.id === socket.id);
         if (!player || player.isSpectator || player.name === room.riddleWinner) return;
         
-        room.stackingResults[socket.id] = data.blocksStacked;
+        // Prevent multiple submissions
+        if (room.sayItResults[socket.id]) return;
+        
+        room.sayItResults[socket.id] = {
+            word: data.word,
+            timestamp: Date.now()
+        };
         
         const activePlayers = room.players.filter(p => !p.isSpectator);
         
-        io.to(data.roomCode).emit('stacking-result-submitted', {
+        io.to(data.roomCode).emit('sayit-answer-submitted', {
             player: player.name,
-            blocksStacked: data.blocksStacked,
-            totalSubmissions: Object.keys(room.stackingResults).length,
+            totalSubmissions: Object.keys(room.sayItResults).length,
             expectedSubmissions: activePlayers.filter(p => p.name !== room.riddleWinner).length
         });
     });
@@ -1874,10 +1907,13 @@ io.on('connection', (socket) => {
                         room.tapResults[socketId] = 0; // 0 taps
                         console.log(`Auto-submitted 0 taps for disconnected ${playerName}`);
                     }
-                } else if (room.currentChallengeType === 'stackingBlocks') {
-                    if (!room.stackingResults[socketId]) {
-                        room.stackingResults[socketId] = 0; // 0 blocks
-                        console.log(`Auto-submitted 0 blocks for disconnected ${playerName}`);
+                } else if (room.currentChallengeType === 'sayIt') {
+                    if (!room.sayItResults[socketId]) {
+                        room.sayItResults[socketId] = {
+                            word: '[No answer]',
+                            timestamp: Date.now()
+                        };
+                        console.log(`Auto-submitted no answer for disconnected ${playerName}`);
                     }
                 } else if (room.currentChallengeType === 'multipleChoiceTrivia') {
                     if (!room.triviaAnswers[socketId]) {
@@ -1975,8 +2011,8 @@ io.on('connection', (socket) => {
                 
                 if (room.currentChallengeType === 'fastTapper') {
                     submissions = Object.keys(room.tapResults).length;
-                } else if (room.currentChallengeType === 'stackingBlocks') {
-                    submissions = Object.keys(room.stackingResults).length;
+                } else if (room.currentChallengeType === 'sayIt') {
+                    submissions = Object.keys(room.sayItResults).length;
                 } else if (room.currentChallengeType === 'multipleChoiceTrivia') {
                     submissions = Object.keys(room.triviaAnswers).length;
                 } else if (room.currentChallengeType === 'memoryChallenge') {
@@ -1995,8 +2031,8 @@ io.on('connection', (socket) => {
                     // Evaluate results based on challenge type
                     if (room.currentChallengeType === 'fastTapper') {
                         evaluateFastTapperResults(roomCode);
-                    } else if (room.currentChallengeType === 'stackingBlocks') {
-                        evaluateStackingBlocksResults(roomCode);
+                    } else if (room.currentChallengeType === 'sayIt') {
+                        evaluateSayItResults(roomCode);
                     } else if (room.currentChallengeType === 'multipleChoiceTrivia') {
                         evaluateTriviaResults(roomCode);
                     } else if (room.currentChallengeType === 'memoryChallenge') {
@@ -2017,7 +2053,7 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log('?? Challenge Timer: 40 seconds with auto-submit');
     console.log('?? Total Riddles Available:', gameData.riddles.length);
     console.log('?? Challenge Types (shuffled per game):', BASE_CHALLENGE_TYPES.join(', '));
-    console.log('?? NEW: Falling Fury challenge - Test your hand-eye coordination!');
+    console.log('💬 NEW: SayIt challenge - Type words starting with random letters!');
     console.log('?? Smart Judging: Rewards creativity, punishes lazy shortcuts');
     if (genAI) {
         console.log('?? Gemini 2.5 Flash: AI-powered challenges with smart evaluation!');
