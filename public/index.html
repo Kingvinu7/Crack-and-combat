@@ -327,17 +327,16 @@
             </div>
             <div class="sayit-section">
                 <h2>💬 SAYIT CHALLENGE</h2>
-                <p class="challenge-description">Type a word that starts with the given letter!</p>
+                <p class="challenge-description">Type any valid word that starts with the letter below!</p>
                 
                 <div class="sayit-prompt">
                     <div class="prompt-box">
                         <div class="letter-display">
-                            <span class="prompt-label">Letter:</span>
+                            <span class="prompt-label">Your Letter:</span>
                             <span id="sayit-letter" class="letter-value">B</span>
                         </div>
-                        <div class="category-display">
-                            <span class="prompt-label">Category:</span>
-                            <span id="sayit-category" class="category-value">Animal</span>
+                        <div class="hint-text">
+                            Type any real word starting with this letter
                         </div>
                     </div>
                 </div>
@@ -347,11 +346,11 @@
                         type="text" 
                         id="sayit-answer-input" 
                         class="sayit-input" 
-                        placeholder="Type your answer here..."
+                        placeholder="Enter a word..."
                         autocomplete="off"
                         maxlength="50"
                     />
-                    <button id="submit-sayit-btn" class="btn primary">Submit Answer</button>
+                    <button id="submit-sayit-btn" class="btn primary">Submit Word</button>
                 </div>
                 
                 <div class="submission-count" id="sayit-submission-count">

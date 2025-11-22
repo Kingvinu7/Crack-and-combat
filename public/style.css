@@ -3230,13 +3230,13 @@ input[type="text"]::placeholder, textarea::placeholder {
     gap: 1.5rem;
 }
 
-.letter-display,
-.category-display {
+.letter-display {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 1rem;
     font-size: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .prompt-label {
@@ -3244,25 +3244,27 @@ input[type="text"]::placeholder, textarea::placeholder {
     font-weight: normal;
     text-transform: uppercase;
     letter-spacing: 1px;
-    font-size: 1rem;
+    font-size: 1.2rem;
 }
 
 .letter-value {
-    font-size: 3rem;
+    font-size: 4rem;
     font-weight: 800;
     color: var(--accent-cyan);
     font-family: 'JetBrains Mono', monospace;
     text-shadow: var(--glow-cyan);
     animation: pulse 2s ease-in-out infinite;
+    display: inline-block;
 }
 
-.category-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--accent-red);
-    text-transform: uppercase;
-    text-shadow: var(--glow-red);
-    font-family: 'JetBrains Mono', monospace;
+.hint-text {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    text-align: center;
+    font-style: italic;
+    opacity: 0.8;
+    margin-top: 0.5rem;
+    letter-spacing: 0.5px;
 }
 
 .sayit-input-section {

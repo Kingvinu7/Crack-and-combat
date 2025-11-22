@@ -20,9 +20,52 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Challenge Types - Fixed order with memoryChallenge always as 2nd challenge
 const BASE_CHALLENGE_TYPES = ['sayIt', 'memoryChallenge', 'multipleChoiceTrivia', 'fastTapper', 'danger'];
 
-// sayIt Challenge Categories and Letters
-const SAYIT_CATEGORIES = ['Animal', 'Color', 'Food', 'Country', 'Object', 'Sport'];
+// sayIt Challenge Letters
 const SAYIT_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+// Basic word validation function
+function isValidWord(word) {
+    if (!word || typeof word !== 'string') return false;
+    
+    const cleanWord = word.trim().toLowerCase();
+    
+    // Must be at least 2 characters
+    if (cleanWord.length < 2) return false;
+    
+    // Must contain only letters
+    if (!/^[a-z]+$/i.test(cleanWord)) return false;
+    
+    // Must have at least one vowel (real words have vowels)
+    if (!/[aeiou]/i.test(cleanWord)) return false;
+    
+    // Check for obvious gibberish patterns
+    // No more than 4 consecutive consonants
+    if (/[^aeiou]{5,}/i.test(cleanWord)) return false;
+    
+    // No more than 3 consecutive same letters
+    if (/(.)\1{3,}/.test(cleanWord)) return false;
+    
+    // Check for reasonable consonant-vowel distribution
+    const vowelCount = (cleanWord.match(/[aeiou]/gi) || []).length;
+    const consonantCount = (cleanWord.match(/[^aeiou]/gi) || []).length;
+    
+    // Words should have a reasonable ratio (not all consonants or all vowels)
+    if (cleanWord.length > 3) {
+        const vowelRatio = vowelCount / cleanWord.length;
+        // Most English words have 30-50% vowels
+        if (vowelRatio < 0.15 || vowelRatio > 0.85) return false;
+    }
+    
+    // Additional checks for very short words (2-3 letters)
+    // Common 2-letter words patterns
+    const valid2Letter = ['am', 'an', 'as', 'at', 'be', 'by', 'do', 'go', 'he', 'hi', 'ho', 'if', 'in', 'is', 'it', 'me', 'my', 'no', 'of', 'oh', 'on', 'or', 'so', 'to', 'up', 'us', 'we', 'ye'];
+    if (cleanWord.length === 2) {
+        // Check if it's a known valid 2-letter word or has at least one vowel
+        return valid2Letter.includes(cleanWord) || /[aeiou]/i.test(cleanWord);
+    }
+    
+    return true;
+}
 
 // Shuffle array function (keeping other challenges except memoryChallenge at position 1)
 function shuffleArray(array) {
@@ -864,19 +907,17 @@ async function startChallengePhase(roomCode) {
             }, 48000);
             
         } else if (challengeType === 'sayIt') {
-            // sayIt Challenge - type a word starting with given letter for category
+            // sayIt Challenge - type any valid word starting with given letter
             room.sayItResults = {};
             room.currentChallengeType = 'sayIt';
             
-            // Generate random letter and category
+            // Generate random letter
             const letter = SAYIT_LETTERS[Math.floor(Math.random() * SAYIT_LETTERS.length)];
-            const category = SAYIT_CATEGORIES[Math.floor(Math.random() * SAYIT_CATEGORIES.length)];
-            room.currentSayItChallenge = { letter, category };
+            room.currentSayItChallenge = { letter };
             
             io.to(roomCode).emit('sayit-challenge-start', {
                 participants: nonWinners.map(p => p.name),
                 letter: letter,
-                category: category,
                 duration: 15
             });
             
@@ -1158,22 +1199,27 @@ function evaluateSayItResults(roomCode) {
         return;
     }
     
-    const { letter, category } = room.currentSayItChallenge;
+    const { letter } = room.currentSayItChallenge;
     const results = sayItEntries.map(([playerId, answer]) => {
         const player = room.players.find(p => p.id === playerId);
         
-        // Validate answer: must start with the letter
-        const isValid = answer && 
-                       answer.word && 
-                       answer.word.trim().length > 0 && 
-                       answer.word.trim().toUpperCase().startsWith(letter);
+        // Validate answer: must start with the letter AND be a valid word
+        const startsWithLetter = answer && 
+                                answer.word && 
+                                answer.word.trim().length > 0 && 
+                                answer.word.trim().toUpperCase().startsWith(letter);
+        
+        const isRealWord = startsWithLetter && isValidWord(answer.word.trim());
         
         return {
             playerName: player ? player.name : 'Unknown',
             playerId: playerId,
             word: answer.word || '[No answer]',
             timestamp: answer.timestamp,
-            isValid: isValid,
+            isValid: isRealWord,
+            reason: !answer.word ? 'No answer' : 
+                   !startsWithLetter ? `Doesn't start with ${letter}` :
+                   !isRealWord ? 'Not a valid word' : 'Valid',
             won: false
         };
     });
@@ -1197,7 +1243,6 @@ function evaluateSayItResults(roomCode) {
     io.to(roomCode).emit('sayit-results', {
         results: results,
         letter: letter,
-        category: category,
         totalValid: results.filter(r => r.isValid).length
     });
     

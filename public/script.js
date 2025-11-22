@@ -14,7 +14,6 @@ let memoryBalloons = [];
 let sayItTimer = null;
 let sayItActive = false;
 let sayItLetter = '';
-let sayItCategory = '';
 
 // Replaced matrix rain with gentle, motion-sickness-free background animations
 
@@ -678,14 +677,12 @@ document.getElementById('memory-answer-input').addEventListener('keypress', (e) 
 });
 
 // ============ SAYIT CHALLENGE ============
-function startSayItChallenge(letter, category, duration) {
+function startSayItChallenge(letter, duration) {
     sayItActive = true;
     sayItLetter = letter;
-    sayItCategory = category;
     
     // Update UI
     document.getElementById('sayit-letter').textContent = letter;
-    document.getElementById('sayit-category').textContent = category;
     
     // Reset input
     const answerInput = document.getElementById('sayit-answer-input');
@@ -1475,7 +1472,7 @@ socket.on('sayit-challenge-start', (data) => {
             `0/${data.participants.length} players answered`;
         
         showPage('sayItChallenge');
-        startSayItChallenge(data.letter, data.category, data.duration || 15);
+        startSayItChallenge(data.letter, data.duration || 15);
     } else {
         document.getElementById('waiting-title').textContent = 'SayIt Challenge!';
         document.getElementById('waiting-message').textContent = 'Others are typing words!';
@@ -1618,14 +1615,18 @@ socket.on('sayit-answer-submitted', (data) => {
 socket.on('sayit-results', (data) => {
     document.getElementById('challenge-results-title').textContent = '💬 SAYIT RESULTS';
     document.getElementById('challenge-results-message').textContent = 
-        `Letter: ${data.letter} | Category: ${data.category} | Valid answers: ${data.totalValid}`;
+        `Letter: ${data.letter} | Valid words: ${data.totalValid}/${data.results.length}`;
     
-    const resultsHtml = data.results.map(result => `
-        <div class="tap-result-item ${result.won ? 'winner correct' : 'incorrect'}">
-            <span class="tap-result-name">${result.won ? '✅ ' : '❌ '}${result.playerName}</span>
-            <span class="tap-result-count">${result.word}</span>
-        </div>
-    `).join('');
+    const resultsHtml = data.results.map(result => {
+        const icon = result.won ? '✅' : '❌';
+        const reasonText = result.reason && result.reason !== 'Valid' ? ` (${result.reason})` : '';
+        return `
+            <div class="tap-result-item ${result.won ? 'winner correct' : 'incorrect'}">
+                <span class="tap-result-name">${icon} ${result.playerName}</span>
+                <span class="tap-result-count">${result.word}${reasonText}</span>
+            </div>
+        `;
+    }).join('');
     
     document.getElementById('challenge-results-content').innerHTML = resultsHtml;
     
