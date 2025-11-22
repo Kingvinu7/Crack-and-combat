@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Crack and Combat</title>
+    <title>Crack and Combat - Multiplayer Word & Trivia Battle Game</title>
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Face the Oracle's evolving challenges in Crack and Combat. Survive. Outsmart. Conquer. A multiplayer strategy game where you must outwit an AI Oracle through 5 challenging rounds.">
-    <meta name="keywords" content="crack and combat, multiplayer game, AI challenge, strategy game, online game, riddles, brain teasers">
+    <meta name="description" content="Crack and Combat - The ultimate multiplayer mind game! Battle the Oracle through riddles, word challenges, trivia, and reflex tests. Type fast, think faster! Features the new SayIt challenge where you race to find valid words. Play with friends in real-time!">
+    <meta name="keywords" content="crack and combat, multiplayer game, word game, sayit challenge, trivia game, riddles, brain teasers, party game, online game, fast typing, reflex test">
     <meta name="author" content="Crack and Combat">
     
     <!-- Open Graph Meta Tags for Facebook, LinkedIn, etc. -->
-    <meta property="og:title" content="Crack and Combat - Face the Oracle's Challenge">
-    <meta property="og:description" content="Face the Oracle's evolving challenges in Crack and Combat. Survive. Outsmart. Conquer. A multiplayer strategy game where you must outwit an AI Oracle through 5 challenging rounds.">
+    <meta property="og:title" content="Crack and Combat - Multiplayer Word & Trivia Battle">
+    <meta property="og:description" content="Crack and Combat - The ultimate multiplayer mind game! Battle the Oracle through riddles, word challenges, trivia, and reflex tests. Type fast, think faster! Features the new SayIt challenge where you race to find valid words. Play with friends in real-time!">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://crackandcombat.fun/">
     <meta property="og:image" content="/logo.png">
@@ -22,8 +22,8 @@
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Crack and Combat - Face the Oracle's Challenge">
-    <meta name="twitter:description" content="Face the Oracle's evolving challenges in Crack and Combat. Survive. Outsmart. Conquer. A multiplayer strategy game where you must outwit an AI Oracle.">
+    <meta name="twitter:title" content="Crack and Combat - Multiplayer Word & Trivia Battle">
+    <meta name="twitter:description" content="Crack and Combat - The ultimate multiplayer mind game! Battle the Oracle through riddles, word challenges, trivia, and reflex tests. Type fast, think faster!">
     <meta name="twitter:image" content="/logo.png">
     <meta name="twitter:image:alt" content="Crack and Combat Game Logo">
     
@@ -32,9 +32,9 @@
     <meta name="msapplication-TileColor" content="#1a1a1a">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="/logo.png">
+    <link rel="shortcut icon" type="image/png" href="/logo.png">
+    <link rel="apple-touch-icon" href="/logo.png">
     
     <link rel="stylesheet" href="style.css">
     <script src="/socket.io/socket.io.js"></script>
@@ -77,7 +77,7 @@
                         <span class="title-separator">∧</span>
                         <span class="title-combat">COMBAT</span>
                     </h1>
-                    <p class="cyber-subtitle">NEURAL COMBAT SIMULATION</p>
+                    <p class="cyber-subtitle">OUTSMART THE ORACLE • WIN THE CROWN</p>
                 </div>
 
                 <!-- Hexagonal AI Symbol -->
@@ -312,8 +312,8 @@
         </div>
     </div>
 
-    <!-- Stacking Blocks Challenge Screen -->
-    <div id="stacking-blocks-screen" class="page">
+    <!-- SayIt Challenge Screen -->
+    <div id="sayit-challenge-screen" class="page">
         <!-- Matrix Background Effect with multiple layers -->
         <div class="matrix-bg">
             <div class="matrix-layer-1"></div>
@@ -322,28 +322,39 @@
         </div>
         <div class="page-content">
             <div class="timer-section">
-                <div id="stacking-timer" class="timer">30</div>
+                <div id="sayit-timer" class="timer">15</div>
                 <p>seconds remaining</p>
             </div>
-            <div class="stacking-section">
-                <h2>🧱 STACKING BLOCKS CHALLENGE</h2>
-                <p class="challenge-description" id="stacking-instruction">Stack as many blocks as you can!</p>
-                <div class="stacking-game-area">
-                    <canvas id="stacking-canvas" width="350" height="500"></canvas>
-                    <div class="stacking-controls">
-                        <div class="stacking-stats">
-                            <div class="stat-item">
-                                <span class="stat-label">Blocks Stacked:</span>
-                                <span id="blocks-stacked" class="stat-value">0</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-label">Best Attempt:</span>
-                                <span id="best-attempt" class="stat-value">0</span>
-                            </div>
+            <div class="sayit-section">
+                <h2>💬 SAYIT CHALLENGE</h2>
+                <p class="challenge-description">Type any valid word that starts with the letter below!</p>
+                
+                <div class="sayit-prompt">
+                    <div class="prompt-box">
+                        <div class="letter-display">
+                            <span class="prompt-label">Your Letter:</span>
+                            <span id="sayit-letter" class="letter-value">B</span>
                         </div>
-                        <button id="drop-block-btn" class="btn primary stacking-btn">DROP BLOCK</button>
-                        <button id="retry-stacking-btn" class="btn secondary stacking-btn" style="display: none;">RETRY</button>
+                        <div class="hint-text">
+                            Type any real word (3+ letters) starting with this letter
+                        </div>
                     </div>
+                </div>
+                
+                <div class="sayit-input-section">
+                    <input 
+                        type="text" 
+                        id="sayit-answer-input" 
+                        class="sayit-input" 
+                        placeholder="Enter a word..."
+                        autocomplete="off"
+                        maxlength="50"
+                    />
+                    <button id="submit-sayit-btn" class="btn primary">Submit Word</button>
+                </div>
+                
+                <div class="submission-count" id="sayit-submission-count">
+                    0/0 players answered
                 </div>
             </div>
         </div>
@@ -636,46 +647,50 @@
                 <div class="game-rules">
                     <div class="rule-section">
                         <h3>🎯 GAME OVERVIEW</h3>
-                        <p>Crack and Combat is a multiplayer strategy game where you must outwit an AI Oracle through 5 challenging rounds. Only the smartest survive!</p>
+                        <p>Crack and Combat is the ultimate multiplayer mind game! Battle the Oracle and other players through riddles, word challenges, trivia, and reflex tests. Type fast, think faster, and outsmart everyone to claim victory!</p>
                     </div>
                     
                     <div class="rule-section">
                         <h3>🏆 HOW TO WIN</h3>
-                        <p>Win the most rounds to become the ultimate champion! Each round tests different skills:</p>
+                        <p>Score the most points across 5 rounds! Each challenge tests different skills:</p>
                         <ul>
-                            <li><strong>Riddles:</strong> Answer brain-teasers correctly and quickly</li>
-                            <li><strong>AI Challenges:</strong> Solve complex scenarios with strategic thinking</li>
-                            <li><strong>Fast Tapper:</strong> Test your reflexes in rapid-fire challenges</li>
+                            <li><strong>💬 SayIt:</strong> Type valid words (3+ letters) starting with a given letter</li>
+                            <li><strong>🎭 Riddles:</strong> Solve brain-teasers correctly and quickly</li>
+                            <li><strong>🧠 Trivia:</strong> Answer questions across various topics</li>
+                            <li><strong>⚡ Fast Tapper:</strong> Click/tap as fast as you can</li>
+                            <li><strong>🎯 Memory:</strong> Remember and recall patterns accurately</li>
                         </ul>
                     </div>
                     
                     <div class="rule-section">
                         <h3>⚡ ROUND STRUCTURE</h3>
-                        <p>Each round consists of:</p>
+                        <p>Each of the 5 rounds follows this pattern:</p>
                         <ul>
-                            <li><strong>Phase 1:</strong> Everyone answers a riddle (45 seconds)</li>
-                            <li><strong>Phase 2:</strong> Non-winners face AI challenges or skill tests</li>
-                            <li><strong>Scoring:</strong> Round winners get points, others get challenges</li>
+                            <li><strong>Phase 1 - Riddle:</strong> Everyone solves the Oracle's riddle (60 seconds)</li>
+                            <li><strong>Phase 2 - Challenge:</strong> Riddle losers face random challenges</li>
+                            <li><strong>Scoring:</strong> Points awarded for correct answers and winning challenges</li>
+                            <li><strong>Victory:</strong> Player with most points after 5 rounds wins!</li>
                         </ul>
                     </div>
                     
                     <div class="rule-section">
                         <h3>🧠 STRATEGY TIPS</h3>
                         <ul>
-                            <li>Think quickly but carefully - speed and accuracy both matter</li>
-                            <li>In AI challenges, provide detailed, thoughtful responses</li>
-                            <li>Watch the timer - auto-submission happens at 0 seconds</li>
-                            <li>Study other players' answers to learn their strategies</li>
+                            <li><strong>SayIt:</strong> Think of common 3+ letter words quickly (Bus, Cat, Dog)</li>
+                            <li><strong>Riddles:</strong> Read carefully - the answer is often simpler than you think</li>
+                            <li><strong>Speed:</strong> First correct answer wins riddle rounds</li>
+                            <li><strong>Timer:</strong> Answers auto-submit at 0 - type something!</li>
+                            <li><strong>Words:</strong> Only real words count - no gibberish allowed!</li>
                         </ul>
                     </div>
                     
                     <div class="rule-section">
                         <h3>🎮 CONTROLS</h3>
                         <ul>
-                            <li><strong>Enter:</strong> Submit riddle answers</li>
-                            <li><strong>Ctrl+Enter:</strong> Submit challenge responses</li>
-                            <li><strong>Click/Tap:</strong> Fast tapper challenges</li>
-                            <li><strong>Type:</strong> All text inputs support real-time entry</li>
+                            <li><strong>Enter:</strong> Submit answers quickly</li>
+                            <li><strong>Type:</strong> Enter words for SayIt challenge</li>
+                            <li><strong>Click/Tap:</strong> Select options or tap rapidly</li>
+                            <li><strong>Mobile:</strong> Fully optimized for touch screens</li>
                         </ul>
                     </div>
                 </div>

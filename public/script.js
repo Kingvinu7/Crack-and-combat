@@ -10,10 +10,10 @@ let gameEnded = false; // Track if game has ended to prevent stray overlays
 let memoryTimer = null;
 let memoryBalloons = [];
 
-// Stacking Blocks Challenge variables
-let stackingGame = null;
-let stackingTimer = null;
-let stackingActive = false;
+// SayIt Challenge variables
+let sayItTimer = null;
+let sayItActive = false;
+let sayItLetter = '';
 
 // Replaced matrix rain with gentle, motion-sickness-free background animations
 
@@ -28,7 +28,7 @@ const pages = {
     triviaChallenge: document.getElementById('trivia-challenge-screen'),
     triviaResults: document.getElementById('trivia-results-screen'),
     fastTapper: document.getElementById('fast-tapper-screen'),
-    stackingBlocks: document.getElementById('stacking-blocks-screen'),
+    sayItChallenge: document.getElementById('sayit-challenge-screen'),
     memoryChallenge: document.getElementById('memory-challenge-screen'),
     memoryResults: document.getElementById('memory-results-screen'),
     challengeResults: document.getElementById('challenge-results-screen'),
@@ -214,7 +214,7 @@ function getMusicForPage(pageName) {
         case 'textChallenge':
         case 'triviaChallenge':
         case 'fastTapper':
-        case 'stackingBlocks':
+        case 'sayItChallenge':
             return 'challenge'; // intense-focus
             
         case 'gameOver':
@@ -676,276 +676,115 @@ document.getElementById('memory-answer-input').addEventListener('keypress', (e) 
     if (e.key === 'Enter') submitMemoryAnswer();
 });
 
-// ============ STACKING BLOCKS GAME ============
-class StackingBlocksGame {
-    constructor(canvasId) {
-        this.canvas = document.getElementById(canvasId);
-        this.ctx = this.canvas.getContext('2d');
-        this.blocks = [];
-        this.currentBlock = null;
-        this.baseBlock = null;
-        this.blocksStacked = 0;
-        this.bestAttempt = 0;
-        this.gameActive = false;
-        this.blockSpeed = 2.5; // Moderate speed for mobile
-        this.direction = 1;
-        this.colors = ['#00ff41', '#ff0080', '#00d4ff', '#ffcc00', '#ff4500', '#9d00ff'];
-        
-        // Performance optimization flags
-        this.useSimplePhysics = true; // Use simplified physics for mobile
-        this.lastUpdate = Date.now();
-        this.updateInterval = 1000 / 30; // 30 FPS for battery efficiency
-    }
+// ============ SAYIT CHALLENGE ============
+function startSayItChallenge(letter, duration) {
+    sayItActive = true;
+    sayItLetter = letter;
     
-    init() {
-        // Create base block (fixed at bottom)
-        this.baseBlock = {
-            x: this.canvas.width / 2 - 40,
-            y: this.canvas.height - 30,
-            width: 80,
-            height: 20,
-            color: '#555',
-            fixed: true
-        };
-        this.blocks = [this.baseBlock];
-        this.blocksStacked = 0;
-        this.gameActive = true;
-        this.spawnNewBlock();
-        this.render();
-    }
+    // Update UI
+    document.getElementById('sayit-letter').textContent = letter;
     
-    spawnNewBlock() {
-        if (!this.gameActive) return;
-        
-        const lastBlock = this.blocks[this.blocks.length - 1];
-        const newWidth = Math.max(40, lastBlock.width - 2); // Slightly narrower each time
-        
-        this.currentBlock = {
-            x: 0,
-            y: lastBlock.y - 25,
-            width: newWidth,
-            height: 20,
-            color: this.colors[this.blocks.length % this.colors.length],
-            velocity: 0,
-            fixed: false,
-            moving: true
-        };
-        
-        this.direction = this.blocks.length % 2 === 0 ? 1 : -1;
-    }
+    // Reset input
+    const answerInput = document.getElementById('sayit-answer-input');
+    const submitBtn = document.getElementById('submit-sayit-btn');
+    answerInput.value = '';
+    answerInput.disabled = false;
+    submitBtn.disabled = false;
     
-    dropBlock() {
-        if (!this.currentBlock || !this.currentBlock.moving || !this.gameActive) return;
-        
-        this.currentBlock.moving = false;
-        const lastBlock = this.blocks[this.blocks.length - 1];
-        
-        // Check overlap with last block
-        const overlapLeft = Math.max(this.currentBlock.x, lastBlock.x);
-        const overlapRight = Math.min(
-            this.currentBlock.x + this.currentBlock.width,
-            lastBlock.x + lastBlock.width
-        );
-        const overlap = overlapRight - overlapLeft;
-        
-        // Need at least 30% overlap to stack successfully
-        const minOverlap = Math.min(this.currentBlock.width, lastBlock.width) * 0.3;
-        
-        if (overlap > minOverlap) {
-            // Success! Adjust block to overlapped area
-            this.currentBlock.x = overlapLeft;
-            this.currentBlock.width = overlap;
-            this.currentBlock.fixed = true;
-            this.blocks.push(this.currentBlock);
-            this.blocksStacked++;
-            
-            // Update UI
-            document.getElementById('blocks-stacked').textContent = this.blocksStacked;
-            if (this.blocksStacked > this.bestAttempt) {
-                this.bestAttempt = this.blocksStacked;
-                document.getElementById('best-attempt').textContent = this.bestAttempt;
-            }
-            
-            // Play success sound
-            if (window.audioManager) window.audioManager.playCorrectSound();
-            
-            // Spawn next block
-            setTimeout(() => this.spawnNewBlock(), 300);
-        } else {
-            // Failed! Blocks fall
-            this.gameActive = false;
-            this.triggerFall();
-        }
-    }
-    
-    triggerFall() {
-        // Simple fall animation
-        let fallStep = 0;
-        const fallAnimation = setInterval(() => {
-            fallStep++;
-            this.blocks.forEach((block, i) => {
-                if (i > 0) { // Don't move base block
-                    block.y += 5;
-                }
-            });
-            
-            if (fallStep > 20 || this.blocks[1]?.y > this.canvas.height) {
-                clearInterval(fallAnimation);
-                // Show retry button
-                document.getElementById('retry-stacking-btn').style.display = 'inline-block';
-                document.getElementById('drop-block-btn').disabled = true;
-                
-                // Play fail sound
-                if (window.audioManager) window.audioManager.playIncorrectSound();
-            }
-            
-            this.render();
-        }, 1000 / 30); // 30 FPS
-    }
-    
-    retry() {
-        this.blocks = [];
-        this.currentBlock = null;
-        this.blocksStacked = 0;
-        document.getElementById('blocks-stacked').textContent = '0';
-        document.getElementById('retry-stacking-btn').style.display = 'none';
-        document.getElementById('drop-block-btn').disabled = false;
-        this.init();
-    }
-    
-    update() {
-        if (!this.gameActive || !this.currentBlock?.moving) return;
-        
-        // Throttle updates for mobile performance
-        const now = Date.now();
-        if (now - this.lastUpdate < this.updateInterval) return;
-        this.lastUpdate = now;
-        
-        // Move current block horizontally
-        this.currentBlock.x += this.blockSpeed * this.direction;
-        
-        // Bounce off walls
-        if (this.currentBlock.x <= 0 || 
-            this.currentBlock.x + this.currentBlock.width >= this.canvas.width) {
-            this.direction *= -1;
-        }
-    }
-    
-    render() {
-        // Clear canvas
-        this.ctx.fillStyle = '#0a0a0a';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Draw grid for depth perception
-        this.ctx.strokeStyle = '#1a1a1a';
-        this.ctx.lineWidth = 1;
-        for (let i = 0; i < this.canvas.height; i += 25) {
-            this.ctx.beginPath();
-            this.ctx.moveTo(0, i);
-            this.ctx.lineTo(this.canvas.width, i);
-            this.ctx.stroke();
-        }
-        
-        // Draw all blocks
-        this.blocks.forEach(block => {
-            this.ctx.fillStyle = block.color;
-            this.ctx.fillRect(block.x, block.y, block.width, block.height);
-            
-            // Add highlight for 3D effect
-            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-            this.ctx.fillRect(block.x, block.y, block.width, 3);
-        });
-        
-        // Draw current block if exists
-        if (this.currentBlock && this.currentBlock.moving) {
-            this.ctx.fillStyle = this.currentBlock.color;
-            this.ctx.fillRect(
-                this.currentBlock.x,
-                this.currentBlock.y,
-                this.currentBlock.width,
-                this.currentBlock.height
-            );
-            
-            // Add highlight
-            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-            this.ctx.fillRect(this.currentBlock.x, this.currentBlock.y, this.currentBlock.width, 3);
-        }
-    }
-    
-    gameLoop() {
-        if (!this.gameActive && !this.currentBlock?.moving) return;
-        
-        this.update();
-        this.render();
-        
-        // Use requestAnimationFrame with throttling for better mobile performance
-        requestAnimationFrame(() => this.gameLoop());
-    }
-    
-    stop() {
-        this.gameActive = false;
-    }
-}
-
-function startStackingBlocksChallenge(duration) {
-    stackingActive = true;
-    
-    // Initialize game
-    stackingGame = new StackingBlocksGame('stacking-canvas');
-    stackingGame.init();
-    stackingGame.gameLoop();
-    
-    // Setup button handlers
-    const dropBtn = document.getElementById('drop-block-btn');
-    const retryBtn = document.getElementById('retry-stacking-btn');
-    
-    dropBtn.onclick = () => stackingGame.dropBlock();
-    retryBtn.onclick = () => stackingGame.retry();
-    
-    // Touch controls for mobile
-    dropBtn.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        stackingGame.dropBlock();
-    });
+    // Focus input
+    setTimeout(() => {
+        answerInput.focus();
+    }, 100);
     
     // Start timer
     let timeLeft = duration;
-    document.getElementById('stacking-timer').textContent = timeLeft;
+    document.getElementById('sayit-timer').textContent = timeLeft;
     
-    stackingTimer = setInterval(() => {
+    sayItTimer = setInterval(() => {
         timeLeft--;
-        document.getElementById('stacking-timer').textContent = timeLeft;
+        document.getElementById('sayit-timer').textContent = timeLeft;
         
-        if (timeLeft <= 10) {
-            document.getElementById('stacking-timer').classList.add('urgent');
-        } else if (timeLeft <= 20) {
-            document.getElementById('stacking-timer').classList.add('danger');
+        if (timeLeft <= 3) {
+            document.getElementById('sayit-timer').classList.add('urgent');
+            document.getElementById('sayit-timer').classList.remove('danger');
+        } else if (timeLeft <= 5) {
+            document.getElementById('sayit-timer').classList.add('danger');
+            document.getElementById('sayit-timer').classList.remove('urgent');
         }
         
         if (timeLeft <= 0) {
-            clearInterval(stackingTimer);
-            stackingActive = false;
-            if (stackingGame) {
-                stackingGame.stop();
-            }
-            
-            // Disable controls
-            dropBtn.disabled = true;
-            retryBtn.style.display = 'none';
-            
-            // Submit result
-            const finalScore = stackingGame ? stackingGame.bestAttempt : 0;
-            socket.emit('submit-stacking-result', { 
-                roomCode: currentRoom, 
-                blocksStacked: finalScore 
-            });
-            
-            setTimeout(() => {
-                showNotification(`Time's up! Best attempt: ${finalScore} blocks!`, 'success');
-            }, 500);
+            clearInterval(sayItTimer);
+            sayItActive = false;
+            submitSayItAnswer(true); // true = auto-submit
         }
     }, 1000);
 }
+
+function submitSayItAnswer(isAutoSubmit = false) {
+    const answerInput = document.getElementById('sayit-answer-input');
+    const answer = answerInput.value.trim();
+    
+    if (!currentRoom) return;
+    
+    // Only validate if it's NOT an auto-submit (manual submit by user)
+    if (!isAutoSubmit) {
+        // Check minimum length
+        if (answer && answer.length < 3) {
+            showNotification(`Your word must be at least 3 letters long!`, 'warning');
+            if (window.audioManager) window.audioManager.playIncorrectSound();
+            return;
+        }
+        
+        // Check if answer starts with the correct letter
+        if (answer && !answer.toUpperCase().startsWith(sayItLetter)) {
+            showNotification(`Your word must start with the letter ${sayItLetter}!`, 'warning');
+            if (window.audioManager) window.audioManager.playIncorrectSound();
+            return;
+        }
+    }
+    
+    // For auto-submit, add a prefix if there's an answer that doesn't meet requirements
+    let finalAnswer = answer || '[No answer]';
+    if (isAutoSubmit && answer) {
+        // If auto-submitted with content, mark it
+        finalAnswer = answer;
+    }
+    
+    socket.emit('submit-sayit-answer', {
+        roomCode: currentRoom,
+        word: finalAnswer
+    });
+    
+    // Disable input and button
+    answerInput.disabled = true;
+    document.getElementById('submit-sayit-btn').disabled = true;
+    
+    if (window.audioManager) window.audioManager.playSubmitSound();
+    
+    if (isAutoSubmit) {
+        showNotification('Time expired! Answer auto-submitted.', 'info');
+    } else {
+        showNotification('Answer submitted!', 'success');
+    }
+}
+
+// Add event listeners for submit button and enter key
+document.addEventListener('DOMContentLoaded', () => {
+    const submitBtn = document.getElementById('submit-sayit-btn');
+    const answerInput = document.getElementById('sayit-answer-input');
+    
+    if (submitBtn) {
+        submitBtn.addEventListener('click', submitSayItAnswer);
+    }
+    
+    if (answerInput) {
+        answerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                submitSayItAnswer();
+            }
+        });
+    }
+});
 
 function updateLobbyOwnerDisplay() {
     const lobbyHeader = document.querySelector('.lobby-header');
@@ -1323,6 +1162,7 @@ function showHowToPlay() {
         howToPlayModal.classList.add('show');
         document.body.style.overflow = 'hidden'; // Prevent background scrolling
         console.log('Modal should now be visible');
+        if (window.audioManager) window.audioManager.playClickSound();
     } else {
         console.error('howToPlayModal element not found!');
     }
@@ -1330,8 +1170,10 @@ function showHowToPlay() {
 
 function hideHowToPlay() {
     console.log('hideHowToPlay called');
-    howToPlayModal.classList.remove('show');
-    document.body.style.overflow = 'auto'; // Restore scrolling
+    if (howToPlayModal) {
+        howToPlayModal.classList.remove('show');
+        document.body.style.overflow = 'auto'; // Restore scrolling
+    }
 }
 
 // Audio control functions
@@ -1647,20 +1489,18 @@ socket.on('fast-tapper-start', (data) => {
     }
 });
 
-socket.on('stacking-blocks-start', (data) => {
+socket.on('sayit-challenge-start', (data) => {
     const isParticipant = data.participants.includes(playerName);
     
     if (isParticipant) {
-        // Reset UI
-        document.getElementById('blocks-stacked').textContent = '0';
-        document.getElementById('drop-block-btn').disabled = false;
-        document.getElementById('retry-stacking-btn').style.display = 'none';
+        document.getElementById('sayit-submission-count').textContent = 
+            `0/${data.participants.length} players answered`;
         
-        showPage('stackingBlocks');
-        startStackingBlocksChallenge(data.duration || 30);
+        showPage('sayItChallenge');
+        startSayItChallenge(data.letter, data.duration || 15);
     } else {
-        document.getElementById('waiting-title').textContent = 'Stacking Blocks Challenge!';
-        document.getElementById('waiting-message').textContent = 'Others are stacking blocks!';
+        document.getElementById('waiting-title').textContent = 'SayIt Challenge!';
+        document.getElementById('waiting-message').textContent = 'Others are typing words!';
         showPage('waiting');
     }
 });
@@ -1771,23 +1611,53 @@ socket.on('fast-tapper-results', (data) => {
     showPage('challengeResults');
 });
 
-socket.on('stacking-blocks-results', (data) => {
-    document.getElementById('challenge-results-title').textContent = '🧱 STACKING BLOCKS RESULTS';
-    document.getElementById('challenge-results-message').textContent = 
-        `Highest tower: ${data.maxBlocks} blocks!`;
+socket.on('sayit-answer-submitted', (data) => {
+    const submissionCount = document.getElementById('sayit-submission-count');
+    submissionCount.textContent = `${data.totalSubmissions}/${data.expectedSubmissions} players answered`;
     
-    const resultsHtml = data.results.map(result => `
-        <div class="tap-result-item ${result.won ? 'winner correct' : 'incorrect'}">
-            <span class="tap-result-name">${result.won ? '🏆 ' : ''}${result.playerName}</span>
-            <span class="tap-result-count">${result.blocksStacked} blocks</span>
-        </div>
-    `).join('');
+    // Show auto-advance indicator when all players have answered
+    if (data.totalSubmissions === data.expectedSubmissions) {
+        submissionCount.innerHTML = `
+            <span style="color: var(--accent-green); font-weight: bold;">
+                ✓ All players answered! Auto-advancing...
+            </span>
+        `;
+        
+        // Clear timer
+        if (sayItTimer) {
+            clearInterval(sayItTimer);
+            sayItTimer = null;
+        }
+        
+        const timer = document.getElementById('sayit-timer');
+        if (timer) {
+            timer.textContent = 'ADVANCING...';
+            timer.classList.add('auto-submit');
+        }
+    }
+});
+
+socket.on('sayit-results', (data) => {
+    document.getElementById('challenge-results-title').textContent = '💬 SAYIT RESULTS';
+    document.getElementById('challenge-results-message').textContent = 
+        `Letter: ${data.letter} | Valid words: ${data.totalValid}/${data.results.length}`;
+    
+    const resultsHtml = data.results.map(result => {
+        const icon = result.won ? '✅' : '❌';
+        const reasonText = result.reason && result.reason !== 'Valid' ? ` (${result.reason})` : '';
+        return `
+            <div class="tap-result-item ${result.won ? 'winner correct' : 'incorrect'}">
+                <span class="tap-result-name">${icon} ${result.playerName}</span>
+                <span class="tap-result-count">${result.word}${reasonText}</span>
+            </div>
+        `;
+    }).join('');
     
     document.getElementById('challenge-results-content').innerHTML = resultsHtml;
     
-    // Stacking blocks completed - go back to cyber-ambient
+    // SayIt completed - go back to cyber-ambient
     if (window.audioManager) {
-        console.log('Stacking blocks completed - returning to cyber ambient');
+        console.log('SayIt completed - returning to cyber ambient');
         window.audioManager.playMusic('home'); // cyber-ambient
     }
     
